@@ -1,0 +1,17 @@
+[tool.poetry]
+name = "avocado-allegory"
+version = "0.1.0"
+description = ""
+authors = ["Joe Gambino <joe@gam.bingo>"]
+
+[tool.poetry.dependencies]
+python = ">=3.7.1,<4.0"
+pandas = "1.2.5"
+streamlit = "^1.6.0"
+
+[tool.poetry.dev-dependencies]
+watchdog = "^2.1.6"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
