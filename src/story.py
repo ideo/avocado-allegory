@@ -6,7 +6,7 @@ STORY = {
     ],
 
     "Guac God": [
-        "Looking down from Horchata Heaven, you are the Guacamole God. You are so pleased that the beings of your creation have fallen for your favorite dip and also proud of their embrace of democratic values. And while you admire everyone’s hard work, since you are hors d'oeuvre omniscient, you can already clearly spot the winners.",
+        "Looking down from Horchata Heaven, you are the Guacamole God. You are so pleased that the beings of your creation have fallen for your favorite dip and also proud of their embrace of democratic values. And while you admire everyone’s hard work, since you are hors d'oeuvre omniscient, you can already clearly spot the winner.",
     ],
 
     "Voting":   [

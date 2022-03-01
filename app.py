@@ -14,7 +14,11 @@ st.set_page_config(
 
 
 # MAIN PAGE
-st.title("Working Title")
+st.title("The Allegory of the Avocados (Working Title)")
+st.write("""
+Here is the link to our 
+[Google Doc](https://docs.google.com/document/d/1CA9NXp8I9b6ds16khcJLrY1ZL7ZBABK6KRu9SvBL5JI/edit?usp=sharing) 
+where we're developing and commenting on the story.""")
 
 st.subheader("Welcome to [Town Name]")
 for paragraph in STORY["introduction"]:
@@ -24,7 +28,7 @@ st.subheader("Let’s Play Guac God")
 for paragraph in STORY["Guac God"]:
     st.write(paragraph)
 
-st.text("Objectively, how do the guacs measure up?")
+st.text("Objectively, how do the guacs measure up relative to each other?")
 lg.objective_ratings()
 
 st.subheader("A Fair Voting Process")
