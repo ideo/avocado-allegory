@@ -24,7 +24,15 @@ st.subheader("Let’s Play Guac God")
 for paragraph in STORY["Guac God"]:
     st.write(paragraph)
 
-
 st.text("Objectively, how do the guacs measure up?")
 lg.objective_ratings()
 
+st.subheader("A Fair Voting Process")
+for paragraph in STORY["Voting"]:
+    st.write(paragraph)
+
+st.subheader("Different Types of Voters")
+for paragraph in STORY["Voter Types"]:
+    st.write(paragraph)
+
+lg.types_of_voters()

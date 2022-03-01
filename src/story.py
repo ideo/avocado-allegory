@@ -7,5 +7,13 @@ STORY = {
 
     "Guac God": [
         "Looking down from Horchata Heaven, you are the Guacamole God. You are so pleased that the beings of your creation have fallen for your favorite dip and also proud of their embrace of democratic values. And while you admire everyone’s hard work, since you are hors d'oeuvre omniscient, you can already clearly spot the winners.",
-    ]
+    ],
+
+    "Voting":   [
+        "Mayor Michelada is busy handing out bowls of tortilla chips. Obviously, if this is going to be a fair competition, everyone is going to need to use the same kind of chip. He also begins handing out the score cards so people can score each guac on a scale from 1 to 10. He thought about having everyone try each guac and then picking a favorite, but they are just too many guacs! No one has that much room in their stomach! Once someone tries the last one, how are they going to remember what the first few tasted like? So people can score each guac independently, and at the end they’ll simply add up all the scores. Highest number wins!",
+    ],
+
+    "Voter Types":  [
+        "You think for a minute on whether the townspeople would agree of your assessment of which is best? You know some people, like Precocious Pepe, like guac so much that they’ll probably score every entrant generously. Others, like Finicky Francisca, are quite critical and will have no problem picking out flaws. They’ll probably score things quite harshly. But as you watch everyone set up, you’re pretty confident that most people will assess the submissions fairly, give or take a few points. The only person you’re really worried about is Cliquey Carlos. He’s the ring leader of a pretty loyal group of farmers. Plus, he always throws the best parties! It’s pretty clear anyone who wants to stay on his good side is going to be voting for him.",
+    ],
 }

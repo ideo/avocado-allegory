@@ -21,3 +21,29 @@ def objective_ratings():
     }
 
     col2.vega_lite_chart(data, spec)
+
+
+def types_of_voters():
+    col1, col2, col3 = st.columns(3)
+    pepe = col1.slider(
+        "What percentage of people in town are like Precocious Pepe?",
+        value=10,
+        min_value=0,
+        max_value=30,
+        format="%g%%")
+
+    fra = col2.slider(
+        "What percentage of people in town are like Finicky Francisca?",
+        value=8,
+        min_value=0,
+        max_value=30,
+        format="%g%%")
+
+    carlos = col3.slider(
+        "What percentage of people in town are friends with Cliquey Carlos?",
+        value=12,
+        min_value=0,
+        max_value=30,
+        format="%g%%")
+
+    return pepe, fra, carlos

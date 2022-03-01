@@ -1,1 +1,1 @@
-# avovado-allegory
+# avocado-allegory
