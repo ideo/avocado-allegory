@@ -37,16 +37,27 @@ guac_df = lg.objective_ratings()
 
 st.subheader("1. Everybody Tries all the Guacs")
 num_townspeople, st_dev = lg.simulation_parameters()
-sim = Simulation(guac_df, num_townspeople, st_dev)
+sim1 = Simulation(guac_df, num_townspeople, st_dev)
 # start = st.button("Simulate")
 # if start:
-sim.simulate()
+sim1.simulate()
 
 # if sim.results_df is not None:
 st.text("Let's see what the townspeople thought!")
-chosen_method = lg.tally_votes(sim)
-lg.declare_a_winner(sim, chosen_method)
+chosen_method = lg.tally_votes(sim1, key="sim1")
+lg.declare_a_winner(sim1, chosen_method)
 
+
+st.markdown("---")
+st.subheader("2. Not enough guac to go around")
+# num_townspeople, st_dev = lg.simulation_parameters()
+guac_limit = st.slider("How many guacs do we limit people to?",
+    value=19, min_value=1, max_value=20)
+sim2 = Simulation(guac_df, num_townspeople, st_dev, limit=guac_limit)
+sim2.simulate()
+st.text("Let's see what the townspeople thought!")
+chosen_method = lg.tally_votes(sim2, key="sim2")
+lg.declare_a_winner(sim2, chosen_method)
 
 
 

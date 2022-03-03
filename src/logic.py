@@ -43,10 +43,11 @@ def simulation_parameters():
     return num_townspeople, st_dev
     
 
-def tally_votes(sim):
+def tally_votes(sim, key):
     col1, col2 = st.columns([2,5])
     method = col1.radio(
         "How would you like to tally the votes?",
+        key=key,
         options=[
             "Sum up all the scores", 
             "Compute the average",
