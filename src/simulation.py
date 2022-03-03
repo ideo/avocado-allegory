@@ -26,17 +26,19 @@ class Townsperson:
 
 
 class Simulation:
-    def __init__(self, guac_df, num_townspeople):
+    def __init__(self, guac_df, num_townspeople, st_dev):
         self.guac_df = guac_df
         self.num_townspeople = num_townspeople
+        self.st_dev = st_dev
         self.results_df = None
         self.objective_winner = guac_df[["Objective Ratings"]].idxmax()[0]
+
 
     def simulate(self):
         # self.results_df = copy(self.guac_df)
         self.results_df = pd.DataFrame(index=self.guac_df.index)
         for ii in range(self.num_townspeople):
-            person = Townsperson(name=ii)
+            person = Townsperson(name=ii, st_dev=self.st_dev)
             self.results_df[person.name] = person.taste(self.guac_df)
 
         sum_of_votes = self.results_df.sum(axis=1)

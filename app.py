@@ -36,7 +36,8 @@ guac_df = lg.objective_ratings()
 
 
 st.subheader("1. Everybody Tries all the Guacs")
-sim = Simulation(guac_df, 250)
+num_townspeople, st_dev = lg.simulation_parameters()
+sim = Simulation(guac_df, num_townspeople, st_dev)
 # start = st.button("Simulate")
 # if start:
 sim.simulate()

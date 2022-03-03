@@ -28,6 +28,21 @@ def objective_ratings():
     return df
 
 
+def simulation_parameters():
+    col1, _, col2 = st.columns([4, 1, 4])
+    num_townspeople = col1.slider("How many townspeople are there?", 
+        value=250, 
+        min_value=10, 
+        max_value=500)
+    st_dev = col2.number_input("What is the st. dev. of their randomly generated scores?",
+        value=1.0,
+        min_value=0.1,
+        max_value=5.0,
+        step=0.1
+        )
+    return num_townspeople, st_dev
+    
+
 def tally_votes(sim):
     col1, col2 = st.columns([2,5])
     method = col1.radio(
@@ -74,6 +89,8 @@ def declare_a_winner(sim, y_field):
         st.text("Oh no! We done fucked up!")
 
 
+
+# Not getting here yet
 def types_of_voters():
     col1, col2, col3 = st.columns(3)
     pepe = col1.slider(
