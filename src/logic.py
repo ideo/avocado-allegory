@@ -1,26 +1,77 @@
 import streamlit as st
 import pandas as pd
 
-from .config import OBJECTIVE_RANKINGS
+from .config import OBJECTIVE_RATINGS
 
 
 def objective_ratings():
     col1, col2 = st.columns([2,5])
-    scenario = col1.radio("Choose a scenario", options=OBJECTIVE_RANKINGS.keys())
+    scenario = col1.radio(
+        "Choose a scenario", 
+        options=OBJECTIVE_RATINGS.keys())
 
-    data = pd.DataFrame(columns=["Rankings"], data=OBJECTIVE_RANKINGS[scenario])
-    data["Entrant"] = data.index
+    df = pd.DataFrame(
+        columns=["Objective Ratings"], 
+        data=OBJECTIVE_RATINGS[scenario])
+    df["Entrant"] = df.index
 
     spec = {
         "mark": {"type": "bar"},
         "encoding": {
             "x":    {"field": "Entrant", "tupe": "nominal"},
-            "y":    {"field": "Rankings", "type": "quantitative"},
+            "y":    {"field": "Objective Ratings", "type": "quantitative"},
         },
         "title":    scenario,   
     }
 
-    col2.vega_lite_chart(data, spec)
+    col2.vega_lite_chart(df, spec)
+    return df
+
+
+def tally_votes(sim):
+    col1, col2 = st.columns([2,5])
+    method = col1.radio(
+        "How would you like to tally the votes?",
+        options=[
+            "Sum up all the scores", 
+            "Compute the average",
+            "Compute the median"]
+    )
+    if method == "Sum up all the scores":
+        y_field = "Sum"
+    elif method == "Compute the average":
+        y_field = "Avg"
+    else:
+        y_field = "Med"
+
+    # y_field = "Sum" if method == "Sum up all the scores" else "Avg"
+    chart_df = sim.results_df[[y_field]]
+    winning_guac = chart_df.idxmax()[0]
+    chart_df["Entrant"] = sim.guac_df["Entrant"]
+
+    spec = {
+        "mark": {"type": "bar"},
+        "encoding": {
+            "x":    {"field": "Entrant", "tupe": "nominal"},
+            "y":    {"field": y_field, "type": "quantitative"},
+        },
+        "title":    f"Our Winner is Guacamole No. {winning_guac}!",   
+    }
+    col2.vega_lite_chart(chart_df, spec)
+    return y_field
+
+
+def declare_a_winner(sim, y_field):
+    winning_guac = sim.results_df[[y_field]].idxmax()[0]
+    top_score = sim.results_df[[y_field]].max()
+
+    # Make sure only one guac got the top score
+    if (sim.results_df[[y_field]] == top_score).astype(int).sum(axis=0)[0] > 1:
+        st.text("Oh no! We have a tie!")
+    elif winning_guac == sim.objective_winner:
+        st.text("Hooray! Democracy Prevails!")
+    else:
+        st.text("Oh no! We done fucked up!")
 
 
 def types_of_voters():

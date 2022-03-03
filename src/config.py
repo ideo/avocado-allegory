@@ -1,4 +1,4 @@
-OBJECTIVE_RANKINGS = {
+OBJECTIVE_RATINGS = {
     "One Clear Winner": [
         4,
         5,
