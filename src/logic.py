@@ -90,8 +90,6 @@ def declare_a_winner(sim, y_field):
         st.text("Oh no! We done fucked up!")
 
 
-
-# Not getting here yet
 def types_of_voters():
     col1, col2, col3 = st.columns(3)
     pepe = col1.slider(
@@ -108,11 +106,15 @@ def types_of_voters():
         max_value=30,
         format="%g%%")
 
-    carlos = col3.slider(
-        "What percentage of people in town are friends with Cliquey Carlos?",
-        value=12,
-        min_value=0,
-        max_value=30,
-        format="%g%%")
+    carlos=None
+    # carlos = col3.slider(
+    #     "What percentage of people in town are friends with Cliquey Carlos?",
+    #     value=12,
+    #     min_value=0,
+    #     max_value=30,
+    #     format="%g%%")
 
+    pepe /= 100
+    fra /= 100
+    # carlos /= 100
     return pepe, fra, carlos

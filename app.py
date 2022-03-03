@@ -52,7 +52,7 @@ st.markdown("---")
 st.subheader("2. Not enough guac to go around")
 # num_townspeople, st_dev = lg.simulation_parameters()
 guac_limit = st.slider("How many guacs do we limit people to?",
-    value=19, min_value=1, max_value=20)
+    value=3, min_value=1, max_value=20)
 sim2 = Simulation(guac_df, num_townspeople, st_dev, limit=guac_limit)
 sim2.simulate()
 st.text("Let's see what the townspeople thought!")
@@ -66,8 +66,14 @@ lg.declare_a_winner(sim2, chosen_method)
 #     st.write(paragraph)
 
 
-# st.subheader("Different Types of Voters")
+st.markdown("---")
+st.subheader("3. Different Types of Voters")
 # for paragraph in STORY["Voter Types"]:
 #     st.write(paragraph)
 
-# lg.types_of_voters()
+perc_pepe, perc_fra, _ = lg.types_of_voters()
+print(perc_pepe, perc_fra)
+sim3 = Simulation(guac_df, num_townspeople, st_dev, limit=guac_limit, perc_pepe=perc_pepe, perc_fra=perc_fra)
+sim3.simulate()
+chosen_method = lg.tally_votes(sim3, key="sim3")
+lg.declare_a_winner(sim3, chosen_method)
