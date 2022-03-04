@@ -98,9 +98,17 @@ chosen_method = lg.tally_votes(sim_fra1, key="sim_fra1")
 #the winner computed with the condocert method is the same as the avocado getting the most votes
 
 
-
 st.subheader("2. Everyone Tries Only Some Guacs, Everyone is Fair, All Guacs are Relatively Good")
+st.text("How much can we fraction guacs before we loose the winner?")
 num_guac_per_person = lg.num_guac_per_person_slider()
 sim_fra2 = Simulation_unknown_best(num_townspeople, num_guacs, num_guac_per_person)
 sim_fra2.simulate(sim_fra1.results_df)
 chosen_method = lg.tally_votes(sim_fra2, key="sim_fra2")
+
+
+st.subheader("3. Everyone Tries Only Some Guacs, Everyone is Fair, Some Guacs have Better Ingredients than Others")
+st.text("How much can we fraction guacs before we loose the winner?")
+sensitive_tastebuds = True
+sim_fra3 = Simulation_unknown_best(num_townspeople, num_guacs, num_guac_per_person, sensitive_tastebuds)
+sim_fra3.simulate(sim_fra1.results_df)
+chosen_method = lg.tally_votes(sim_fra3, key="sim_fra3")

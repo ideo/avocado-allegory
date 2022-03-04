@@ -136,7 +136,7 @@ def types_of_voters():
 
 def num_people_slider():
     num_townspeople = st.slider("How many townspeople showed up?", 
-        value=5, 
+        value=20, 
         min_value=10, 
         max_value=500)
     return num_townspeople

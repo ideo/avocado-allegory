@@ -5,7 +5,7 @@ import random
 
 # Base Class
 class Townsperson:
-    def __init__(self, name, st_dev=1, limit=20, mean_offset=0, 
+    def __init__(self, name, sensitive_tastebuds = False, st_dev=1, limit=20, mean_offset=0, 
                 min_allowed_vote = 1, max_allowed_vote = 10):
         self.name = name
         self.person_number = name
@@ -15,6 +15,7 @@ class Townsperson:
         self.min_allowed_vote = min_allowed_vote
         self.max_allowed_vote = max_allowed_vote
         self.cazzo = False
+        self.sensitive_tastebuds = sensitive_tastebuds
 
     def taste_and_vote(self, guac_df):
         """
@@ -47,9 +48,23 @@ class Townsperson:
         subj = 0 if subj < 0 else subj
         return subj
 
-    def fill_in_ballot(self, num_guacs_per_person, guac_names, seed, votes_from_testing_all = pd.DataFrame()):
-        """FIXME TO ADD DOCSTRING"""
+    def fill_in_ballot(self, 
+                        num_guacs_per_person, 
+                        guac_names, 
+                        seed,
+                        votes_from_testing_all = pd.DataFrame()):
+        """This function compute the ballot and ballot matrix or each voter.
+        The ballot matrix is used to compute the winner
 
+        Args:
+            num_guacs_per_person (int): number of guacs each person can taste
+            guac_names (str): name of the guac
+            seed (int): random seed currently assigned to the person ID
+            votes_from_testing_all (dataframe, optional): when computing results feeding only some guacs to people, we sample from the results calculated when everyone tried all the guacs. Defaults to pd.DataFrame().
+
+        Returns:
+            ballot matrix and ballot dictionary containins the mapping guac - score
+        """
         #If each person is given a fixed number of guacs, 
         #we sample from the scores previously calculated
         if len(votes_from_testing_all) > 0:
@@ -66,10 +81,15 @@ class Townsperson:
             #all guacs are similar, everyone is fair
             possible_votes = np.linspace(self.min_allowed_vote,self.max_allowed_vote,num_guacs_per_person).tolist()
             ballot  = random.sample(possible_votes, num_guacs_per_person)            
-            ballot_dict = dict(zip(guac_names, ballot))            
+            ballot_dict = dict(zip(guac_names, ballot)) 
+            
+            if self.sensitive_tastebuds:        
+                ballot_dict = self.adjust_for_sensitive_tastebuds(ballot_dict)
+
             this_ballot_matrix = self.create_ballot_matrix(ballot_dict, guac_names)
             
         return this_ballot_matrix, ballot_dict
+
 
     def create_ballot_matrix(self, ballot_dict, guac_names):
         """This function converts a ballot containing a score for each guac into
@@ -123,6 +143,35 @@ class Townsperson:
         #if runner loses assign -1
         else: return -1
 
+    #TODO: DO WE NEED A GUAC OBJECT?
+    def adjust_for_sensitive_tastebuds(self, ballot_dict):
+        """This function tries to account for some guacs being better than others in terms of
+        ingredients
+
+        Args:
+            ballot_dict (dictionary): guac ID - score mapping
+
+        Returns:
+            ballot_dict (dictionary): aupdated guac ID - score mapping accounting for taste
+        """
+        #Some guacs (9 and 13) are made ONLY with organic ingredients, 
+        #mashed by hand every single day and they are legittimately better
+        #we create a skewed list of numbers to sample from
+        possible_votes = np.linspace(6,self.max_allowed_vote,self.num_guacs_per_person).tolist()
+        
+        for i in ['9', '13']:
+            ballot_dict[i] = random.sample(possible_votes, 1)
+            ballot_dict[i] = ballot_dict[i][0]
+        
+        #Some other guacs (2, 7, 5) are cheap and contain a bunch
+        #of chemicals, rather than organic ingredients
+        #we create a skewed list of numbers to sample from
+        possible_votes = np.linspace(self.min_allowed_vote,4,self.num_guacs_per_person).tolist()
+        for i in ['2', '7', '5']:
+            ballot_dict[i] = random.sample(possible_votes, 1)
+            ballot_dict[i] = ballot_dict[i][0]
+        
+        return ballot_dict
 
 # # Inherited Classes
 # class UnreasonableTownsperson(Townsperson):

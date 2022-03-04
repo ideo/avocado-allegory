@@ -8,13 +8,16 @@ class Simulation_unknown_best:
             self, num_townspeople, 
             num_guacs_total, 
             num_guacs_per_person, 
+            sensitive_tastebuds = False
             ):
         self.num_townspeople = num_townspeople
         self.num_guacs_per_person = num_guacs_per_person
         self.guac_names = [str(i) for i in range(num_guacs_total)]
         self.results_df = pd.DataFrame(self.guac_names, columns = ['guac'])
         self.winner = None
+        self.scores_cols = []
         self.fra_joe = 'fra'
+        self.sensitive_tastebuds = sensitive_tastebuds
 
     def simulate(self, votes_from_testing_all = pd.DataFrame()):
         """This function simulate scores.
@@ -24,12 +27,14 @@ class Simulation_unknown_best:
         all_ballots_matrix = []
         person_number = 0
         
-
         for _ in range(self.num_townspeople):            
-            person = Townsperson(name=person_number)
+            person = Townsperson(person_number, self.sensitive_tastebuds)
             
             #simulate score for each guac and determine ballot matrix
-            ballot_matrix, ballot_dict = person.fill_in_ballot(self.num_guacs_per_person, self.guac_names, person_number, votes_from_testing_all)
+            ballot_matrix, ballot_dict = person.fill_in_ballot(self.num_guacs_per_person, 
+                                                                self.guac_names, 
+                                                                person_number, 
+                                                                votes_from_testing_all)
 
             #collect all ballots matrices to then sum them to find the winner
             all_ballots_matrix.append(ballot_matrix)
@@ -48,13 +53,14 @@ class Simulation_unknown_best:
 
         #compute score for each guac
         self.results_df.set_index('guac', inplace = True)
+        self.scores_cols = self.results_df.columns        
         self.compute_scores()
         self.results_df['guac'] = self.results_df.index
         
     def compute_scores(self):
-        self.results_df['Sum'] = self.results_df.sum(axis=1)
-        self.results_df['Avg'] = self.results_df.mean(axis=1)
-        self.results_df['Med'] = self.results_df.median(axis=1)
+        self.results_df['Sum'] = self.results_df[self.scores_cols].sum(axis=1)
+        self.results_df['Avg'] = self.results_df[self.scores_cols].mean(axis=1)
+        self.results_df['Med'] = self.results_df[self.scores_cols].median(axis=1)
 
 
     def find_winner(self, ballots_matrix_sum):
@@ -64,5 +70,5 @@ class Simulation_unknown_best:
         df.sort_values(['sum'], ascending=False, inplace = True)
         
         return df.iloc[0]['runner']        
-        
+
 
