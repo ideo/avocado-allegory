@@ -5,20 +5,27 @@ from .config import OBJECTIVE_RATINGS
 
 
 def objective_ratings():
+
+    #define the structure of the entry as
+    #2 columns
     col1, col2 = st.columns([2,5])
+
+    #one column has a widget with 2 options
     scenario = col1.radio(
         "Choose a scenario", 
         options=OBJECTIVE_RATINGS.keys())
 
+    #pull data based on corresponding scenario
     df = pd.DataFrame(
         columns=["Objective Ratings"], 
         data=OBJECTIVE_RATINGS[scenario])
     df["Entrant"] = df.index
 
+    #draw the chart
     spec = {
         "mark": {"type": "bar"},
         "encoding": {
-            "x":    {"field": "Entrant", "tupe": "nominal"},
+            "x":    {"field": "Entrant", "type": "nominal"},
             "y":    {"field": "Objective Ratings", "type": "quantitative"},
         },
         "title":    scenario,   
@@ -61,9 +68,16 @@ def tally_votes(sim, key):
         y_field = "Med"
 
     # y_field = "Sum" if method == "Sum up all the scores" else "Avg"
-    chart_df = sim.results_df[[y_field]]
-    winning_guac = chart_df.idxmax()[0]
-    chart_df["Entrant"] = sim.guac_df["Entrant"]
+    chart_df = sim.results_df[[y_field]].copy()
+
+    #this is to accomodate mine and joe's simulations
+    if sim.fra_joe == 'fra':
+        winning_guac = sim.winner
+        chart_df["Entrant"] = chart_df.index
+        
+    else:   
+        winning_guac = chart_df.idxmax()[0]
+        chart_df["Entrant"] = sim.guac_df["Entrant"]
 
     spec = {
         "mark": {"type": "bar"},
@@ -118,3 +132,18 @@ def types_of_voters():
     fra /= 100
     # carlos /= 100
     return pepe, fra, carlos
+
+
+def num_people_slider():
+    num_townspeople = st.slider("How many townspeople showed up?", 
+        value=5, 
+        min_value=10, 
+        max_value=500)
+    return num_townspeople
+
+def num_guac_per_person_slider():
+    num_guac_per_person = st.slider("How many guacs can everyone try?", 
+        value=10, 
+        min_value=1, 
+        max_value=20)
+    return num_guac_per_person

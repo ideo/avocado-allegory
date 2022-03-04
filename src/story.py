@@ -16,4 +16,9 @@ STORY = {
     "Voter Types":  [
         "You think for a minute on whether the townspeople would agree of your assessment of which is best? You know some people, like Precocious Pepe, like guac so much that they’ll probably score every entrant generously. Others, like Finicky Francisca, are quite critical and will have no problem picking out flaws. They’ll probably score things quite harshly. But as you watch everyone set up, you’re pretty confident that most people will assess the submissions fairly, give or take a few points. The only person you’re really worried about is Cliquey Carlos. He’s the ring leader of a pretty loyal group of farmers. Plus, he always throws the best parties! It’s pretty clear anyone who wants to stay on his good side is going to be voting for him.",
     ],
+
+    "Unknown Best":  [
+        "What if we don't know who's best and just decide to go with people's guts? Here we ask participants to rank ALL the guacs.",
+    ],
+
 }

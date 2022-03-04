@@ -3,7 +3,8 @@ import streamlit as st
 from src.story import STORY
 import src.logic as lg
 from src.simulation import Simulation
-
+from src.simulation_unknown_best import Simulation_unknown_best
+import pandas as pd
 
 st.set_page_config(
     page_title="Guacamole Contest",
@@ -77,3 +78,29 @@ sim3 = Simulation(guac_df, num_townspeople, st_dev, limit=guac_limit, perc_pepe=
 sim3.simulate()
 chosen_method = lg.tally_votes(sim3, key="sim3")
 lg.declare_a_winner(sim3, chosen_method)
+
+
+
+## FRA WIP BELOW
+num_guacs = 20
+# Allow abstinence?
+st.subheader("What if We Don't Know Whose Guac is Best?")
+for paragraph in STORY["Unknown Best"]:
+    st.write(paragraph)
+
+
+
+st.subheader("1. Everybody Tries all the Guacs, Everyone is Fair, All Guacs are Relatively Good")
+num_townspeople = lg.num_people_slider()
+sim_fra1 = Simulation_unknown_best(num_townspeople, num_guacs, num_guacs)
+sim_fra1.simulate()
+chosen_method = lg.tally_votes(sim_fra1, key="sim_fra1")
+#the winner computed with the condocert method is the same as the avocado getting the most votes
+
+
+
+st.subheader("2. Everyone Tries Only Some Guacs, Everyone is Fair, All Guacs are Relatively Good")
+num_guac_per_person = lg.num_guac_per_person_slider()
+sim_fra2 = Simulation_unknown_best(num_townspeople, num_guacs, num_guac_per_person)
+sim_fra2.simulate(sim_fra1.results_df)
+chosen_method = lg.tally_votes(sim_fra2, key="sim_fra2")

@@ -17,6 +17,7 @@ class Simulation:
         self.perc_pepe = perc_pepe
         self.results_df = None
         self.objective_winner = guac_df[["Objective Ratings"]].idxmax()[0]
+        self.fra_joe = 'joe'
 
 
     def simulate(self):
