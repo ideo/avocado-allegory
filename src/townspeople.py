@@ -84,7 +84,7 @@ class Townsperson:
             ballot_dict = dict(zip(guac_names, ballot)) 
             
             if self.sensitive_tastebuds:        
-                ballot_dict = self.adjust_for_sensitive_tastebuds(ballot_dict)
+                ballot_dict = self.adjust_for_sensitive_tastebuds(ballot_dict, num_guacs_per_person)
 
             this_ballot_matrix = self.create_ballot_matrix(ballot_dict, guac_names)
             
@@ -144,7 +144,7 @@ class Townsperson:
         else: return -1
 
     #TODO: DO WE NEED A GUAC OBJECT?
-    def adjust_for_sensitive_tastebuds(self, ballot_dict):
+    def adjust_for_sensitive_tastebuds(self, ballot_dict, num_guacs_per_person):
         """This function tries to account for some guacs being better than others in terms of
         ingredients
 
@@ -157,7 +157,7 @@ class Townsperson:
         #Some guacs (9 and 13) are made ONLY with organic ingredients, 
         #mashed by hand every single day and they are legittimately better
         #we create a skewed list of numbers to sample from
-        possible_votes = np.linspace(6,self.max_allowed_vote,self.num_guacs_per_person).tolist()
+        possible_votes = np.linspace(6,self.max_allowed_vote,num_guacs_per_person).tolist()
         
         for i in ['9', '13']:
             ballot_dict[i] = random.sample(possible_votes, 1)
@@ -166,7 +166,7 @@ class Townsperson:
         #Some other guacs (2, 7, 5) are cheap and contain a bunch
         #of chemicals, rather than organic ingredients
         #we create a skewed list of numbers to sample from
-        possible_votes = np.linspace(self.min_allowed_vote,4,self.num_guacs_per_person).tolist()
+        possible_votes = np.linspace(self.min_allowed_vote,4,num_guacs_per_person).tolist()
         for i in ['2', '7', '5']:
             ballot_dict[i] = random.sample(possible_votes, 1)
             ballot_dict[i] = ballot_dict[i][0]

@@ -92,8 +92,10 @@ for paragraph in STORY["Unknown Best"]:
 
 st.subheader("1. Everybody Tries all the Guacs, Everyone is Fair, All Guacs are Relatively Good")
 num_townspeople = lg.num_people_slider()
-sim_fra1 = Simulation_unknown_best(num_townspeople, num_guacs, num_guacs)
+sensitive_tastebuds = True
+sim_fra1 = Simulation_unknown_best(num_townspeople, num_guacs, num_guacs, sensitive_tastebuds)
 sim_fra1.simulate()
+
 chosen_method = lg.tally_votes(sim_fra1, key="sim_fra1")
 #the winner computed with the condocert method is the same as the avocado getting the most votes
 
@@ -108,7 +110,6 @@ chosen_method = lg.tally_votes(sim_fra2, key="sim_fra2")
 
 st.subheader("3. Everyone Tries Only Some Guacs, Everyone is Fair, Some Guacs have Better Ingredients than Others")
 st.text("How much can we fraction guacs before we loose the winner?")
-sensitive_tastebuds = True
-sim_fra3 = Simulation_unknown_best(num_townspeople, num_guacs, num_guac_per_person, sensitive_tastebuds)
+sim_fra3 = Simulation_unknown_best(num_townspeople, num_guacs, num_guac_per_person)
 sim_fra3.simulate(sim_fra1.results_df)
 chosen_method = lg.tally_votes(sim_fra3, key="sim_fra3")
