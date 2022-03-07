@@ -18,7 +18,15 @@ STORY = {
     ],
 
     "Unknown Best":  [
-        "What if we don't know who's best and just decide to go with people's guts? Here we ask participants to rank ALL the guacs.",
+        "What if we don't know who is the best and just decide to go with people's guts? On day 1 of the competition everyone tries all the guacs, and a winner is found. However, the judges realize that trying all guacs turns out to be way too much food. So, on day two they decide to do an experiment. What if we only assign to each judge a random subset of guacs? How small does this subset have to be before the winner identify on day 1 is lost?",
     ],
+
+    "Conclusion 1":  [
+        "When all guacs are relatively similar, the votes end up being very close to each other. As a result, as soon as we start fractioning the guacs it's easy to loose the winner. Try it!"
+    ],
+
+    "Conclusion 2":  [
+        "Introducing better/worse ingredients leads to clearer winners, even when not everyone tries all the guacs."
+    ]
 
 }

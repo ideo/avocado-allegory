@@ -83,33 +83,64 @@ lg.declare_a_winner(sim3, chosen_method)
 
 ## FRA WIP BELOW
 num_guacs = 20
+
 # Allow abstinence?
 st.subheader("What if We Don't Know Whose Guac is Best?")
 for paragraph in STORY["Unknown Best"]:
     st.write(paragraph)
 
 
+st.subheader("1. All Guacs are Relatively Good")
+col1, _, col2 = st.columns([4, 4, 4])
 
-st.subheader("1. Everybody Tries all the Guacs, Everyone is Fair, All Guacs are Relatively Good")
-num_townspeople = lg.num_people_slider()
-sensitive_tastebuds = True
-sim_fra1 = Simulation_unknown_best(num_townspeople, num_guacs, num_guacs, sensitive_tastebuds)
-sim_fra1.simulate()
+with col1:
+    num_townspeople = lg.num_people_slider("How many townspeople showed up?")
+    sim_day1 = Simulation_unknown_best(num_townspeople, num_guacs, num_guacs)
+    sim_day1.simulate()
+    lg.plot_votes(sim_day1, 1)
 
-chosen_method = lg.tally_votes(sim_fra1, key="sim_fra1")
-#the winner computed with the condocert method is the same as the avocado getting the most votes
-
-
-st.subheader("2. Everyone Tries Only Some Guacs, Everyone is Fair, All Guacs are Relatively Good")
-st.text("How much can we fraction guacs before we loose the winner?")
-num_guac_per_person = lg.num_guac_per_person_slider()
-sim_fra2 = Simulation_unknown_best(num_townspeople, num_guacs, num_guac_per_person)
-sim_fra2.simulate(sim_fra1.results_df)
-chosen_method = lg.tally_votes(sim_fra2, key="sim_fra2")
+with col2:
+    num_guac_per_person = lg.num_guac_per_person_slider("How many guacs can everyone try?")
+    sim_day2 = Simulation_unknown_best(num_townspeople, num_guacs, num_guac_per_person)
+    sim_day2.simulate(sim_day1.results_df)
+    lg.plot_votes(sim_day2, 2)
 
 
-st.subheader("3. Everyone Tries Only Some Guacs, Everyone is Fair, Some Guacs have Better Ingredients than Others")
-st.text("How much can we fraction guacs before we loose the winner?")
-sim_fra3 = Simulation_unknown_best(num_townspeople, num_guacs, num_guac_per_person)
-sim_fra3.simulate(sim_fra1.results_df)
-chosen_method = lg.tally_votes(sim_fra3, key="sim_fra3")
+for paragraph in STORY["Conclusion 1"]:
+    st.write(paragraph)
+
+
+st.subheader("2. Some Guacs Have Better Ingredients")
+col1, _, col2 = st.columns([4, 4, 4])
+
+with col1:
+    num_townspeople = lg.num_people_slider("How many townspeople showed up? ")
+    has_different_ingredients = True
+    sim_day1 = Simulation_unknown_best(num_townspeople, num_guacs, num_guacs, has_different_ingredients)
+    sim_day1.simulate()
+    lg.plot_votes(sim_day1, 1)
+
+with col2:
+    num_guac_per_person = lg.num_guac_per_person_slider("How many guacs can everyone try? ")
+    sim_day2 = Simulation_unknown_best(num_townspeople, num_guacs, num_guac_per_person)
+    sim_day2.simulate(sim_day1.results_df)
+    lg.plot_votes(sim_day2, 2)
+
+for paragraph in STORY["Conclusion 2"]:
+    st.write(paragraph)
+
+# 
+
+# sim_base = Simulation_unknown_best(num_townspeople, num_guacs, num_guacs, has_different_ingredients)
+# sim_base.simulate()
+# lg.plot_votes(sim_base)
+
+# # num_guac_per_person = lg.num_guac_per_person_slider()
+# sim_has_ingredients = Simulation_unknown_best(num_townspeople, num_guacs, num_guac_per_person)
+# sim_has_ingredients.simulate(sim_base.results_df)
+# lg.plot_votes(sim_has_ingredients)
+
+# for paragraph in STORY["Conclusion 2"]:
+#     st.write(paragraph)
+
+

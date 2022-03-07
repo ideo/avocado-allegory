@@ -8,7 +8,7 @@ class Simulation_unknown_best:
             self, num_townspeople, 
             num_guacs_total, 
             num_guacs_per_person, 
-            sensitive_tastebuds = False
+            has_different_ingredients = False
             ):
         self.num_townspeople = num_townspeople
         self.num_guacs_per_person = num_guacs_per_person
@@ -17,7 +17,7 @@ class Simulation_unknown_best:
         self.winner = None
         self.scores_cols = []
         self.fra_joe = 'fra'
-        self.sensitive_tastebuds = sensitive_tastebuds
+        self.has_different_ingredients = has_different_ingredients
 
     def simulate(self, votes_from_testing_all = pd.DataFrame()):
         """This function simulate scores.
@@ -28,7 +28,7 @@ class Simulation_unknown_best:
         person_number = 0
         
         for _ in range(self.num_townspeople):            
-            person = Townsperson(person_number, self.sensitive_tastebuds)
+            person = Townsperson(person_number, self.has_different_ingredients)
             
             #simulate score for each guac and determine ballot matrix
             ballot_matrix, ballot_dict = person.fill_in_ballot(self.num_guacs_per_person, 

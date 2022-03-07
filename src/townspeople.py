@@ -5,7 +5,7 @@ import random
 
 # Base Class
 class Townsperson:
-    def __init__(self, name, sensitive_tastebuds = False, st_dev=1, limit=20, mean_offset=0, 
+    def __init__(self, name, has_different_ingredients = False, st_dev=1, limit=20, mean_offset=0, 
                 min_allowed_vote = 1, max_allowed_vote = 10):
         self.name = name
         self.person_number = name
@@ -15,7 +15,7 @@ class Townsperson:
         self.min_allowed_vote = min_allowed_vote
         self.max_allowed_vote = max_allowed_vote
         self.cazzo = False
-        self.sensitive_tastebuds = sensitive_tastebuds
+        self.has_different_ingredients = has_different_ingredients
 
     def taste_and_vote(self, guac_df):
         """
@@ -51,7 +51,7 @@ class Townsperson:
     def fill_in_ballot(self, 
                         num_guacs_per_person, 
                         guac_names, 
-                        seed,
+                        person_number,
                         votes_from_testing_all = pd.DataFrame()):
         """This function compute the ballot and ballot matrix or each voter.
         The ballot matrix is used to compute the winner
@@ -60,34 +60,43 @@ class Townsperson:
             num_guacs_per_person (int): number of guacs each person can taste
             guac_names (str): name of the guac
             seed (int): random seed currently assigned to the person ID
-            votes_from_testing_all (dataframe, optional): when computing results feeding only some guacs to people, we sample from the results calculated when everyone tried all the guacs. Defaults to pd.DataFrame().
+            votes_from_testing_all (dataframe, optional): votes computed when everyone tried all guacs. We sample from these when everyone tries only a few. Defaults to pd.DataFrame().
 
         Returns:
             ballot matrix and ballot dictionary containins the mapping guac - score
         """
+       # If no previouly calculated scores are given, we let people vote on all
+        if len(votes_from_testing_all) == 0:
+            #each person is a seet
+            random.seed(person_number)
+
+            # Create a list of uniformly spaced votes from min to max.
+            # This assumes all guacs a similar
+            possible_votes = np.linspace(self.min_allowed_vote,self.max_allowed_vote,num_guacs_per_person).tolist()
+            
+            #create the ballot
+            ballot  = random.sample(possible_votes, num_guacs_per_person)            
+
+            #create the ballot dictionary, storing the vote for each guac
+            ballot_dict = dict(zip(guac_names, ballot)) 
+            
+            #if some guacs have better ingredients that others, adjust the scores for those
+            if self.has_different_ingredients:        
+                ballot_dict = self.adjust_for_different_ingredients(ballot_dict, num_guacs_per_person)
+
+            #create the ballot matrix (used to compute winner)
+            this_ballot_matrix = self.create_ballot_matrix(ballot_dict, guac_names)
+
         #If each person is given a fixed number of guacs, 
         #we sample from the scores previously calculated
-        if len(votes_from_testing_all) > 0:
+        else:
             sampled_votes = votes_from_testing_all.sample(n=num_guacs_per_person, replace=False).copy()
             ballot_dict = dict(zip(sampled_votes['guac'].tolist(), 
                                    sampled_votes[f"score_person_{self.person_number}"].tolist()))
             self.cazzo = True                                   
             this_ballot_matrix = self.create_ballot_matrix(ballot_dict, guac_names)
 
-        # otherwise we let people vote on al
-        else:
-            random.seed(seed)
-
-            #all guacs are similar, everyone is fair
-            possible_votes = np.linspace(self.min_allowed_vote,self.max_allowed_vote,num_guacs_per_person).tolist()
-            ballot  = random.sample(possible_votes, num_guacs_per_person)            
-            ballot_dict = dict(zip(guac_names, ballot)) 
-            
-            if self.sensitive_tastebuds:        
-                ballot_dict = self.adjust_for_sensitive_tastebuds(ballot_dict, num_guacs_per_person)
-
-            this_ballot_matrix = self.create_ballot_matrix(ballot_dict, guac_names)
-            
+             
         return this_ballot_matrix, ballot_dict
 
 
@@ -144,7 +153,7 @@ class Townsperson:
         else: return -1
 
     #TODO: DO WE NEED A GUAC OBJECT?
-    def adjust_for_sensitive_tastebuds(self, ballot_dict, num_guacs_per_person):
+    def adjust_for_different_ingredients(self, ballot_dict, num_guacs_per_person):
         """This function tries to account for some guacs being better than others in terms of
         ingredients
 
@@ -157,7 +166,8 @@ class Townsperson:
         #Some guacs (9 and 13) are made ONLY with organic ingredients, 
         #mashed by hand every single day and they are legittimately better
         #we create a skewed list of numbers to sample from
-        possible_votes = np.linspace(6,self.max_allowed_vote,num_guacs_per_person).tolist()
+        new_min = int(1 + (self.max_allowed_vote - self.min_allowed_vote)/2)
+        possible_votes = np.linspace(new_min,self.max_allowed_vote,num_guacs_per_person).tolist()
         
         for i in ['9', '13']:
             ballot_dict[i] = random.sample(possible_votes, 1)
@@ -166,7 +176,8 @@ class Townsperson:
         #Some other guacs (2, 7, 5) are cheap and contain a bunch
         #of chemicals, rather than organic ingredients
         #we create a skewed list of numbers to sample from
-        possible_votes = np.linspace(self.min_allowed_vote,4,num_guacs_per_person).tolist()
+        new_max = int((self.max_allowed_vote - self.min_allowed_vote)/2 - 1)
+        possible_votes = np.linspace(self.min_allowed_vote,new_max,num_guacs_per_person).tolist()
         for i in ['2', '7', '5']:
             ballot_dict[i] = random.sample(possible_votes, 1)
             ballot_dict[i] = ballot_dict[i][0]

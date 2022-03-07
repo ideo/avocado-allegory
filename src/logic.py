@@ -134,16 +134,50 @@ def types_of_voters():
     return pepe, fra, carlos
 
 
-def num_people_slider():
-    num_townspeople = st.slider("How many townspeople showed up?", 
-        value=20, 
+def num_people_and_guac_per_person_slider():
+    col1, _, col2 = st.columns([4, 1, 4])
+    num_townspeople = col1.slider("How many townspeople showed up?", 
+        value=250, 
+        min_value=10, 
+        max_value=500)
+    num_guac_per_person = col2.slider("How many guacs can everyone try?",
+        value=10,
+        min_value=1,
+        max_value=20,
+        )
+    return num_townspeople, num_guac_per_person
+
+def num_people_slider(key):
+    num_townspeople = st.slider(key, 
+        value=250, 
         min_value=10, 
         max_value=500)
     return num_townspeople
 
-def num_guac_per_person_slider():
-    num_guac_per_person = st.slider("How many guacs can everyone try?", 
+def num_guac_per_person_slider(key):
+    num_guac_per_person = st.slider(key, 
         value=10, 
         min_value=1, 
         max_value=20)
     return num_guac_per_person
+
+def plot_votes(sim, day_title = 1):
+    
+    y_field = 'Avg'
+    chart_df = sim.results_df[[y_field]].copy()
+    chart_df["Entrant"] = chart_df.index
+
+    winning_guac = sim.winner
+        
+    spec = {
+        "mark": {"type": "bar"},
+        "encoding": {
+            "x":    {"field": "Entrant", "tupe": "nominal"},
+            "y":    {"field": y_field, "type": "quantitative"},
+        },
+        "title":    f"Day {day_title}: Our Winner is Guacamole No. {winning_guac}!",   
+    }
+    st.vega_lite_chart(chart_df, spec)
+
+    
+
