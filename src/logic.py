@@ -41,7 +41,8 @@ def simulation_parameters():
     num_townspeople = col1.slider("How many townspeople are there?", 
         value=250, 
         min_value=10, 
-        max_value=500)
+        max_value=500,
+        step=10)
     st_dev = col2.number_input("What is the st. dev. of their randomly generated scores?",
         value=1.0,
         min_value=0.1,
@@ -90,7 +91,7 @@ def tally_votes(sim, key):
         "title":    f"Our Winner is Guacamole No. {winning_guac}!",   
     }
     col2.vega_lite_chart(chart_df, spec)
-    st.write(sim.results_df)
+    # st.write(sim.results_df)
     return y_field
 
 

@@ -119,4 +119,8 @@ def plot_results(df):
             }
         }
     st.vega_lite_chart(chart_df, spec, use_container_width=True)
-    # st.write(chart_df)
+    
+    invalid_results = chart_df[~chart_df["Valid"]]
+    invalid_results["Ratio"] = \
+        invalid_results["Townspeople"] / invalid_results["Sampling Limit"]
+    st.write(invalid_results)
