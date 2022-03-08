@@ -53,22 +53,23 @@ def simulation_parameters():
 
 def tally_votes(sim, key):
     col1, col2 = st.columns([2,5])
-    method = col1.radio(
-        "How would you like to tally the votes?",
-        key=key,
-        options=[
-            "Sum up all the scores", 
-            "Compute the average",
-            "Compute the median"]
-    )
-    if method == "Sum up all the scores":
-        y_field = "Sum"
-    elif method == "Compute the average":
-        y_field = "Avg"
-    else:
-        y_field = "Med"
+    # method = col1.radio(
+    #     "How would you like to tally the votes?",
+    #     key=key,
+    #     options=[
+    #         "Sum up all the scores", 
+    #         "Compute the average",
+    #         "Compute the median"]
+    # )
+    # if method == "Sum up all the scores":
+    #     y_field = "Sum"
+    # elif method == "Compute the average":
+    #     y_field = "Avg"
+    # else:
+    #     y_field = "Med"
 
     # y_field = "Sum" if method == "Sum up all the scores" else "Avg"
+    y_field = "sum"
     chart_df = sim.results_df[[y_field]].copy()
 
     #this is to accomodate mine and joe's simulations
@@ -89,6 +90,7 @@ def tally_votes(sim, key):
         "title":    f"Our Winner is Guacamole No. {winning_guac}!",   
     }
     col2.vega_lite_chart(chart_df, spec)
+    st.write(sim.results_df)
     return y_field
 
 

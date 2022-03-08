@@ -17,6 +17,7 @@ class Townsperson:
         self.cazzo = False
         self.has_different_ingredients = has_different_ingredients
 
+
     def taste_and_vote(self, guac_df):
         """
         Randomly select guacs from the dataframe to taste.
@@ -47,6 +48,7 @@ class Townsperson:
         subj = 10 if subj > 10 else subj
         subj = 0 if subj < 0 else subj
         return subj
+
 
     def fill_in_ballot(self, 
                         num_guacs_per_person, 

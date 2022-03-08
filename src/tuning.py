@@ -11,14 +11,14 @@ def tune_simulation(guac_df):
     the simulated winner is no longer valid.
     """
     st.write(msg)
-    num_guacs, num_townspeople, sl, method, st_dev = set_parameters(guac_df)
+    num_guacs, num_townspeople, sl, st_dev = set_parameters(guac_df)
     tuning_df = load_dataframe()
       
     tune = st.button("Tune the Parameters")
     if tune:
         valid_results = True
         while valid_results:
-            sim = Simulation(guac_df, num_townspeople, limit=sl, st_dev=st_dev, method=method)
+            sim = Simulation(guac_df, num_townspeople, limit=sl, st_dev=st_dev)
             sim.simulate()
             valid_results = sim.objective_winner == sim.winner
 
@@ -27,7 +27,6 @@ def tune_simulation(guac_df):
                 "Townspeople":          num_townspeople,
                 "Sampling Limit":       sl,
                 "Std. Deviation":       st_dev,
-                "Method":               sim.method,
                 "Valid":                valid_results,
             }
             tuning_df = tuning_df.append(output, ignore_index=True)
@@ -42,46 +41,32 @@ def tune_simulation(guac_df):
                 num_townspeople += 250
 
             if sl == 1:
-                tuning_df.to_csv("tuning_df.csv")
                 break
 
     # st.write(tuning_df) 
+    save_dataframe(tuning_df)
     plot_results(tuning_df)
     st.markdown("___")
 
 
-
 def set_parameters(guac_df):
     num_guac_entrants = guac_df.shape[0]
-    col1, _, col2 = st.columns([5, 1, 5])
+    col1, col2, col3 = st.columns(3)
     num_townspeople = col1.slider("How many townspeople taste and vote in the contest?",
         value=300,
         min_value=10,
         max_value=1000,
         step=10)
-    sl = col1.slider("Set the Sampling Limit", 
+    sl = col2.slider("Set the Sampling Limit", 
         value=20, 
         min_value=1, 
         max_value=20)
-    st_dev = col2.number_input("The Std. Deviation of voters' scores of the same guacs.", 
-        value=2.0,
+    st_dev = col3.number_input("The Std. Deviation of voters' scores of the same guacs.", 
+        value=3.0,
         min_value=0.5,
         max_value=5.0,
         step=0.5)
-    method = col2.radio(
-        "How would you like to tally the votes to determine the winner?",
-        options=[
-            "Sum up all the scores", 
-            "Compute the average",
-            "Compute the median"]
-    )
-    if method == "Sum up all the scores":
-        y_field = "Sum"
-    elif method == "Compute the average":
-        y_field = "Avg"
-    else:
-        y_field = "Med"
-    return num_guac_entrants, num_townspeople, sl, y_field, st_dev
+    return num_guac_entrants, num_townspeople, sl, st_dev
 
 
 def load_dataframe():
@@ -90,7 +75,6 @@ def load_dataframe():
         "Townspeople", 
         "Sampling Limit",
         "Std. Deviation",
-        "Method",
         "Valid"]
 
     try:
@@ -102,7 +86,7 @@ def load_dataframe():
 
 
 def save_dataframe(df):
-    pass
+    df.to_csv("tuning_df.csv")
 
 
 def plot_results(df):
@@ -116,15 +100,10 @@ def plot_results(df):
         "Std. Deviation", 
         options=df["Std. Deviation"].value_counts().index.tolist()
         )
-    method = col3.selectbox(
-        "Method", 
-        options=df["Method"].value_counts().index.tolist()
-        )
 
     chart_df = df[
         (df["Guac Entrants"] == num_guacs) &
-        (df["Std. Deviation"] == st_dev) &
-        (df["Method"] == method)
+        (df["Std. Deviation"] == st_dev)
         ]
 
     spec = {
