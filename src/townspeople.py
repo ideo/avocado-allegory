@@ -22,20 +22,33 @@ class Townsperson:
         Randomly select guacs from the dataframe to taste.
         Taste and generate 'subjective' rating.
         """
-        # Choose guacs        
-        guacs_to_try = np.random.choice(guac_df.index.tolist(), 
-            size=self.num_guac_per_person, 
-            replace=False)
-
-        # Taste
-        votes = {}
-        for guac_id in guacs_to_try:
-            obj_score = guac_df["Objective Ratings"].iloc[guac_id]
-            sbj_score = self.taste(obj_score)
-            votes[guac_id] = sbj_score
-
+        
+        # Choose guacs 
+        sample_guac_df = guac_df.sample(n=self.num_guac_per_person, replace=False)
+        sample_guac_df['Subjective Ratings'] = sample_guac_df["Objective Ratings"].apply(lambda x: self.taste(x))                
         votes_cast = pd.DataFrame(index=guac_df.index)
-        votes_cast["Vote"] = pd.Series(votes)
+        votes_cast = votes_cast.join(sample_guac_df[['Subjective Ratings']])
+        # import pdb;pdb.set_trace()                           
+        
+        # votes_cast
+
+        # # Choose guacs        
+        # guacs_to_try = np.random.choice(guac_df.index.tolist(), 
+        #     size=self.num_guac_per_person, 
+        #     replace=False)
+
+        # # Taste
+        # votes = {}
+        # for guac_id in guacs_to_try:
+        #     obj_score = guac_df["Objective Ratings"].iloc[guac_id]
+        #     sbj_score = self.taste(obj_score)
+        #     votes[guac_id] = sbj_score
+
+        # votes_cast = pd.DataFrame(index=guac_df.index)
+        # votes_cast["Vote"] = pd.Series(votes)
+
+        # import pdb;pdb.set_trace()
+
         return votes_cast
 
 

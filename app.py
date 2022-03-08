@@ -5,8 +5,7 @@ from src.story import STORY
 import src.logic as lg
 from src.simulation import Simulation
 from src.simulation_unknown_best import Simulation_unknown_best
-from src.tuning import tune_simulation
-
+from src.tuning import tune_simulation, create_histogram
 
 st.set_page_config(
     page_title="Guacamole Contest",
@@ -37,6 +36,7 @@ st.write("(We're tabling the story for now while we work on the math.)")
 st.text("Objectively, how do the guacs measure up, relative to each other?")
 guac_df = lg.objective_ratings()
 
+create_histogram(guac_df)
 tune_simulation(guac_df)
 
 

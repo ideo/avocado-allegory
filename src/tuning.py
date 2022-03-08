@@ -2,6 +2,38 @@ import streamlit as st
 import pandas as pd
 
 from .simulation import Simulation
+import matplotlib.pyplot as plt
+
+def create_histogram(guac_df):
+    num_guacs, num_townspeople, num_guac_per_person, st_dev = set_parameters(guac_df)
+
+
+    min_guac_to_recover_winner = 20
+    min_guac_to_recover_winners = []
+    for n in range(10):
+        print('n = ', n)
+        
+        for ngpp in range(num_guacs, 0, -1):
+
+            sim = Simulation(guac_df, num_townspeople, st_dev, num_guac_per_person=ngpp)
+            
+            sim.simulate() 
+            
+            if sim.objective_winner == sim.winner:
+                min_guac_to_recover_winner = ngpp
+            else:
+                min_guac_to_recover_winners.append(min_guac_to_recover_winner)
+                break
+
+    plt.hist(min_guac_to_recover_winners)
+    plt.savefig('tempo.pdf')
+
+    
+    
+    # st.bar_chart(min_guac_to_recover_winners)
+
+
+    
 
 
 def tune_simulation(guac_df):
@@ -26,18 +58,20 @@ def tune_simulation(guac_df):
             sim = Simulation(guac_df, num_townspeople, num_guac_per_person=num_guac_per_person, st_dev=st_dev)
             sim.simulate()
             valid_results = sim.objective_winner == sim.winner
+            
+            import pdb;pdb.set_trace()
 
             output = {
                 "Guac Entrants":        num_guacs,
                 "Townspeople":          num_townspeople,
-                "Sampling Limit":       sl,
+                "Sampling Limit":       num_guac_per_person,
                 "Std. Deviation":       st_dev,
                 "Valid":                valid_results,
             }
             tuning_df = tuning_df.append(output, ignore_index=True)
             print(output)
 
-            sl -= 1
+            num_guac_per_person -= 1
             if num_townspeople < 100:
                 num_townspeople += 10
             elif num_townspeople < 1000:
@@ -45,7 +79,7 @@ def tune_simulation(guac_df):
             else:
                 num_townspeople += 250
 
-            if sl == 1:
+            if num_guac_per_person == 1:
                 break
 
     # st.write(tuning_df) 
@@ -124,8 +158,4 @@ def plot_results(df):
             }
         }
     st.vega_lite_chart(chart_df, spec, use_container_width=True)
-    
-    invalid_results = chart_df[~chart_df["Valid"]]
-    invalid_results["Ratio"] = \
-        invalid_results["Townspeople"] / invalid_results["Sampling Limit"]
-    st.write(invalid_results)
+    # st.write(chart_df)
