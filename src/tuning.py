@@ -3,6 +3,32 @@ import pandas as pd
 import numpy as np
 
 from .simulation import Simulation
+import matplotlib.pyplot as plt
+
+def create_histogram(guac_df):
+    num_guacs, num_townspeople, num_guac_per_person, st_dev = set_parameters(guac_df)
+
+
+    min_guac_to_recover_winner = 20
+    min_guac_to_recover_winners = []
+    for n in range(10):
+        print('n = ', n)
+        
+        for ngpp in range(num_guacs, 0, -1):
+
+            sim = Simulation(guac_df, num_townspeople, st_dev, num_guac_per_person=ngpp)
+            
+            sim.simulate() 
+            
+            if sim.objective_winner == sim.winner:
+                min_guac_to_recover_winner = ngpp
+            else:
+                min_guac_to_recover_winners.append(min_guac_to_recover_winner)
+                break
+
+    plt.hist(min_guac_to_recover_winners)
+    plt.savefig('tempo.pdf')
+    # st.bar_chart(min_guac_to_recover_winners)
 
 
 def tune_simulation(guac_df):
