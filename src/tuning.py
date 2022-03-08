@@ -91,7 +91,7 @@ def save_dataframe(df):
 
 def plot_results(df):
     st.markdown("##### Plot the Results")
-    col1, col2, col3 = st.columns(3)
+    col1, col2 = st.columns(2)
     num_guacs = col1.selectbox(
         "Guac Entrants", 
         options=df["Guac Entrants"].value_counts().index.tolist()
@@ -107,7 +107,10 @@ def plot_results(df):
         ]
 
     spec = {
-        "mark": "point",
+        "mark": {"type": "point", "tooltip": True},
+        "title": {
+            "text": "Simulation Tuning",
+            "subtitle": f"{num_guacs} guacamoles, tasters votes vary +/- {st_dev}"},
         "encoding": {
             "x": {"field": "Sampling Limit", "type": "quantitative"},
             "y": {"field": "Townspeople", "type": "quantitative"},
