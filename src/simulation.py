@@ -6,9 +6,8 @@ from .townspeople import Townsperson
 class Simulation:
     def __init__(
             self, guac_df, num_townspeople, st_dev, 
-            limit=20, perc_fra=0.0, perc_pepe=0.0
+            limit=20, perc_fra=0.0, perc_pepe=0.0, method="sum"
         ):
-        print("what's going on>>>>>>???????")
         self.guac_df = guac_df
         self.num_townspeople = num_townspeople
         self.st_dev = st_dev
@@ -18,6 +17,7 @@ class Simulation:
         self.results_df = None
         self.objective_winner = guac_df[["Objective Ratings"]].idxmax()[0]
         self.fra_joe = 'joe'
+        self.method = method.lower()
 
 
     def simulate(self):
@@ -48,6 +48,8 @@ class Simulation:
         sum_of_votes = self.results_df.sum(axis=1)
         avg_of_votes = self.results_df.mean(axis=1)
         med_of_votes = self.results_df.median(axis=1)
-        self.results_df["Sum"] = sum_of_votes
-        self.results_df["Avg"] = avg_of_votes
-        self.results_df["Med"] = med_of_votes
+        self.results_df["sum"] = sum_of_votes
+        self.results_df["avg"] = avg_of_votes
+        self.results_df["med"] = med_of_votes
+
+        self.winner = self.results_df[[self.method]].idxmax()[0]

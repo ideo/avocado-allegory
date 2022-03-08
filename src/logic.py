@@ -13,7 +13,8 @@ def objective_ratings():
     #one column has a widget with 2 options
     scenario = col1.radio(
         "Choose a scenario", 
-        options=OBJECTIVE_RATINGS.keys())
+        options=OBJECTIVE_RATINGS.keys(),
+        index=1)
 
     #pull data based on corresponding scenario
     df = pd.DataFrame(
