@@ -11,14 +11,19 @@ def tune_simulation(guac_df):
     the simulated winner is no longer valid.
     """
     st.write(msg)
-    num_guacs, num_townspeople, sl, st_dev = set_parameters(guac_df)
+
+    num_guacs, num_townspeople, num_guac_per_person, st_dev = set_parameters(guac_df)
     tuning_df = load_dataframe()
       
     tune = st.button("Tune the Parameters")
+
     if tune:
         valid_results = True
+        
         while valid_results:
-            sim = Simulation(guac_df, num_townspeople, limit=sl, st_dev=st_dev)
+
+            
+            sim = Simulation(guac_df, num_townspeople, num_guac_per_person=num_guac_per_person, st_dev=st_dev)
             sim.simulate()
             valid_results = sim.objective_winner == sim.winner
 

@@ -5,28 +5,26 @@ import random
 
 # Base Class
 class Townsperson:
-    def __init__(self, name, has_different_ingredients = False, st_dev=1, limit=20, mean_offset=0, 
+    def __init__(self, name, has_different_ingredients = False, st_dev=1, num_guac_per_person=20, mean_offset=0, 
                 min_allowed_vote = 1, max_allowed_vote = 10):
         self.name = name
         self.person_number = name
         self.st_dev = st_dev
-        self.limit = limit
+        self.num_guac_per_person = num_guac_per_person
         self.mean_offset=0
         self.min_allowed_vote = min_allowed_vote
         self.max_allowed_vote = max_allowed_vote
         self.cazzo = False
         self.has_different_ingredients = has_different_ingredients
 
-
     def taste_and_vote(self, guac_df):
         """
         Randomly select guacs from the dataframe to taste.
         Taste and generate 'subjective' rating.
         """
-        # Choose guacs
-        
+        # Choose guacs        
         guacs_to_try = np.random.choice(guac_df.index.tolist(), 
-            size=self.limit, 
+            size=self.num_guac_per_person, 
             replace=False)
 
         # Taste
@@ -48,7 +46,6 @@ class Townsperson:
         subj = 10 if subj > 10 else subj
         subj = 0 if subj < 0 else subj
         return subj
-
 
     def fill_in_ballot(self, 
                         num_guacs_per_person, 
@@ -154,7 +151,6 @@ class Townsperson:
         #if runner loses assign -1
         else: return -1
 
-    #TODO: DO WE NEED A GUAC OBJECT?
     def adjust_for_different_ingredients(self, ballot_dict, num_guacs_per_person):
         """This function tries to account for some guacs being better than others in terms of
         ingredients
