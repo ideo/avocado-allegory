@@ -24,7 +24,7 @@ class Townsperson:
         """
         # Choose guacs        
         guacs_to_try = np.random.choice(guac_df.index.tolist(), 
-            size=self.num_guac_per_person, 
+            size=int(self.num_guac_per_person), 
             replace=False)
 
         # Taste
@@ -46,6 +46,7 @@ class Townsperson:
         subj = 10 if subj > 10 else subj
         subj = 0 if subj < 0 else subj
         return subj
+
 
     def fill_in_ballot(self, 
                         num_guacs_per_person, 
@@ -122,6 +123,7 @@ class Townsperson:
         ballot_matrix = np.matrix(ballot_matrix)
         return ballot_matrix
     
+
     @staticmethod
     def assign_score(runner, opponent, ballot_dict):
         """This function convert a ballot into a -1/0/1 score based on whether
@@ -150,6 +152,7 @@ class Townsperson:
         elif ballot_dict[runner] == ballot_dict[opponent]: return 0
         #if runner loses assign -1
         else: return -1
+
 
     def adjust_for_different_ingredients(self, ballot_dict, num_guacs_per_person):
         """This function tries to account for some guacs being better than others in terms of

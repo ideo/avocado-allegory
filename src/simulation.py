@@ -6,12 +6,12 @@ from .townspeople import Townsperson
 class Simulation:
     def __init__(
             self, guac_df, num_townspeople, st_dev, 
-            limit=20, perc_fra=0.0, perc_pepe=0.0
+            num_guac_per_person=20, perc_fra=0.0, perc_pepe=0.0
         ):
         self.guac_df = guac_df
         self.num_townspeople = num_townspeople
         self.st_dev = st_dev
-        self.limit = limit
+        self.num_guac_per_person = num_guac_per_person
         self.perc_fra = perc_fra
         self.perc_pepe = perc_pepe
         self.results_df = None
@@ -34,7 +34,7 @@ class Simulation:
 
         for num_people, offset in zip(person_types, mean_offsets):
             for _ in range(num_people):
-                person = Townsperson(name=name, st_dev=self.st_dev, limit=self.limit, mean_offset=offset)
+                person = Townsperson(name=name, st_dev=self.st_dev, num_guac_per_person=self.num_guac_per_person, mean_offset=offset)
                 self.results_df[person.name] = person.taste_and_vote(self.guac_df)
                 name += 1
 
