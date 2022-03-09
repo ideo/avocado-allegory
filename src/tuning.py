@@ -6,17 +6,49 @@ from .simulation import Simulation
 import matplotlib.pyplot as plt
 
 def create_histogram(guac_df):
-    num_guacs, num_townspeople, num_guac_per_person, st_dev = set_parameters(guac_df)
-
-
     min_guac_to_recover_winner = 20
+
+    num_guacs = 20
+    nt_color_map = {50: 'orange', 100: 'blue', 200: 'green', 400: 'grey'}
+
+    
+    for std in [1,2,3]:
+        rows = []
+        for nt in [50,100,200,400]:
+            row = {}    
+            row['std'] = std
+            row['nt'] = nt
+
+            min_guac_to_recover_winners = run_a_bunch_of_simulations(num_guacs, guac_df, nt, std)
+
+            row['guacs_limit'] = '|'.join([str(i) for i in min_guac_to_recover_winners])
+
+            plt.hist(min_guac_to_recover_winners, 
+                    density = True, 
+                    label = nt, 
+                    color = nt_color_map[nt], 
+                    alpha = 0.5)
+            rows.append(row)
+
+        df = pd.DataFrame(rows)
+        df.to_csv(f"Distribution_varying_townpeople_{std}_std_{num_guacs}total_guacs.csv")
+        plt.xlabel('# guacs/person yielding true winner')
+        plt.ylabel('%')
+        plt.title(f"Initial number of guacs = {num_guacs}, standard dev on people score = {std}")
+        plt.legend(loc = 2)
+        plt.ylim(0, 0.8)
+        plt.savefig(f"Distribution_varying_townpeople_{std}stev_{num_guacs}total_guacs.pdf")
+        plt.close()
+    # import pdb;pdb.set_trace()
+
+def run_a_bunch_of_simulations(num_guacs, guac_df, nt, std):
     min_guac_to_recover_winners = []
-    for n in range(10):
-        print('n = ', n)
+    for n in range(200):
+        print('nt = ', nt, 'n = ', n)
         
         for ngpp in range(num_guacs, 0, -1):
 
-            sim = Simulation(guac_df, num_townspeople, st_dev, num_guac_per_person=ngpp)
+            sim = Simulation(guac_df, nt, std, assigned_guacs=ngpp)
             
             sim.simulate() 
             
@@ -25,10 +57,9 @@ def create_histogram(guac_df):
             else:
                 min_guac_to_recover_winners.append(min_guac_to_recover_winner)
                 break
-
-    plt.hist(min_guac_to_recover_winners)
-    plt.savefig('tempo.pdf')
-    # st.bar_chart(min_guac_to_recover_winners)
+    
+    return min_guac_to_recover_winners
+    
 
 
 def tune_simulation(guac_df):
@@ -39,7 +70,7 @@ def tune_simulation(guac_df):
     """
     st.write(msg)
 
-    num_guacs, num_townspeople, num_guac_per_person, st_dev = set_parameters(guac_df)
+    num_guacs, num_townspeople, assigned_guacs, st_dev = set_parameters(guac_df)
     tuning_df = load_dataframe()
       
     tune = st.button("Tune the Parameters")
@@ -48,24 +79,24 @@ def tune_simulation(guac_df):
         # while valid_results:
         for _ in range(100):
             for num_townspeople in [10, 20, 30, 40, 50, 75, 100, 150, 200, 250, 300, 350, 400]:
-                for num_guac_per_person in np.linspace(2, 20, 19):
-                    print(num_townspeople, num_guac_per_person)
+                for assigned_guacs in np.linspace(2, 20, 19):
+                    print(num_townspeople, assigned_guacs)
                 
-                    sim = Simulation(guac_df, num_townspeople, num_guac_per_person=num_guac_per_person, st_dev=st_dev)
+                    sim = Simulation(guac_df, num_townspeople, assigned_guacs=assigned_guacs, st_dev=st_dev)
                     sim.simulate()
                     valid_results = sim.objective_winner == sim.winner
 
                     output = {
                         "Guac Entrants":        num_guacs,
                         "Townspeople":          num_townspeople,
-                        "Sampling Limit":       num_guac_per_person,
+                        "Sampling Limit":       assigned_guacs,
                         "Std. Deviation":       st_dev,
                         "Valid":                valid_results,
                     }
                     tuning_df = tuning_df.append(output, ignore_index=True)
                     print(output)
 
-                    # num_guac_per_person -= 1
+                    # assigned_guacs -= 1
                     # if num_townspeople < 100:
                     #     num_townspeople += 10
                     # elif num_townspeople < 1000:
@@ -73,7 +104,7 @@ def tune_simulation(guac_df):
                     # else:
                     #     num_townspeople += 250
 
-                    # if num_guac_per_person == 1:
+                    # if assigned_guacs == 1:
                     #     break
 
     # st.write(tuning_df) 
