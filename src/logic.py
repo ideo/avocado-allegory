@@ -102,6 +102,7 @@ def animate_results(sim, key):
         st.session_state[f"{key}_pressed"] = True
         for NN in range(results_df.shape[1]):
             chart_df, spec = format_spec(sim, subtitle, y_max, col_limit=NN)
+            # overwrite_chart(col2, bar_chart, chart_df, spec)
             if bar_chart is not None:
                 bar_chart.vega_lite_chart(chart_df, spec)
             else:
@@ -111,6 +112,7 @@ def animate_results(sim, key):
     if st.session_state[f"{key}_pressed"]:
         # Ensure the final chart stays visible
         chart_df, spec = format_spec(sim, subtitle, y_max)
+        # overwrite_chart(col2, bar_chart, chart_df, spec)
         if bar_chart is not None:
             bar_chart.vega_lite_chart(chart_df, spec)
         else:
@@ -142,6 +144,14 @@ def format_spec(sim, subtitle, y_max, col_limit=None):
             }  
         }
     return chart_df, spec
+
+
+# def overwrite_chart(st_col, chart_obj, chart_df, spec):
+#     """I wish we could use this but cannot overwrite a copy of the chart_obj"""
+#     if chart_obj is not None:
+#         chart_obj.vega_lite_chart(chart_df, spec)
+#     else:
+#         chart_obj = st_col.vega_lite_chart(chart_df, spec)
 
 
 def tally_votes(sim, key):
