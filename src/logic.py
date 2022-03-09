@@ -11,6 +11,16 @@ import warnings
 warnings.simplefilter(action='ignore', category=UserWarning)
 
 
+def initialize_session_state():
+    initial_values = {
+        "simulation_1_pressed":     False,
+    }
+
+    for key, value in initial_values.items():
+        if key not in st.session_state:
+            st.session_state[key] = value
+
+
 def write_story(section_title):
     for paragraph in STORY[section_title]:
         st.write(paragraph)
@@ -78,86 +88,61 @@ def choose_scenario():
     return df
 
 
-# def simulation_parameters():
-#     col1, _, col2 = st.columns([4, 1, 4])
-#     num_townspeople = col1.slider("How many townspeople are there?", 
-#         value=250, 
-#         min_value=10, 
-#         max_value=500,
-#         step=10)
-#     st_dev = col2.number_input("What is the st. dev. of their randomly generated scores?",
-#         value=1.0,
-#         min_value=0.1,
-#         max_value=5.0,
-#         step=0.1
-#         )
-#     return num_townspeople, st_dev
-
-
 def animate_results(sim, key):
     col1, col2 = st.columns([2,5])
     start_btn = col1.button("Simulate", key=key)
 
     results_df = sim.results_df.copy()
     results_df.drop(columns=["sum"], inplace=True)
-    y_max = int(sim.results_df["sum"].max())
     subtitle = "And the winner is... "
+    y_max = int(sim.results_df["sum"].max())
 
     bar_chart = None
     if start_btn:
+        st.session_state[f"{key}_pressed"] = True
         for NN in range(results_df.shape[1]):
-            chart_df = results_df.iloc[:, :NN].copy()
-            chart_df["SUM"] = chart_df.sum(axis=1)
-            chart_df["Entrant"] = sim.guac_df["Entrant"]
-
-            if NN == results_df.shape[1]-1:
-                subtitle += f"Guacamole No. {sim.winner}!"
-
-            spec = {
-                "mark": {"type": "bar"},
-                "encoding": {
-                    "x":    {"field": "Entrant", "tupe": "nominal"},
-                    "y":    {
-                        "field": "SUM", "type": "quantitative", 
-                        "scale": {"domain": [0, y_max]},
-                        "title": "Tally of Votes"},
-                },
-                "title":    {
-                    "text": f"Simulation Results",
-                    "subtitle": subtitle, 
-                }  
-            }
+            chart_df, spec = format_spec(sim, subtitle, y_max, col_limit=NN)
             if bar_chart is not None:
                 bar_chart.vega_lite_chart(chart_df, spec)
             else:
                 bar_chart = col2.vega_lite_chart(chart_df, spec)
             time.sleep(0.01)
 
-    if st.session_state[key]:
-        # Display the final chart
-        chart_df = results_df.copy()
-        chart_df["SUM"] = chart_df.sum(axis=1)
-        chart_df["Entrant"] = sim.guac_df["Entrant"]
-        subtitle += f"Guacamole No. {sim.winner}!"
-        spec = {
-                "mark": {"type": "bar"},
-                "encoding": {
-                    "x":    {"field": "Entrant", "tupe": "nominal"},
-                    "y":    {
-                        "field": "SUM", "type": "quantitative", 
-                        "scale": {"domain": [0, y_max]},
-                        "title": "Tally of Votes"},
-                },
-                "title":    {
-                    "text": f"Simulation Results",
-                    "subtitle": subtitle, 
-                }  
-            }
+    if st.session_state[f"{key}_pressed"]:
+        # Ensure the final chart stays visible
+        chart_df, spec = format_spec(sim, subtitle, y_max)
+        if bar_chart is not None:
+            bar_chart.vega_lite_chart(chart_df, spec)
+        else:
+            bar_chart = col2.vega_lite_chart(chart_df, spec)
+        
 
+def format_spec(sim, subtitle, y_max, col_limit=None):
 
+    if col_limit:
+        chart_df = sim.results_df.iloc[:, :col_limit].copy()
+        chart_df["sum"] = chart_df.sum(axis=1)
+    else:
+        chart_df = sim.results_df.copy()
 
-    # chart_df["Entrant"] = sim.guac_df["Entrant"]
-    
+    chart_df["Entrant"] = sim.guac_df["Entrant"]
+    subtitle += f"Guacamole No. {sim.sum_winner}!"
+    spec = {
+            "mark": {"type": "bar"},
+            "encoding": {
+                "x":    {"field": "Entrant", "tupe": "nominal"},
+                "y":    {
+                    "field": "sum", "type": "quantitative", 
+                    "scale": {"domain": [0, y_max]},
+                    "title": "Tally of Votes"},
+            },
+            "title":    {
+                "text": f"Simulation Results",
+                "subtitle": subtitle, 
+            }  
+        }
+    return chart_df, spec
+
 
 def tally_votes(sim, key):
     col1, col2 = st.columns([2,5])
@@ -168,7 +153,7 @@ def tally_votes(sim, key):
 
     #this is to accomodate mine and joe's simulations
     if sim.fra_joe == 'fra':
-        winning_guac = sim.winner
+        winning_guac = sim.sum_winner
         chart_df["Entrant"] = chart_df.index
         
     else:   
@@ -264,7 +249,7 @@ def plot_votes(sim, day_title = 1):
     chart_df = sim.results_df[[y_field]].copy()
     chart_df["Entrant"] = chart_df.index
 
-    winning_guac = sim.winner
+    winning_guac = sim.sum_winner
         
     spec = {
         "mark": {"type": "bar"},
