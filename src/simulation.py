@@ -5,7 +5,7 @@ from .townspeople import Townsperson
 
 class Simulation:
     def __init__(
-            self, guac_df, num_townspeople, st_dev, fullness_factor,
+            self, guac_df, num_townspeople, st_dev, fullness_factor = 0.0,
             assigned_guacs=20, perc_fra=0.0, perc_pepe=0.0
         ):
         self.guac_df = guac_df

@@ -25,30 +25,28 @@ class Townsperson:
 
         # Choose guacs 
         sample_guac_df = guac_df.sample(n=self.assigned_guacs, replace=False)
-        sample_guac_df['Subjective Ratings'] = sample_guac_df["Objective Ratings"].apply(lambda x: self.taste(x))
+        sample_guac_df['Subjective Ratings'] = sample_guac_df[["Objective Ratings"]].apply(lambda x: self.taste(x, sample_guac_df.index), axis=1)
         condorcet_elements = Condorcetcounting(guac_df, sample_guac_df, ballots_matrix_sum)
         return condorcet_elements
 
     def taste(self, row_data, df_index):
+
         obj_rating = row_data[0]
-        taste_order = df_index.get_loc(row_data.name)
-        # print("row_data: ", row_data.name)
-        # print(df_index)
-        # print(taste_order)
+        # taste_order = df_index.get_loc(row_data.name)
+        # taste_order = taste_order / len(df_index)
+        # import pdb;pdb.set_trace()
+        # # print(taste_order)
 
-        taste_order = taste_order / len(df_index)
-        # print(taste_order)
+        # fullness_offset = 0
+        # if taste_order < 0.33:
+        #     fullness_offset += self.fullness_factor
+        # elif taste_order < 0.66:
+        #     pass
+        # else:
+        #     fullness_offset -= self.fullness_factor
 
-        fullness_offset = 0
-        if taste_order < 0.33:
-            fullness_offset += self.fullness_factor
-        elif taste_order < 0.66:
-            pass
-        else:
-            fullness_offset -= self.fullness_factor
-
-        mu = obj_rating + self.mean_offset + fullness_offset
-        subj = np.random.normal(loc=mu, scale=self.st_dev)
+        # mu = obj_rating + self.mean_offset + fullness_offset
+        subj = np.random.normal(obj_rating, self.st_dev)
         subj = round(subj)
         subj = 10 if subj > 10 else subj
         subj = 0 if subj < 0 else subj

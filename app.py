@@ -7,6 +7,7 @@ from src.simulation import Simulation
 from src.simulation_unknown_best import Simulation_unknown_best
 # from src.tuning import tune_simulation, create_histogram
 
+
 st.set_page_config(
     page_title="Guacamole Contest",
     page_icon="img/avocado-emoji.png",
