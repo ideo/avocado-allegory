@@ -44,16 +44,9 @@ class Townsperson:
         # print(df_index)
         # print(taste_order)
 
-        taste_order = taste_order / len(df_index)
-        # print(taste_order)
-
-        fullness_offset = 0
-        if taste_order < 0.33:
-            fullness_offset += self.fullness_factor
-        elif taste_order < 0.66:
-            pass
-        else:
-            fullness_offset -= self.fullness_factor
+        slope = -self.fullness_factor / (len(df_index)/2)
+        fullness_offset =  slope * taste_order + self.fullness_factor
+        # print(f"taste_order: {taste_order}\t\tfullness_offset: {fullness_offset}")
 
         mu = obj_rating + self.mean_offset + fullness_offset
         subj = np.random.normal(loc=mu, scale=self.st_dev)

@@ -37,6 +37,6 @@ INSTRUCTIONS = {
     ],
 
     "Voting":   [
-        "In our first scenario, tasters prefer the guacamoles they try earlier on, but all participants taste in a random orders. Everyone tries every guacamole. Click the button below to simulate the voting process. Highest score wins!"
+        "In our first scenario, tasters prefer the guacamoles they try earliest and like them less and less as they get more full. But, all participants taste in random orders and everyone tries every guacamole. Click the button below to simulate the voting process. Highest score wins!"
     ],
 }

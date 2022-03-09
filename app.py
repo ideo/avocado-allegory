@@ -34,10 +34,9 @@ st.subheader("Let's Taste and Vote!")
 lg.write_story("Voting")
 sim1 = Simulation(guac_df, num_townspeople, st_dev, fullness_factor=fullness_factor)
 sim1.simulate()
-
 lg.animate_results(sim1, key="simulation_1")
+print(st.session_state)
 
-0/0
 # chosen_method = lg.tally_votes(sim1, key="sim1")
 # lg.declare_a_winner(sim1, chosen_method)
 
@@ -49,9 +48,10 @@ guac_limit = st.slider("How many guacs do we limit people to?",
     value=3, min_value=1, max_value=20)
 sim2 = Simulation(guac_df, num_townspeople, st_dev, num_guac_per_person=guac_limit)
 sim2.simulate()
-st.text("Let's see what the townspeople thought!")
-chosen_method = lg.tally_votes(sim2, key="sim2")
-lg.declare_a_winner(sim2, chosen_method)
+lg.animate_results(sim2, key="simulation_2")
+# st.text("Let's see what the townspeople thought!")
+# chosen_method = lg.tally_votes(sim2, key="sim2")
+# lg.declare_a_winner(sim2, chosen_method)
 
 
 
@@ -66,7 +66,7 @@ st.subheader("3. Different Types of Voters")
 #     st.write(paragraph)
 
 perc_pepe, perc_fra, _ = lg.types_of_voters()
-print(perc_pepe, perc_fra)
+# print(perc_pepe, perc_fra)
 sim3 = Simulation(guac_df, num_townspeople, st_dev, num_guac_per_person=guac_limit, perc_pepe=perc_pepe, perc_fra=perc_fra)
 sim3.simulate()
 chosen_method = lg.tally_votes(sim3, key="sim3")

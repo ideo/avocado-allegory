@@ -7,6 +7,10 @@ from .story import STORY, INSTRUCTIONS
 from .config import OBJECTIVE_RATINGS
 
 
+import warnings
+warnings.simplefilter(action='ignore', category=UserWarning)
+
+
 def write_story(section_title):
     for paragraph in STORY[section_title]:
         st.write(paragraph)
@@ -30,7 +34,7 @@ def sidebar():
         step=0.1
         )
     fullness_factor = st.sidebar.number_input("What is the mean offset of the fullness factor?",
-        value=0.5,
+        value=1.0,
         min_value=0.1,
         max_value=3.0,
         step=0.1
@@ -97,6 +101,7 @@ def animate_results(sim, key):
     results_df = sim.results_df.copy()
     results_df.drop(columns=["sum"], inplace=True)
     y_max = int(sim.results_df["sum"].max())
+    subtitle = "And the winner is... "
 
     bar_chart = None
     if start_btn:
@@ -105,8 +110,6 @@ def animate_results(sim, key):
             chart_df["SUM"] = chart_df.sum(axis=1)
             chart_df["Entrant"] = sim.guac_df["Entrant"]
 
-            subtitle = "And the winner is... "
-            
             if NN == results_df.shape[1]-1:
                 subtitle += f"Guacamole No. {sim.winner}!"
 
@@ -129,6 +132,27 @@ def animate_results(sim, key):
             else:
                 bar_chart = col2.vega_lite_chart(chart_df, spec)
             time.sleep(0.01)
+
+    if st.session_state[key]:
+        # Display the final chart
+        chart_df = results_df.copy()
+        chart_df["SUM"] = chart_df.sum(axis=1)
+        chart_df["Entrant"] = sim.guac_df["Entrant"]
+        subtitle += f"Guacamole No. {sim.winner}!"
+        spec = {
+                "mark": {"type": "bar"},
+                "encoding": {
+                    "x":    {"field": "Entrant", "tupe": "nominal"},
+                    "y":    {
+                        "field": "SUM", "type": "quantitative", 
+                        "scale": {"domain": [0, y_max]},
+                        "title": "Tally of Votes"},
+                },
+                "title":    {
+                    "text": f"Simulation Results",
+                    "subtitle": subtitle, 
+                }  
+            }
 
 
 
