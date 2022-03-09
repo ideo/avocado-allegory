@@ -5,56 +5,58 @@ import random
 
 # Base Class
 class Townsperson:
-    def __init__(self, name, has_different_ingredients = False, st_dev=1, num_guac_per_person=20, mean_offset=0, 
+    def __init__(self, name, has_different_ingredients = False, st_dev=1, 
+                num_guac_per_person=20, mean_offset=0, fullness_factor=0,
                 min_allowed_vote = 1, max_allowed_vote = 10):
         self.name = name
         self.person_number = name
         self.st_dev = st_dev
-        self.num_guac_per_person = num_guac_per_person
+        self.fullness_factor = fullness_factor
+        self.num_guac_per_person = int(num_guac_per_person)
         self.mean_offset=0
         self.min_allowed_vote = min_allowed_vote
         self.max_allowed_vote = max_allowed_vote
         self.cazzo = False
         self.has_different_ingredients = has_different_ingredients
 
+
     def taste_and_vote(self, guac_df):
         """
         Randomly select guacs from the dataframe to taste.
         Taste and generate 'subjective' rating.
         """
-        
-        # Choose guacs 
+        # Sample to return a dataframe of guacs with the index randomized
         sample_guac_df = guac_df.sample(n=self.num_guac_per_person, replace=False)
-        sample_guac_df['Subjective Ratings'] = sample_guac_df["Objective Ratings"].apply(lambda x: self.taste(x))                
+
+        # Taste and assign a 'subjective ranking'
+        sample_guac_df['Subjective Ratings'] = sample_guac_df[["Objective Ratings"]].apply(lambda x: self.taste(x, sample_guac_df.index), axis=1)                
+        
+        # Put into a df
         votes_cast = pd.DataFrame(index=guac_df.index)
         votes_cast = votes_cast.join(sample_guac_df[['Subjective Ratings']])
-        # import pdb;pdb.set_trace()                           
-        
-        # votes_cast
-
-        # # Choose guacs        
-        # guacs_to_try = np.random.choice(guac_df.index.tolist(), 
-        #     size=self.num_guac_per_person, 
-        #     replace=False)
-
-        # # Taste
-        # votes = {}
-        # for guac_id in guacs_to_try:
-        #     obj_score = guac_df["Objective Ratings"].iloc[guac_id]
-        #     sbj_score = self.taste(obj_score)
-        #     votes[guac_id] = sbj_score
-
-        # votes_cast = pd.DataFrame(index=guac_df.index)
-        # votes_cast["Vote"] = pd.Series(votes)
-
-        # import pdb;pdb.set_trace()
-
         return votes_cast
 
 
-    def taste(self, obj_rating):
-        mu, sigma = obj_rating+self.mean_offset, self.st_dev
-        subj = np.random.normal(loc=mu, scale=sigma)
+    def taste(self, row_data, df_index):
+        obj_rating = row_data[0]
+        taste_order = df_index.get_loc(row_data.name)
+        # print("row_data: ", row_data.name)
+        # print(df_index)
+        # print(taste_order)
+
+        taste_order = taste_order / len(df_index)
+        # print(taste_order)
+
+        fullness_offset = 0
+        if taste_order < 0.33:
+            fullness_offset += self.fullness_factor
+        elif taste_order < 0.66:
+            pass
+        else:
+            fullness_offset -= self.fullness_factor
+
+        mu = obj_rating + self.mean_offset + fullness_offset
+        subj = np.random.normal(loc=mu, scale=self.st_dev)
         subj = round(subj)
         subj = 10 if subj > 10 else subj
         subj = 0 if subj < 0 else subj

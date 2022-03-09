@@ -46,34 +46,35 @@ def tune_simulation(guac_df):
     if tune:
         # valid_results = True
         # while valid_results:
-        for num_townspeople in [10, 20, 30, 40, 50, 75, 100, 150, 200, 250, 300, 350, 400]:
-            for num_guac_per_person in np.linspace(2, 20, 19):
-                print(num_townspeople, num_guac_per_person)
-            
-                sim = Simulation(guac_df, num_townspeople, num_guac_per_person=num_guac_per_person, st_dev=st_dev)
-                sim.simulate()
-                valid_results = sim.objective_winner == sim.winner
+        for _ in range(100):
+            for num_townspeople in [10, 20, 30, 40, 50, 75, 100, 150, 200, 250, 300, 350, 400]:
+                for num_guac_per_person in np.linspace(2, 20, 19):
+                    print(num_townspeople, num_guac_per_person)
+                
+                    sim = Simulation(guac_df, num_townspeople, num_guac_per_person=num_guac_per_person, st_dev=st_dev)
+                    sim.simulate()
+                    valid_results = sim.objective_winner == sim.winner
 
-                output = {
-                    "Guac Entrants":        num_guacs,
-                    "Townspeople":          num_townspeople,
-                    "Sampling Limit":       num_guac_per_person,
-                    "Std. Deviation":       st_dev,
-                    "Valid":                valid_results,
-                }
-                tuning_df = tuning_df.append(output, ignore_index=True)
-                print(output)
+                    output = {
+                        "Guac Entrants":        num_guacs,
+                        "Townspeople":          num_townspeople,
+                        "Sampling Limit":       num_guac_per_person,
+                        "Std. Deviation":       st_dev,
+                        "Valid":                valid_results,
+                    }
+                    tuning_df = tuning_df.append(output, ignore_index=True)
+                    print(output)
 
-                # num_guac_per_person -= 1
-                # if num_townspeople < 100:
-                #     num_townspeople += 10
-                # elif num_townspeople < 1000:
-                #     num_townspeople += 50
-                # else:
-                #     num_townspeople += 250
+                    # num_guac_per_person -= 1
+                    # if num_townspeople < 100:
+                    #     num_townspeople += 10
+                    # elif num_townspeople < 1000:
+                    #     num_townspeople += 50
+                    # else:
+                    #     num_townspeople += 250
 
-                # if num_guac_per_person == 1:
-                #     break
+                    # if num_guac_per_person == 1:
+                    #     break
 
     # st.write(tuning_df) 
     save_dataframe(tuning_df)
@@ -94,7 +95,7 @@ def set_parameters(guac_df):
         min_value=1, 
         max_value=20)
     st_dev = col3.number_input("The Std. Deviation of voters' scores of the same guacs.", 
-        value=3.0,
+        value=1.5,
         min_value=0.5,
         max_value=5.0,
         step=0.5)
