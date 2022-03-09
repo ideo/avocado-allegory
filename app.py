@@ -36,7 +36,9 @@ st.write("(We're tabling the story for now while we work on the math.)")
 st.text("Objectively, how do the guacs measure up, relative to each other?")
 guac_df = lg.objective_ratings()
 
-create_histogram(guac_df)
+
+# create_histogram(guac_df)
+
 tune_simulation(guac_df)
 
 
