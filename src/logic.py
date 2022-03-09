@@ -1,10 +1,48 @@
+from ssl import CHANNEL_BINDING_TYPES
 import streamlit as st
 import pandas as pd
+import time
 
+from .story import STORY, INSTRUCTIONS
 from .config import OBJECTIVE_RATINGS
 
 
-def objective_ratings():
+def write_story(section_title):
+    for paragraph in STORY[section_title]:
+        st.write(paragraph)
+
+    if section_title in INSTRUCTIONS:
+        for paragraph in INSTRUCTIONS[section_title]:
+            st.caption(paragraph)  
+
+
+def sidebar():
+    st.sidebar.subheader("Simulation Parameters")
+    num_townspeople = st.sidebar.slider("How many townspeople are there?", 
+        value=250, 
+        min_value=10, 
+        max_value=500,
+        step=10)
+    st_dev = st.sidebar.number_input("What is the st. dev. of their randomly generated scores?",
+        value=1.0,
+        min_value=0.1,
+        max_value=5.0,
+        step=0.1
+        )
+    fullness_factor = st.sidebar.number_input("What is the mean offset of the fullness factor?",
+        value=0.5,
+        min_value=0.1,
+        max_value=3.0,
+        step=0.1
+        )
+    return num_townspeople, st_dev, fullness_factor
+
+
+def choose_scenario():
+    """
+    The user selects a scenario, which determines the 'objective ratings' to be
+    used in the simulation.
+    """
 
     #define the structure of the entry as
     #2 columns
@@ -36,40 +74,71 @@ def objective_ratings():
     return df
 
 
-def simulation_parameters():
-    col1, _, col2 = st.columns([4, 1, 4])
-    num_townspeople = col1.slider("How many townspeople are there?", 
-        value=250, 
-        min_value=10, 
-        max_value=500,
-        step=10)
-    st_dev = col2.number_input("What is the st. dev. of their randomly generated scores?",
-        value=1.0,
-        min_value=0.1,
-        max_value=5.0,
-        step=0.1
-        )
-    return num_townspeople, st_dev
+# def simulation_parameters():
+#     col1, _, col2 = st.columns([4, 1, 4])
+#     num_townspeople = col1.slider("How many townspeople are there?", 
+#         value=250, 
+#         min_value=10, 
+#         max_value=500,
+#         step=10)
+#     st_dev = col2.number_input("What is the st. dev. of their randomly generated scores?",
+#         value=1.0,
+#         min_value=0.1,
+#         max_value=5.0,
+#         step=0.1
+#         )
+#     return num_townspeople, st_dev
+
+
+def animate_results(sim, key):
+    col1, col2 = st.columns([2,5])
+    start_btn = col1.button("Simulate", key=key)
+
+    results_df = sim.results_df.copy()
+    results_df.drop(columns=["sum"], inplace=True)
+    y_max = int(sim.results_df["sum"].max())
+
+    bar_chart = None
+    if start_btn:
+        for NN in range(results_df.shape[1]):
+            chart_df = results_df.iloc[:, :NN].copy()
+            chart_df["SUM"] = chart_df.sum(axis=1)
+            chart_df["Entrant"] = sim.guac_df["Entrant"]
+
+            subtitle = "And the winner is... "
+            
+            if NN == results_df.shape[1]-1:
+                subtitle += f"Guacamole No. {sim.winner}!"
+
+            spec = {
+                "mark": {"type": "bar"},
+                "encoding": {
+                    "x":    {"field": "Entrant", "tupe": "nominal"},
+                    "y":    {
+                        "field": "SUM", "type": "quantitative", 
+                        "scale": {"domain": [0, y_max]},
+                        "title": "Tally of Votes"},
+                },
+                "title":    {
+                    "text": f"Simulation Results",
+                    "subtitle": subtitle, 
+                }  
+            }
+            if bar_chart is not None:
+                bar_chart.vega_lite_chart(chart_df, spec)
+            else:
+                bar_chart = col2.vega_lite_chart(chart_df, spec)
+            time.sleep(0.01)
+
+
+
+    # chart_df["Entrant"] = sim.guac_df["Entrant"]
     
 
 def tally_votes(sim, key):
     col1, col2 = st.columns([2,5])
-    # method = col1.radio(
-    #     "How would you like to tally the votes?",
-    #     key=key,
-    #     options=[
-    #         "Sum up all the scores", 
-    #         "Compute the average",
-    #         "Compute the median"]
-    # )
-    # if method == "Sum up all the scores":
-    #     y_field = "Sum"
-    # elif method == "Compute the average":
-    #     y_field = "Avg"
-    # else:
-    #     y_field = "Med"
 
-    # y_field = "Sum" if method == "Sum up all the scores" else "Avg"
+    col1.button("Simulate!")
     y_field = "sum"
     chart_df = sim.results_df[[y_field]].copy()
 

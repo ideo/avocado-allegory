@@ -5,54 +5,41 @@ from src.story import STORY
 import src.logic as lg
 from src.simulation import Simulation
 from src.simulation_unknown_best import Simulation_unknown_best
-from src.tuning import tune_simulation, create_histogram
+# from src.tuning import tune_simulation, create_histogram
 
 st.set_page_config(
     page_title="Guacamole Contest",
-    page_icon="img/avocado-emoji.png")
+    page_icon="img/avocado-emoji.png",
+    initial_sidebar_state="collapsed")
 
 
-# SIDEBAR
-# No sidebar to begin. We fix the parameters first, then provide a sandbox later.
+num_townspeople, st_dev, fullness_factor = lg.sidebar()
 
 
-# MAIN PAGE
 st.title("The Allegory of the Avocados")
-# st.write("""
-# Here is the link to our 
-# [Google Doc](https://docs.google.com/document/d/1CA9NXp8I9b6ds16khcJLrY1ZL7ZBABK6KRu9SvBL5JI/edit?usp=sharing) 
-# where we're developing and commenting on the story.""")
-st.write("(We're tabling the story for now while we work on the math.)")
+st.write("""
+Here is the link to our 
+[Google Doc](https://docs.google.com/document/d/1CA9NXp8I9b6ds16khcJLrY1ZL7ZBABK6KRu9SvBL5JI/edit?usp=sharing) 
+where we're developing and commenting on the story.""")
 
-# st.subheader("Welcome to [Town Name]")
-# for paragraph in STORY["introduction"]:
-#     st.write(paragraph)
+st.subheader("Welcome to Sunnyvale")
+lg.write_story("Introduction")
 
-
-# st.subheader("Let’s Play Guac God")
-# for paragraph in STORY["Guac God"]:
-#     st.write(paragraph)
-
-st.text("Objectively, how do the guacs measure up, relative to each other?")
-guac_df = lg.objective_ratings()
+st.subheader("Let’s Play Guac God")
+lg.write_story("Guac God")
+guac_df = lg.choose_scenario()
 
 
-# create_histogram(guac_df)
-
-tune_simulation(guac_df)
-
-
-st.subheader("1. Everybody Tries all the Guacs")
-num_townspeople, st_dev = lg.simulation_parameters()
-sim1 = Simulation(guac_df, num_townspeople, st_dev)
-# start = st.button("Simulate")
-# if start:
+st.subheader("Let's Taste and Vote!")
+lg.write_story("Voting")
+sim1 = Simulation(guac_df, num_townspeople, st_dev, fullness_factor=fullness_factor)
 sim1.simulate()
 
-# if sim.results_df is not None:
-st.text("Let's see what the townspeople thought!")
-chosen_method = lg.tally_votes(sim1, key="sim1")
-lg.declare_a_winner(sim1, chosen_method)
+lg.animate_results(sim1, key="simulation_1")
+
+0/0
+# chosen_method = lg.tally_votes(sim1, key="sim1")
+# lg.declare_a_winner(sim1, chosen_method)
 
 
 st.markdown("---")
@@ -60,7 +47,7 @@ st.subheader("2. Not enough guac to go around")
 # num_townspeople, st_dev = lg.simulation_parameters()
 guac_limit = st.slider("How many guacs do we limit people to?",
     value=3, min_value=1, max_value=20)
-sim2 = Simulation(guac_df, num_townspeople, st_dev, num_guac_per_person=guac_limit)
+sim2 = Simulation(guac_df, num_townspeople, st_dev, assigned_guacs=guac_limit)
 sim2.simulate()
 st.text("Let's see what the townspeople thought!")
 chosen_method = lg.tally_votes(sim2, key="sim2")
@@ -80,7 +67,7 @@ st.subheader("3. Different Types of Voters")
 
 perc_pepe, perc_fra, _ = lg.types_of_voters()
 print(perc_pepe, perc_fra)
-sim3 = Simulation(guac_df, num_townspeople, st_dev, num_guac_per_person=guac_limit, perc_pepe=perc_pepe, perc_fra=perc_fra)
+sim3 = Simulation(guac_df, num_townspeople, st_dev, assigned_guacs=guac_limit, perc_pepe=perc_pepe, perc_fra=perc_fra)
 sim3.simulate()
 chosen_method = lg.tally_votes(sim3, key="sim3")
 lg.declare_a_winner(sim3, chosen_method)
@@ -106,8 +93,8 @@ with col1:
     lg.plot_votes(sim_day1, 1)
 
 with col2:
-    num_guac_per_person = lg.num_guac_per_person_slider("How many guacs can everyone try?")
-    sim_day2 = Simulation_unknown_best(num_townspeople, num_guacs, num_guac_per_person)
+    assigned_guacs = lg.num_guac_per_person_slider("How many guacs can everyone try?")
+    sim_day2 = Simulation_unknown_best(num_townspeople, num_guacs, assigned_guacs)
     sim_day2.simulate(sim_day1.results_df)
     lg.plot_votes(sim_day2, 2)
 
@@ -127,8 +114,8 @@ with col1:
     lg.plot_votes(sim_day1, 1)
 
 with col2:
-    num_guac_per_person = lg.num_guac_per_person_slider("How many guacs can everyone try? ")
-    sim_day2 = Simulation_unknown_best(num_townspeople, num_guacs, num_guac_per_person)
+    assigned_guacs = lg.num_guac_per_person_slider("How many guacs can everyone try? ")
+    sim_day2 = Simulation_unknown_best(num_townspeople, num_guacs, assigned_guacs)
     sim_day2.simulate(sim_day1.results_df)
     lg.plot_votes(sim_day2, 2)
 

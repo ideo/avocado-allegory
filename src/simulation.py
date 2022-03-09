@@ -5,12 +5,13 @@ from .townspeople import Townsperson
 
 class Simulation:
     def __init__(
-            self, guac_df, num_townspeople, st_dev, 
+            self, guac_df, num_townspeople, st_dev, fullness_factor,
             assigned_guacs=20, perc_fra=0.0, perc_pepe=0.0
         ):
         self.guac_df = guac_df
         self.num_townspeople = num_townspeople
         self.st_dev = st_dev
+        self.fullness_factor = fullness_factor
         self.assigned_guacs = assigned_guacs
         self.perc_fra = perc_fra
         self.perc_pepe = perc_pepe
