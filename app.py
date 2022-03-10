@@ -32,11 +32,12 @@ guac_df = lg.choose_scenario()
 
 
 st.subheader("Let's Taste and Vote!")
-lg.write_story("Voting")
+section_title = "Voting"
+lg.write_story(section_title)
 sim1 = Simulation(guac_df, num_townspeople, st_dev, fullness_factor=fullness_factor)
 sim1.simulate()
 lg.animate_results(sim1, key="simulation_1")
-print(st.session_state)
+# lg.success_message(section_title, sim1.success)
 
 # chosen_method = lg.tally_votes(sim1, key="sim1")
 # lg.declare_a_winner(sim1, chosen_method)

@@ -6,7 +6,8 @@ from .townspeople import Townsperson
 class Simulation:
     def __init__(
             self, guac_df, num_townspeople, st_dev, fullness_factor = 0.0,
-            assigned_guacs=20, perc_fra=0.0, perc_pepe=0.0
+            assigned_guacs=20, perc_fra=0.0, perc_pepe=0.0, method="sum",
+            section_title=""
         ):
         self.guac_df = guac_df
         self.num_townspeople = num_townspeople
@@ -16,9 +17,11 @@ class Simulation:
         self.perc_fra = perc_fra
         self.perc_pepe = perc_pepe
         self.results_df = None
+        self.method = method
         self.objective_winner = guac_df[["Objective Ratings"]].idxmax()[0]
         self.winner = None
-        # self.method = method.lower()
+        self.success = False
+        self.section_title = section_title
 
 
     def simulate(self, cazzo=False):
@@ -58,7 +61,8 @@ class Simulation:
 
         self.results_df.set_index(['Entrant'], inplace = True)
         self.results_df["sum"] = self.results_df.sum(axis=1)
-        self.sum_winner = self.results_df[["sum"]].idxmax()[0]
+        self.winner = self.results_df[["sum"]].idxmax()[0]
+        self.success = self.winner == self.objective_winner
 
         
         

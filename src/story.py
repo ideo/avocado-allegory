@@ -11,7 +11,7 @@ STORY = {
 
     "Voting":   [
         "Mayor Michelada is busy handing out bowls of tortilla chips. Obviously, if this is going to be a fair competition, everyone is going to need to use the same kind of chip. He also begins handing out the score cards so people can score each guac on a scale from 1 to 10. He thought about asking everyone to try each guac and and then sorting them from worst to best, but there are just too many guacs! Try to keep track of 20 different guacamoles would be too hard. It’ll much easier for people to just score them independently and then add up the scores. Whichever guac gets the highest score wins! Easy enough.",
-        "[Optional, if we want to include a fullness factor] For a moment, Mayor Michelada worries that perhaps 20 guacamoles is too many. Do people have that much room in their stomachs? Will everyone just prefer the first one they try, when they’re the most hungry? Then, by the time they’re full, will they all think the last one is nothing special? But looking around at the huge crowd as everyone jockeys to get close, he realizes that folks will end up tasting in different orders, so hopefully people getting full at different times will just even itself out.",
+        "For a moment, Mayor Michelada worries that perhaps 20 guacamoles is too many. Do people have that much room in their stomachs? Will everyone just prefer the first one they try, when they’re the most hungry? Then, by the time they’re full, will they all think the last one is nothing special? But looking around at the huge crowd as everyone jockeys to get close, he realizes that folks will end up tasting in different orders, so hopefully people getting full at different times will just even itself out.",
         ],
 
     "Voter Types":  [
@@ -31,6 +31,7 @@ STORY = {
     ]
 }
 
+
 INSTRUCTIONS = {
     "Guac God": [
         "Objectively, how do the guacs measure up, relative to each other? Choose a scenario below to be used throughout this simulation.",
@@ -39,4 +40,14 @@ INSTRUCTIONS = {
     "Voting":   [
         "In our first scenario, tasters slightly prefer the guacamoles they try earliest and like them less and less as they get more full. But, all participants taste in random orders and everyone tries every guacamole. Click the button below to simulate the voting process. Highest score wins!"
     ],
+}
+
+
+SUCCESS_MESSAGES = {
+    "Voting":   {
+        True:  [
+            "Success! Even though people had so many guacs to try, and probably became quite full by the end, having everyone taste in random orders ensured the contest still had a fair result.",
+            ]
+    },
+    
 }

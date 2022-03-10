@@ -3,7 +3,7 @@ import streamlit as st
 import pandas as pd
 import time
 
-from .story import STORY, INSTRUCTIONS
+from .story import STORY, INSTRUCTIONS, SUCCESS_MESSAGES
 from .config import OBJECTIVE_RATINGS
 
 
@@ -13,12 +13,19 @@ warnings.simplefilter(action='ignore', category=UserWarning)
 
 def initialize_session_state():
     initial_values = {
-        "simulation_1_pressed":     False,
+        "simulation_1_keep_chart_visible":     False,
+        # "simulation_2_keep_chart_visible":     False,
     }
 
     for key, value in initial_values.items():
         if key not in st.session_state:
             st.session_state[key] = value
+
+
+def reset_visuals():
+    for key in st.session_state:
+        if "_keep_chart_visible" in key:
+            st.session_state[key] = False
 
 
 def write_story(section_title):
@@ -31,7 +38,11 @@ def write_story(section_title):
 
 
 def sidebar():
+    """
+    Let's put all the sidebar controls here!
+    """
     st.sidebar.subheader("Simulation Parameters")
+    st.write("HEY! What are you doing it here? This area is off limits! Only Fra and Joe are allowed in here!")
     num_townspeople = st.sidebar.slider("How many townspeople are there?", 
         value=250, 
         min_value=10, 
@@ -58,15 +69,15 @@ def choose_scenario():
     used in the simulation.
     """
 
-    #define the structure of the entry as
-    #2 columns
+    #define the structure of the entry as 2 columns
     col1, col2 = st.columns([2,5])
 
     #one column has a widget with 2 options
     scenario = col1.radio(
         "Choose a scenario", 
         options=OBJECTIVE_RATINGS.keys(),
-        index=1)
+        index=1,
+        on_change=reset_visuals)
 
     #pull data based on corresponding scenario
     df = pd.DataFrame(
@@ -89,6 +100,9 @@ def choose_scenario():
 
 
 def animate_results(sim, key):
+    """
+    Creates the `Simulate` button, animated chart, and success/fail message
+    """
     col1, col2 = st.columns([2,5])
     start_btn = col1.button("Simulate", key=key)
 
@@ -99,7 +113,7 @@ def animate_results(sim, key):
 
     bar_chart = None
     if start_btn:
-        st.session_state[f"{key}_pressed"] = True
+        st.session_state[f"{key}_keep_chart_visible"] = True
         for NN in range(results_df.shape[1]):
             chart_df, spec = format_spec(sim, subtitle, y_max, col_limit=NN)
             # overwrite_chart(col2, bar_chart, chart_df, spec)
@@ -109,7 +123,7 @@ def animate_results(sim, key):
                 bar_chart = col2.vega_lite_chart(chart_df, spec)
             time.sleep(0.01)
 
-    if st.session_state[f"{key}_pressed"]:
+    if st.session_state[f"{key}_keep_chart_visible"]:
         # Ensure the final chart stays visible
         chart_df, spec = format_spec(sim, subtitle, y_max)
         # overwrite_chart(col2, bar_chart, chart_df, spec)
@@ -117,9 +131,11 @@ def animate_results(sim, key):
             bar_chart.vega_lite_chart(chart_df, spec)
         else:
             bar_chart = col2.vega_lite_chart(chart_df, spec)
+        success_message(sim.section_title, sim.success)
         
 
 def format_spec(sim, subtitle, y_max, col_limit=None):
+    """Format the chart to be shown in each frame of the animation"""
 
     if col_limit:
         chart_df = sim.results_df.iloc[:, :col_limit].copy()
@@ -128,7 +144,7 @@ def format_spec(sim, subtitle, y_max, col_limit=None):
         chart_df = sim.results_df.copy()
 
     chart_df["Entrant"] = sim.guac_df["Entrant"]
-    subtitle += f"Guacamole No. {sim.sum_winner}!"
+    subtitle += f"Guacamole No. {sim.winner}!"
     spec = {
             "mark": {"type": "bar"},
             "encoding": {
@@ -144,6 +160,11 @@ def format_spec(sim, subtitle, y_max, col_limit=None):
             }  
         }
     return chart_df, spec
+
+
+def success_message(section_title, success):
+    for paragraph in SUCCESS_MESSAGES[section_title][success]:
+        st.caption(paragraph)
 
 
 # def overwrite_chart(st_col, chart_obj, chart_df, spec):
@@ -234,12 +255,14 @@ def num_people_and_guac_per_person_slider():
         )
     return num_townspeople, num_guac_per_person
 
+
 def num_people_slider(key):
     num_townspeople = st.slider(key, 
         value=250, 
         min_value=10, 
         max_value=500)
     return num_townspeople
+
 
 def num_guac_per_person_slider(key):
     num_guac_per_person = st.slider(key, 
@@ -248,13 +271,14 @@ def num_guac_per_person_slider(key):
         max_value=20)
     return num_guac_per_person
 
+
 def plot_votes(sim, day_title = 1):
     
     y_field = 'Avg'
     chart_df = sim.results_df[[y_field]].copy()
     chart_df["Entrant"] = chart_df.index
 
-    winning_guac = sim.sum_winner
+    winning_guac = sim.winner
         
     spec = {
         "mark": {"type": "bar"},
