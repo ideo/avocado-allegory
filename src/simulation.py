@@ -2,7 +2,7 @@ import pandas as pd
 import numpy
 from .townspeople import Townsperson
 
-
+TEST_JENNAS_NUMBERS = False
 class Simulation:
     def __init__(
             self, guac_df, num_townspeople, st_dev, fullness_factor = 0.0,
@@ -17,8 +17,14 @@ class Simulation:
         self.perc_pepe = perc_pepe
         self.results_df = None
         self.objective_winner = guac_df[["Objective Ratings"]].idxmax()[0]
-        self.winner = None
+        self.sum_winner = None
         # self.method = method.lower()
+
+        if TEST_JENNAS_NUMBERS:
+            self.num_townspeople = 7
+            self.assigned_guacs = 6
+            self.guac_df = pd.DataFrame([0,1,2,3,4,5], columns = ['Entrant'])
+            self.guac_df['Objective Ratings'] = 0
 
 
     def simulate(self, cazzo=False):
@@ -48,17 +54,22 @@ class Simulation:
         #filling in the ballots dataframe, looping through the various characters
         for num_people, offset in zip(person_types, mean_offsets):
             last_person=False
+
             for np in range(num_people):
                 if np == num_people-1:last_person=True
-                person = Townsperson(person_number=np, st_dev=self.st_dev, assigned_guacs=self.assigned_guacs, mean_offset=offset)
+                person = Townsperson(person_number=np, st_dev=self.st_dev, assigned_guacs=self.assigned_guacs, mean_offset=offset, test_jennas_numbers = TEST_JENNAS_NUMBERS)
                 #creating the elements to compute the condorcet winner
                 condorcet_elements = person.taste_and_vote(self.guac_df, ballots_matrix_sum, last_person)
                 self.results_df[f"Score Person {person.number}"] = self.results_df['Entrant'].apply(lambda x: condorcet_elements.ballot_dict.get(x, None))
 
 
         self.results_df.set_index(['Entrant'], inplace = True)
-        self.results_df["sum"] = self.results_df.sum(axis=1)
-        self.sum_winner = self.results_df[["sum"]].idxmax()[0]
+        
+        columns_to_consider = self.results_df.columns
+        self.results_df["Sum"] = self.results_df[columns_to_consider].sum(axis=1)
+        self.results_df["Mean"] = self.results_df[columns_to_consider].mean(axis=1)
+        self.sum_winner = self.results_df[["Sum"]].idxmax()[0]
+        self.condorcet_winner = condorcet_elements.declare_winner(self.results_df)
 
         
         

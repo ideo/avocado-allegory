@@ -30,7 +30,7 @@ st.subheader("Let’s Play Guac God")
 lg.write_story("Guac God")
 guac_df = lg.choose_scenario()
 
-
+# create_histogram(guac_df)
 st.subheader("Let's Taste and Vote!")
 lg.write_story("Voting")
 sim1 = Simulation(guac_df, num_townspeople, st_dev, fullness_factor=fullness_factor)
