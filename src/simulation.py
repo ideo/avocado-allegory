@@ -21,7 +21,7 @@ class Simulation:
         # self.method = method.lower()
 
 
-    def simulate(self):
+    def simulate(self, cazzo=False):
 
         #introducing characters to the simulation
         #num_pepes tend to score people lower
@@ -47,13 +47,14 @@ class Simulation:
 
         #filling in the ballots dataframe, looping through the various characters
         for num_people, offset in zip(person_types, mean_offsets):
-
+            last_person=False
             for np in range(num_people):
+                if np == num_people-1:last_person=True
                 person = Townsperson(person_number=np, st_dev=self.st_dev, assigned_guacs=self.assigned_guacs, mean_offset=offset)
-                
                 #creating the elements to compute the condorcet winner
-                condorcet_elements = person.taste_and_vote(self.guac_df, ballots_matrix_sum)
+                condorcet_elements = person.taste_and_vote(self.guac_df, ballots_matrix_sum, last_person)
                 self.results_df[f"Score Person {person.number}"] = self.results_df['Entrant'].apply(lambda x: condorcet_elements.ballot_dict.get(x, None))
+
 
         self.results_df.set_index(['Entrant'], inplace = True)
         self.results_df["sum"] = self.results_df.sum(axis=1)

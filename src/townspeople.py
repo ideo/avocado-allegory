@@ -17,7 +17,7 @@ class Townsperson:
         self.max_allowed_vote = max_allowed_vote
 
 
-    def taste_and_vote(self, guac_df, ballots_matrix_sum):
+    def taste_and_vote(self, guac_df, ballots_matrix_sum, last_person):
         """This function takes a subset of the guac god data frame and it assigns subjective ratings to each
         guac. The subjective ratings are sampled by a normal distribution centered at the guac god given score (objective ratings) and with a user defined
         standard deviation.
@@ -25,7 +25,7 @@ class Townsperson:
         # Choose guacs 
         sample_guac_df = guac_df.sample(n=self.assigned_guacs, replace=False)
         sample_guac_df['Subjective Ratings'] = sample_guac_df[["Objective Ratings"]].apply(lambda x: self.taste(x, sample_guac_df.index), axis=1)
-        condorcet_elements = Condorcetcounting(guac_df, sample_guac_df, ballots_matrix_sum)
+        condorcet_elements = Condorcetcounting(guac_df, sample_guac_df, ballots_matrix_sum, last_person)
         return condorcet_elements
 
 

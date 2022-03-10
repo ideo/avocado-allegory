@@ -1,7 +1,16 @@
 import numpy as np
 
 class Condorcetcounting():
-    def __init__(self, guac_df, sample_guac_df, sum_ballots_matrix):
+    def __init__(
+            self, 
+            guac_df, 
+            sample_guac_df, 
+            sum_ballots_matrix, 
+            last_person=False, 
+            cazzo=False):
+        
+        #for debugging
+        self.cazzo = cazzo
         self.guac_names = list(guac_df.index)
         self.num_guacs = len(guac_df)
         self.sample_guac_df = sample_guac_df
@@ -9,19 +18,22 @@ class Condorcetcounting():
         self.ballot_dict = self.get_ballot_dictionary()        
         self.ballot_matrix = self.create_ballot_matrix()
         
+        
+
         #as ballots are created, we sum the matrices on the fly
         sum_ballots_matrix += self.ballot_matrix
 
         self.sum_ballots_matrix = sum_ballots_matrix
+        
 
-
-        self.getSchwartzRelationsMatrix()
+        if last_person:
+            self.getSchwartzRelationsMatrix()
         
 
 
     def create_ballot_matrix(self):
         """This function converts a ballot containing a score for each guac into
-        a matrix of runner (rows) vs opponent (columns), only wins are counted.
+        a matrix of runner (rows) vs opponent (columns), where wins (and only wins) are marked as 1.
 
         Returns:
             numpy ballot matrix
@@ -35,8 +47,8 @@ class Condorcetcounting():
 
             #if this runner wasn't in the ballot, then fill in with 0s and move to the next
             if runner not in self.ballot_dict.keys():
-                ballot_array = [0 for i in range(len(self.guac_names))]
-                break
+                ballot_matrix.append([0 for i in range(len(self.guac_names))])
+                continue
 
             ballot_array = []
             #loop on opponents
@@ -45,7 +57,7 @@ class Condorcetcounting():
                 #if this opponent wasn't in the ballot, add a 0 and move to the next
                 if opponent not in self.ballot_dict.keys():
                     ballot_array.append(0)
-                    break
+                    continue
                     
                 #if runner beats the opponent, record the win
                 if self.ballot_dict[runner] > self.ballot_dict[opponent]:
@@ -56,6 +68,7 @@ class Condorcetcounting():
             #append to then create a ballot matrix
             ballot_matrix.append(ballot_array)
     
+
         ballot_matrix = np.matrix(ballot_matrix)
 
         return ballot_matrix
@@ -77,7 +90,6 @@ class Condorcetcounting():
         Returns:
             matrix of preferences
         """
-
         #initialize a matrix with all zeros 
         relationsMatrix = np.zeros([self.num_guacs,self.num_guacs], dtype=np.bool) # Init to False (loss)
 

@@ -167,13 +167,8 @@ def tally_votes(sim, key):
     chart_df = sim.results_df[[y_field]].copy()
 
     #this is to accomodate mine and joe's simulations
-    if sim.fra_joe == 'fra':
-        winning_guac = sim.winner
-        chart_df["Entrant"] = chart_df.index
-        
-    else:   
-        winning_guac = chart_df.idxmax()[0]
-        chart_df["Entrant"] = sim.guac_df["Entrant"]
+    winning_guac = chart_df.idxmax()[0]
+    chart_df["Entrant"] = sim.guac_df["Entrant"]
 
     spec = {
         "mark": {"type": "bar"},
