@@ -32,9 +32,13 @@ def write_story(section_title):
     for paragraph in STORY[section_title]:
         st.write(paragraph)
 
-    if section_title in INSTRUCTIONS:
-        for paragraph in INSTRUCTIONS[section_title]:
-            st.caption(paragraph)  
+
+def write_instructions(section_title, st_col=None):
+    for paragraph in INSTRUCTIONS[section_title]:
+        if st_col is not None:
+            st_col.caption(paragraph)
+        else:
+            st.caption(paragraph)
 
 
 def sidebar():
@@ -168,7 +172,7 @@ def format_spec(sim, subtitle, y_max, col_limit=None):
                 "y":    {
                     "field": "sum", "type": "quantitative", 
                     "scale": {"domain": [0, y_max]},
-                    "title": "Tally of Votes"},
+                    "title": "Vote Tallies"},
                 "color":    color_spec,
             },
             "title":    {
@@ -184,7 +188,6 @@ def format_bar_colors(sim, chart_df):
     chart_df.at[sim.winner, "Color"] = COLORS["red"]
     chart_df.at[sim.objective_winner, "Color"] = COLORS["green"]
     return chart_df
-
 
 
 def success_message(section_key, success):

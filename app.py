@@ -26,27 +26,40 @@ where we're developing and commenting on the story.""")
 st.subheader("Welcome to Sunnyvale")
 lg.write_story("Introduction")
 
+
 st.subheader("Let’s Play Guac God")
 lg.write_story("Guac God")
+lg.write_instructions("Guac God")
 guac_df = lg.choose_scenario()
 
 
 st.subheader("Let's Taste and Vote!")
-section_title = "Voting"
+section_title = "simulation_1"
 lg.write_story(section_title)
+lg.write_instructions(section_title)
 sim1 = Simulation(guac_df, num_townspeople, st_dev, fullness_factor=fullness_factor)
 sim1.simulate()
-lg.animate_results(sim1, key="simulation_1")
+lg.animate_results(sim1, key=section_title)
 
 
 st.markdown("---")
-st.subheader("2. Not enough guac to go around")
-guac_limit = st.slider("How many guacs do we limit people to?",
-    value=18, min_value=1, max_value=20)
+lg.write_story("transition_1_to_2")
+st.subheader("Not Enough Guac to Go Around")
+section_title = "simulation_2"
+lg.write_story(section_title)
+
+col1, col2 = st.columns(2)
+lg.write_instructions(section_title, col1)
+guac_limit = col2.slider(
+    "How many guacs do we limit people to?",
+    value=18, 
+    min_value=1, 
+    max_value=20)
+
 
 sim2 = Simulation(guac_df, num_townspeople, st_dev, assigned_guacs=guac_limit)
 sim2.simulate()
-lg.animate_results(sim2, key="simulation_2")
+lg.animate_results(sim2, key=section_title)
 
 
 # # st.text("Let's see what the townspeople thought!")
