@@ -161,7 +161,7 @@ def format_spec(sim, subtitle, y_max, col_limit=None):
     color_spec = None
     chart_df["Entrant"] = sim.guac_df["Entrant"]
     if col_limit is None:
-        subtitle += f"Guacamole No. {sim.winner}!"
+        subtitle += f"Guacamole No. {sim.sum_winner}!"
         chart_df = format_bar_colors(sim, chart_df)
         color_spec = {"field": "Color", "type": "nomical", "scale": None}
 
@@ -185,7 +185,7 @@ def format_spec(sim, subtitle, y_max, col_limit=None):
 
 def format_bar_colors(sim, chart_df):
     chart_df["Color"] = pd.Series([COLORS["blue"]]*chart_df.shape[0])
-    chart_df.at[sim.winner, "Color"] = COLORS["red"]
+    chart_df.at[sim.sum_winner, "Color"] = COLORS["red"]
     chart_df.at[sim.objective_winner, "Color"] = COLORS["green"]
     return chart_df
 
@@ -306,7 +306,7 @@ def plot_votes(sim, day_title = 1):
     chart_df = sim.results_df[[y_field]].copy()
     chart_df["Entrant"] = chart_df.index
 
-    winning_guac = sim.winner
+    winning_guac = sim.sum_winner
         
     spec = {
         "mark": {"type": "bar"},

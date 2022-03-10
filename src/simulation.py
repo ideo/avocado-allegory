@@ -18,7 +18,7 @@ class Simulation:
         self.results_df = None
         self.method = method
         self.objective_winner = guac_df[["Objective Ratings"]].idxmax()[0]
-        self.winner = None
+        self.sum_winner = None
         self.success = False
 
 
@@ -59,8 +59,8 @@ class Simulation:
 
         self.results_df.set_index(['Entrant'], inplace = True)
         self.results_df["sum"] = self.results_df.sum(axis=1)
-        self.winner = self.results_df[["sum"]].idxmax()[0]
-        self.success = self.winner == self.objective_winner
+        self.sum_winner = self.results_df[["sum"]].idxmax()[0]
+        self.success = self.sum_winner == self.objective_winner
 
         
         
