@@ -32,7 +32,7 @@ lg.write_story("Guac God")
 lg.write_instructions("Guac God")
 guac_df = lg.choose_scenario()
 
-
+# create_histogram(guac_df)
 st.subheader("Let's Taste and Vote!")
 section_title = "simulation_1"
 lg.write_story(section_title)
