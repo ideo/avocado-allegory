@@ -1,3 +1,9 @@
+COLORS = {
+    "blue":     "#4c78a8",
+    "green":    "#9EA856",
+    "red":      "#E0665C",
+}
+
 OBJECTIVE_RATINGS = {
     "One Clear Winner": [
         4,
@@ -55,10 +61,10 @@ OBJECTIVE_RATINGS = {
         7,
         9,
         8,
-        10,
+        5,
         9.5,
         8,
-        5,
+        10,
         8,
         9,
         5,

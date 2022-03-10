@@ -6,7 +6,7 @@ TEST_JENNAS_NUMBERS = False
 class Simulation:
     def __init__(
             self, guac_df, num_townspeople, st_dev, fullness_factor = 0.0,
-            assigned_guacs=20, perc_fra=0.0, perc_pepe=0.0
+            assigned_guacs=20, perc_fra=0.0, perc_pepe=0.0, method="sum"
         ):
         self.guac_df = guac_df
         self.num_townspeople = num_townspeople
@@ -16,8 +16,10 @@ class Simulation:
         self.perc_fra = perc_fra
         self.perc_pepe = perc_pepe
         self.results_df = None
+        self.method = method
         self.objective_winner = guac_df[["Objective Ratings"]].idxmax()[0]
         self.sum_winner = None
+        self.success = False
         # self.method = method.lower()
 
         if TEST_JENNAS_NUMBERS:
@@ -64,12 +66,10 @@ class Simulation:
 
 
         self.results_df.set_index(['Entrant'], inplace = True)
-        
         columns_to_consider = self.results_df.columns
         self.results_df["Sum"] = self.results_df[columns_to_consider].sum(axis=1)
         self.results_df["Mean"] = self.results_df[columns_to_consider].mean(axis=1)
         self.sum_winner = self.results_df[["Sum"]].idxmax()[0]
         self.condorcet_winner = condorcet_elements.declare_winner(self.results_df)
-
         
         

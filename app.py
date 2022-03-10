@@ -26,33 +26,42 @@ where we're developing and commenting on the story.""")
 st.subheader("Welcome to Sunnyvale")
 lg.write_story("Introduction")
 
+
 st.subheader("Let’s Play Guac God")
 lg.write_story("Guac God")
+lg.write_instructions("Guac God")
 guac_df = lg.choose_scenario()
 
 # create_histogram(guac_df)
 st.subheader("Let's Taste and Vote!")
-lg.write_story("Voting")
+section_title = "simulation_1"
+lg.write_story(section_title)
+lg.write_instructions(section_title)
 sim1 = Simulation(guac_df, num_townspeople, st_dev, fullness_factor=fullness_factor)
 sim1.simulate()
-lg.animate_results(sim1, key="simulation_1")
-print(st.session_state)
-
-# chosen_method = lg.tally_votes(sim1, key="sim1")
-# lg.declare_a_winner(sim1, chosen_method)
+lg.animate_results(sim1, key=section_title)
 
 
 st.markdown("---")
-st.subheader("2. Not enough guac to go around")
-# num_townspeople, st_dev = lg.simulation_parameters()
-guac_limit = st.slider("How many guacs do we limit people to?",
-    value=3, min_value=1, max_value=20)
+lg.write_story("transition_1_to_2")
+st.subheader("Not Enough Guac to Go Around")
+section_title = "simulation_2"
+lg.write_story(section_title)
+
+col1, col2 = st.columns(2)
+lg.write_instructions(section_title, col1)
+guac_limit = col2.slider(
+    "How many guacs do we limit people to?",
+    value=18, 
+    min_value=1, 
+    max_value=20)
 
 
+sim2 = Simulation(guac_df, num_townspeople, st_dev, assigned_guacs=guac_limit)
+sim2.simulate()
+lg.animate_results(sim2, key=section_title)
 
-# sim2 = Simulation(guac_df, num_townspeople, st_dev, assigned_guacs=guac_limit)
-# sim2.simulate()
-# lg.animate_results(sim2, key="simulation_2")
+
 # # st.text("Let's see what the townspeople thought!")
 # # chosen_method = lg.tally_votes(sim2, key="sim2")
 # # lg.declare_a_winner(sim2, chosen_method)
