@@ -67,9 +67,10 @@ class Simulation:
 
         self.results_df.set_index(['Entrant'], inplace = True)
         columns_to_consider = self.results_df.columns
-        self.results_df["Sum"] = self.results_df[columns_to_consider].sum(axis=1)
+        self.results_df["sum"] = self.results_df[columns_to_consider].sum(axis=1)
         self.results_df["Mean"] = self.results_df[columns_to_consider].mean(axis=1)
-        self.sum_winner = self.results_df[["Sum"]].idxmax()[0]
+        self.sum_winner = self.results_df[["sum"]].idxmax()[0]
+        self.success = self.sum_winner == self.objective_winner
         self.condorcet_winner = condorcet_elements.declare_winner(self.results_df)
         
         

@@ -61,7 +61,10 @@ SUCCESS_MESSAGES = {
     "simulation_1": {
         True:  [
             "Success! Even though people had so many guacs to try, and probably became quite full by the end, having everyone taste in random orders ensured the contest still had a fair result.",
-            ]
+            ],
+        False:  [
+            "Oh no! The contest didn't reach a fair conclusion. That's not supposed to happen!"
+        ]
     },
 
     "simulation_2": {
