@@ -6,7 +6,6 @@ from .simulation import Simulation
 import matplotlib.pyplot as plt
 
 def create_histogram(guac_df):
-    min_guac_to_recover_winner = 20
 
     num_guacs = 20
     nt_color_map = {50: 'orange', 100: 'blue', 200: 'green', 400: 'grey'}
@@ -14,7 +13,7 @@ def create_histogram(guac_df):
     
     for std in [1,2,3]:
         rows = []
-        for nt in [50,100,200,400]:
+        for nt in [50,100,200]:
             row = {}    
             row['std'] = std
             row['nt'] = nt
@@ -43,6 +42,7 @@ def create_histogram(guac_df):
 
 def run_a_bunch_of_simulations(num_guacs, guac_df, nt, std):
     min_guac_to_recover_winners = []
+    min_guac_to_recover_winner = 20
     for n in range(200):
         print('nt = ', nt, 'n = ', n)
         
@@ -52,7 +52,7 @@ def run_a_bunch_of_simulations(num_guacs, guac_df, nt, std):
             
             sim.simulate() 
             
-            if sim.objective_winner == sim.winner:
+            if sim.objective_winner == sim.condorcet_winner:
                 min_guac_to_recover_winner = ngpp
             else:
                 min_guac_to_recover_winners.append(min_guac_to_recover_winner)
