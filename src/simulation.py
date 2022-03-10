@@ -6,8 +6,7 @@ from .townspeople import Townsperson
 class Simulation:
     def __init__(
             self, guac_df, num_townspeople, st_dev, fullness_factor = 0.0,
-            assigned_guacs=20, perc_fra=0.0, perc_pepe=0.0, method="sum",
-            section_title=""
+            assigned_guacs=20, perc_fra=0.0, perc_pepe=0.0, method="sum"
         ):
         self.guac_df = guac_df
         self.num_townspeople = num_townspeople
@@ -21,7 +20,6 @@ class Simulation:
         self.objective_winner = guac_df[["Objective Ratings"]].idxmax()[0]
         self.winner = None
         self.success = False
-        self.section_title = section_title
 
 
     def simulate(self, cazzo=False):

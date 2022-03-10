@@ -37,23 +37,18 @@ lg.write_story(section_title)
 sim1 = Simulation(guac_df, num_townspeople, st_dev, fullness_factor=fullness_factor)
 sim1.simulate()
 lg.animate_results(sim1, key="simulation_1")
-# lg.success_message(section_title, sim1.success)
-
-# chosen_method = lg.tally_votes(sim1, key="sim1")
-# lg.declare_a_winner(sim1, chosen_method)
 
 
 st.markdown("---")
 st.subheader("2. Not enough guac to go around")
-# num_townspeople, st_dev = lg.simulation_parameters()
 guac_limit = st.slider("How many guacs do we limit people to?",
-    value=3, min_value=1, max_value=20)
+    value=18, min_value=1, max_value=20)
+
+sim2 = Simulation(guac_df, num_townspeople, st_dev, assigned_guacs=guac_limit)
+sim2.simulate()
+lg.animate_results(sim2, key="simulation_2")
 
 
-
-# sim2 = Simulation(guac_df, num_townspeople, st_dev, assigned_guacs=guac_limit)
-# sim2.simulate()
-# lg.animate_results(sim2, key="simulation_2")
 # # st.text("Let's see what the townspeople thought!")
 # # chosen_method = lg.tally_votes(sim2, key="sim2")
 # # lg.declare_a_winner(sim2, chosen_method)

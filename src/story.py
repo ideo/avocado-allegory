@@ -38,16 +38,25 @@ INSTRUCTIONS = {
     ],
 
     "Voting":   [
-        "In our first scenario, tasters slightly prefer the guacamoles they try earliest and like them less and less as they get more full. But, all participants taste in random orders and everyone tries every guacamole. Click the button below to simulate the voting process. Highest score wins!"
+        "In our first contest, tasters slightly prefer the guacamoles they try earliest and like them less and less as they get more full. But, all participants taste in random orders and everyone tries every guacamole. Click the button below to simulate the voting process. Highest score wins!"
     ],
 }
 
 
 SUCCESS_MESSAGES = {
-    "Voting":   {
+    "simulation_1": {
         True:  [
             "Success! Even though people had so many guacs to try, and probably became quite full by the end, having everyone taste in random orders ensured the contest still had a fair result.",
             ]
     },
+
+    "simulation_2": {
+        True:   [
+            "Success!"
+        ],
+        False:  [
+            "Oh no!"
+        ]
+    }
     
 }

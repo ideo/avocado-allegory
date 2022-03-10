@@ -4,7 +4,7 @@ import pandas as pd
 import time
 
 from .story import STORY, INSTRUCTIONS, SUCCESS_MESSAGES
-from .config import OBJECTIVE_RATINGS
+from .config import OBJECTIVE_RATINGS, COLORS
 
 
 import warnings
@@ -14,7 +14,7 @@ warnings.simplefilter(action='ignore', category=UserWarning)
 def initialize_session_state():
     initial_values = {
         "simulation_1_keep_chart_visible":     False,
-        # "simulation_2_keep_chart_visible":     False,
+        "simulation_2_keep_chart_visible":     False,
     }
 
     for key, value in initial_values.items():
@@ -42,7 +42,11 @@ def sidebar():
     Let's put all the sidebar controls here!
     """
     st.sidebar.subheader("Simulation Parameters")
-    st.write("HEY! What are you doing it here? This area is off limits! Only Fra and Joe are allowed in here!")
+    keep_out = """
+        HEY! What are you doing it here? This area is off limits! Only Fra and 
+        Joe are allowed in here! Get outta here ya meddling kids!
+    """
+    st.sidebar.write(keep_out)
     num_townspeople = st.sidebar.slider("How many townspeople are there?", 
         value=250, 
         min_value=10, 
@@ -76,7 +80,7 @@ def choose_scenario():
     scenario = col1.radio(
         "Choose a scenario", 
         options=OBJECTIVE_RATINGS.keys(),
-        index=1,
+        index=0,
         on_change=reset_visuals)
 
     #pull data based on corresponding scenario
@@ -84,6 +88,10 @@ def choose_scenario():
         columns=["Objective Ratings"], 
         data=OBJECTIVE_RATINGS[scenario])
     df["Entrant"] = df.index
+    winner = df["Objective Ratings"].idxmax()
+    winning_score = df["Objective Ratings"].max()
+    df["Color"] = df["Objective Ratings"].apply(
+        lambda x: COLORS["green"] if x==winning_score else COLORS["blue"])
 
     #draw the chart
     spec = {
@@ -91,8 +99,11 @@ def choose_scenario():
         "encoding": {
             "x":    {"field": "Entrant", "type": "nominal"},
             "y":    {"field": "Objective Ratings", "type": "quantitative"},
+            "color":    {"field": "Color", "type": "nomical", "scale": None}
         },
-        "title":    scenario,   
+        "title":    {
+            "text": scenario, 
+            "subtitle": f"The Best Guac is Guac No. {winner}"},   
     }
 
     col2.vega_lite_chart(df, spec)
@@ -131,7 +142,7 @@ def animate_results(sim, key):
             bar_chart.vega_lite_chart(chart_df, spec)
         else:
             bar_chart = col2.vega_lite_chart(chart_df, spec)
-        success_message(sim.section_title, sim.success)
+        success_message(key, sim.success)
         
 
 def format_spec(sim, subtitle, y_max, col_limit=None):
@@ -143,8 +154,13 @@ def format_spec(sim, subtitle, y_max, col_limit=None):
     else:
         chart_df = sim.results_df.copy()
 
+    color_spec = None
     chart_df["Entrant"] = sim.guac_df["Entrant"]
-    subtitle += f"Guacamole No. {sim.winner}!"
+    if col_limit is None:
+        subtitle += f"Guacamole No. {sim.winner}!"
+        chart_df = format_bar_colors(sim, chart_df)
+        color_spec = {"field": "Color", "type": "nomical", "scale": None}
+
     spec = {
             "mark": {"type": "bar"},
             "encoding": {
@@ -153,6 +169,7 @@ def format_spec(sim, subtitle, y_max, col_limit=None):
                     "field": "sum", "type": "quantitative", 
                     "scale": {"domain": [0, y_max]},
                     "title": "Tally of Votes"},
+                "color":    color_spec,
             },
             "title":    {
                 "text": f"Simulation Results",
@@ -162,8 +179,16 @@ def format_spec(sim, subtitle, y_max, col_limit=None):
     return chart_df, spec
 
 
-def success_message(section_title, success):
-    for paragraph in SUCCESS_MESSAGES[section_title][success]:
+def format_bar_colors(sim, chart_df):
+    chart_df["Color"] = pd.Series([COLORS["blue"]]*chart_df.shape[0])
+    chart_df.at[sim.winner, "Color"] = COLORS["red"]
+    chart_df.at[sim.objective_winner, "Color"] = COLORS["green"]
+    return chart_df
+
+
+
+def success_message(section_key, success):
+    for paragraph in SUCCESS_MESSAGES[section_key][success]:
         st.caption(paragraph)
 
 
