@@ -22,7 +22,11 @@ STORY = {
         "Mayor Michelada looks around at the huge crowd that’s gathered. He’s thrilled so many people were excited by his idea for a contest, but he’s wishing he had told the entrants to make more guacamole. Will they have enough to go around? Heck, they might run out of chips! He is sweating trying to figure out how they can save the competition. Clearly they’re going to have to limit how many people can participate – there’s just no way for everyone to try everything!",
         "But how should they pick who gets to be a taster? Well, one of the few things everyone can agree on is that their mom makes the best guac. Maybe they just the mom’s vote? That could work. But people will be upset if they came all this way and don’t get to try any guac. And, truthfully, the Mayor knows his townspeople. They like to have their own say in the matter, especially the younger ones. Almost on principle they’re going to disagree with whatever their parents say!",
         "Seeing the distress on her Mayor’s face, Earnest Emilia approaches with an idea. She’s just taken an online course in data analytics and really enjoyed learning the clever ways purposeful randomness can useful. What if not everyone needs to try every guac, she suggests. What if, we intentionally let people only try some, but randomly assign a different some to each person?",
-    ]
+    ],
+
+    "simulation_3": [
+        "(WIP) You think for a minute on whether the townspeople would agree of your assessment of which is best? You know some people, like Precocious Pepe, like guac so much that they’ll probably score every entrant generously. Others, like Finicky Francisca, are quite critical and will have no problem picking out flaws. They’ll probably score things quite harshly. But as you watch everyone set up, you’re pretty confident that most people will assess the submissions fairly, give or take a few points. The only person you’re really worried about is Cliquey Carlos. He’s the ring leader of a pretty loyal group of farmers. Plus, he always throws the best parties! It’s pretty clear anyone who wants to stay on his good side is going to be voting for him.",
+    ],
 
     # "Voter Types":  [
     #     "You think for a minute on whether the townspeople would agree of your assessment of which is best? You know some people, like Precocious Pepe, like guac so much that they’ll probably score every entrant generously. Others, like Finicky Francisca, are quite critical and will have no problem picking out flaws. They’ll probably score things quite harshly. But as you watch everyone set up, you’re pretty confident that most people will assess the submissions fairly, give or take a few points. The only person you’re really worried about is Cliquey Carlos. He’s the ring leader of a pretty loyal group of farmers. Plus, he always throws the best parties! It’s pretty clear anyone who wants to stay on his good side is going to be voting for him.",
@@ -53,7 +57,11 @@ INSTRUCTIONS = {
 
     "simulation_2": [
         "In our second contest, try limiting how many guacamoles each taster gets to try. Like before, tasters will taste in random orders and get slightly less generous with their scores as they get full."
-    ]
+    ],
+
+    "simulation_3": [
+        "Choose what percentage of of the town is like each character."
+    ],
 }
 
 
@@ -69,11 +77,21 @@ SUCCESS_MESSAGES = {
 
     "simulation_2": {
         True:   [
-            "Success!"
+            "Success! Even though the tasters missed out on trying MISSING_GUACS guacs each, we had enough participants that we still reached a fair result.",
+            "Try again! Can we push that number even lower than GUAC_LIMIT still get a fair result?"
         ],
+        False:  [
+            "Oh no! Looks like missing out on trying MISSING_GUACS guacs each was too many to skip. Perhaps if we had more tasters we could've compensated."
+        ]
+    },
+
+    "simulation_3": {
+        True:  [
+            "Success!",
+            ],
         False:  [
             "Oh no!"
         ]
-    }
+    },
     
 }

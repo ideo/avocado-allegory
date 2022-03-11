@@ -31,8 +31,10 @@ st.subheader("Let’s Play Guac God")
 lg.write_story("Guac God")
 lg.write_instructions("Guac God")
 guac_df = lg.choose_scenario()
+st.image("img/holy_guacamole.jpeg", width=400, caption="This is you, the Guacamole Goddess.")
 
-# create_histogram(guac_df)
+
+st.markdown("---")
 st.subheader("Let's Taste and Vote!")
 section_title = "simulation_1"
 lg.write_story(section_title)
@@ -40,6 +42,8 @@ lg.write_instructions(section_title)
 sim1 = Simulation(guac_df, num_townspeople, st_dev, fullness_factor=fullness_factor)
 sim1.simulate()
 lg.animate_results(sim1, key=section_title)
+if st.session_state[f"{section_title}_keep_chart_visible"]:
+    lg.success_message(section_title, sim1.success)
 
 
 st.markdown("---")
@@ -51,25 +55,28 @@ lg.write_story(section_title)
 col1, col2 = st.columns(2)
 lg.write_instructions(section_title, col1)
 guac_limit = col2.slider(
-    "How many guacs do we limit people to?",
+    "How many guacs will tasters try? Start by just removing a couple and then push it from there.",
     value=18, 
     min_value=1, 
     max_value=20)
 
-
 sim2 = Simulation(guac_df, num_townspeople, st_dev, assigned_guacs=guac_limit)
 sim2.simulate()
 lg.animate_results(sim2, key=section_title)
+if st.session_state[f"{section_title}_keep_chart_visible"]:
+    lg.success_message(section_title, sim2.success, guac_limit)
 
 
-# # st.text("Let's see what the townspeople thought!")
-# # chosen_method = lg.tally_votes(sim2, key="sim2")
-# # lg.declare_a_winner(sim2, chosen_method)
-
-
-
-# # st.subheader("A Fair Voting Process")
-# # for paragraph in STORY["Voting"]:
-# #     st.write(paragraph)
-
+st.markdown("---")
+st.subheader("Different types of voters")
+section_title = "simulation_3"
+lg.write_story(section_title)
+lg.write_instructions(section_title)
+pepe, fra, carlos = lg.types_of_voters()
+sim3 = Simulation(guac_df, num_townspeople, st_dev, 
+    assigned_guacs=guac_limit,
+    perc_fra=fra,
+    perc_pepe=pepe)
+sim3.simulate()
+lg.animate_results(sim2, key=section_title)
 

@@ -13,8 +13,9 @@ warnings.simplefilter(action='ignore', category=UserWarning)
 
 def initialize_session_state():
     initial_values = {
-        "simulation_1_keep_chart_visible":     False,
-        "simulation_2_keep_chart_visible":     False,
+        "simulation_1_keep_chart_visible":  False,
+        "simulation_2_keep_chart_visible":  False,
+        "simulation_3_keep_chart_visible":  False,
     }
 
     for key, value in initial_values.items():
@@ -136,7 +137,7 @@ def animate_results(sim, key):
                 bar_chart.vega_lite_chart(chart_df, spec)
             else:
                 bar_chart = col2.vega_lite_chart(chart_df, spec)
-            time.sleep(0.01)
+            time.sleep(0.01/2)
 
     if st.session_state[f"{key}_keep_chart_visible"]:
         # Ensure the final chart stays visible
@@ -146,7 +147,11 @@ def animate_results(sim, key):
             bar_chart.vega_lite_chart(chart_df, spec)
         else:
             bar_chart = col2.vega_lite_chart(chart_df, spec)
-        success_message(key, sim.success)
+
+        # message_var = None
+        # if sim.assigned_guacs < results_df.shape[0]:
+        #     message_var = results_df.shape[0] - sim.assigned_guacs
+        # success_message(key, sim.success, message_var)
         
 
 def format_spec(sim, subtitle, y_max, col_limit=None):
@@ -190,9 +195,12 @@ def format_bar_colors(sim, chart_df):
     return chart_df
 
 
-def success_message(section_key, success):
+def success_message(section_key, success, guac_limit=None):
     for paragraph in SUCCESS_MESSAGES[section_key][success]:
-        st.caption(paragraph)
+        if guac_limit is not None:
+            st.caption(paragraph.replace("GUAC_LIMIT", str(guac_limit)).replace("MISSING_GUACS", str(20-guac_limit)))
+        else:
+            st.caption(paragraph)
 
 
 # def overwrite_chart(st_col, chart_obj, chart_df, spec):
@@ -256,13 +264,13 @@ def types_of_voters():
         max_value=30,
         format="%g%%")
 
-    carlos=None
-    # carlos = col3.slider(
-    #     "What percentage of people in town are friends with Cliquey Carlos?",
-    #     value=12,
-    #     min_value=0,
-    #     max_value=30,
-    #     format="%g%%")
+    # carlos=None
+    carlos = col3.slider(
+        "What percentage of people in town are friends with Cliquey Carlos?",
+        value=12,
+        min_value=0,
+        max_value=30,
+        format="%g%%")
 
     pepe /= 100
     fra /= 100
