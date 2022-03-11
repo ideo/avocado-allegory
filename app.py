@@ -76,7 +76,8 @@ pepe, fra, carlos = lg.types_of_voters()
 sim3 = Simulation(guac_df, num_townspeople, st_dev, 
     assigned_guacs=guac_limit,
     perc_fra=fra,
-    perc_pepe=pepe)
+    perc_pepe=pepe,
+    perc_carlos=carlos)
 sim3.simulate()
 lg.animate_results(sim2, key=section_title)
 

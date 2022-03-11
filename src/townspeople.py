@@ -7,7 +7,7 @@ from .condorcetcounting import Condorcetcounting
 # Base Class
 class Townsperson:
     def __init__(self, person_number, fullness_factor = 0.0, st_dev=1, assigned_guacs=20, mean_offset=0, 
-                min_allowed_vote = 1, max_allowed_vote = 10, 
+                min_allowed_vote = 1, max_allowed_vote = 10, carlos_crony=False,
                 test_jennas_numbers = False):
         self.number = person_number
         self.st_dev = st_dev
@@ -16,6 +16,8 @@ class Townsperson:
         self.mean_offset=0
         self.min_allowed_vote = min_allowed_vote
         self.max_allowed_vote = max_allowed_vote
+        self.carlos_crony = carlos_crony
+        self.carlos_index = None
         self.test_jennas_numbers=test_jennas_numbers
 
 
@@ -32,6 +34,8 @@ class Townsperson:
         Returns:
             A Condorcetcounting object
         """
+        self.carlos_index = guac_df[guac_df["Entrant"] == "Cliquey Carlos"].index[0]
+
         sample_guac_df = guac_df.sample(n=self.assigned_guacs, replace=False)
         sample_guac_df['Subjective Ratings'] = sample_guac_df[["Objective Ratings"]].apply(lambda x: self.taste(x, sample_guac_df.index), axis=1)
 
@@ -44,7 +48,7 @@ class Townsperson:
             jennas_data[4] = [(0,9), (1,9.5), (3,0), (5,10)]
             jennas_data[5] = [(1,5), (3,4), (4,8)]
             jennas_data[6] = [(0,6),(1,8),(3,10),(4,7)]        
-            sample_guac_df = pd.DataFrame(jennas_data[self.number], columns = ['Entrant', 'Subjective Ratings'])
+            sample_guac_df = pd.DataFrame(jennas_data[self.number], columns = ["ID", 'Subjective Ratings'])
 
         condorcet_elements = Condorcetcounting(guac_df, sample_guac_df, ballots_matrix_sum, last_person)
         return condorcet_elements
@@ -55,7 +59,7 @@ class Townsperson:
 
         Args:
             row_data (list): objective rating
-            df_index (Int64Index): index containing all guac entrants
+            df_index (Int64Index): index containing all guac IDs
 
         Returns:
             float: subjective rating
@@ -63,18 +67,23 @@ class Townsperson:
         obj_rating = row_data[0]
         taste_order = df_index.get_loc(row_data.name)
 
-        # Here the fullness_offset is modeled as a straight line going from -1 to +1. 
-        # The FF is just a multiplicative factor that moves the offset and increases/decreases the slope.
-        # When fullness_factor = 1, you recover the equation of a straight line. 
-        # When fullness_factor = 0, the effect is off        
-        slope = -self.fullness_factor / (len(df_index)/2)
-        fullness_offset =  slope * taste_order + self.fullness_factor
+        if self.carlos_crony and row_data.name==self.carlos_index:
+            # We voting for our boy!
+            return 10
 
-        obj_rating = row_data[0]
-        mu = obj_rating + self.mean_offset + fullness_offset
-        subj = np.random.normal(mu, self.st_dev)
-        subj = round(subj)
-        subj = 10 if subj > 10 else subj
-        subj = 0 if subj < 0 else subj
-        return subj
+        else:
+            # Here the fullness_offset is modeled as a straight line going from -1 to +1. 
+            # The FF is just a multiplicative factor that moves the offset and increases/decreases the slope.
+            # When fullness_factor = 1, you recover the equation of a straight line. 
+            # When fullness_factor = 0, the effect is off        
+            slope = -self.fullness_factor / (len(df_index)/2)
+            fullness_offset =  slope * taste_order + self.fullness_factor
+
+            obj_rating = row_data[0]
+            mu = obj_rating + self.mean_offset + fullness_offset
+            subj = np.random.normal(mu, self.st_dev)
+            subj = round(subj)
+            subj = 10 if subj > 10 else subj
+            subj = 0 if subj < 0 else subj
+            return subj
 

@@ -4,7 +4,7 @@ import pandas as pd
 import time
 
 from .story import STORY, INSTRUCTIONS, SUCCESS_MESSAGES
-from .config import OBJECTIVE_RATINGS, COLORS
+from .config import COLORS, ENTRANTS
 
 
 import warnings
@@ -82,27 +82,41 @@ def choose_scenario():
     col1, col2 = st.columns([2,5])
 
     #one column has a widget with 2 options
+    options = list(ENTRANTS[0].keys())
+    options.remove("ID")
+    options.remove("Entrant")
+
     scenario = col1.radio(
         "Choose a scenario", 
-        options=OBJECTIVE_RATINGS.keys(),
+        # options=OBJECTIVE_RATINGS.keys(),
+        options=options,
         index=0,
         on_change=reset_visuals)
 
+    df = pd.DataFrame(data=ENTRANTS)
+    df["Objective Ratings"] = df[scenario].copy()
+
     #pull data based on corresponding scenario
-    df = pd.DataFrame(
-        columns=["Objective Ratings"], 
-        data=OBJECTIVE_RATINGS[scenario])
-    df["Entrant"] = df.index
+    # df = pd.DataFrame(
+    #     columns=["Objective Ratings"], 
+    #     data=OBJECTIVE_RATINGS[scenario])
+    # df["Entrant"] = df.index
+    # df["Entrant"] = df["Entrant"].apply(lambda x: ENTRANTS[x]["Name"])
     winner = df["Objective Ratings"].idxmax()
     winning_score = df["Objective Ratings"].max()
     df["Color"] = df["Objective Ratings"].apply(
         lambda x: COLORS["green"] if x==winning_score else COLORS["blue"])
 
+    # st.write(df)
     #draw the chart
     spec = {
+        "height":   275,
         "mark": {"type": "bar"},
         "encoding": {
-            "x":    {"field": "Entrant", "type": "nominal"},
+            "x":    {
+                "field": "Entrant", "type": "nominal", "sort": "ID", 
+                "axis": {"labelAngle": 45}
+                },
             "y":    {"field": "Objective Ratings", "type": "quantitative"},
             "color":    {"field": "Color", "type": "nomical", "scale": None}
         },
@@ -171,9 +185,12 @@ def format_spec(sim, subtitle, y_max, col_limit=None):
         color_spec = {"field": "Color", "type": "nomical", "scale": None}
 
     spec = {
+            "height":   275,
             "mark": {"type": "bar"},
             "encoding": {
-                "x":    {"field": "Entrant", "tupe": "nominal"},
+                "x":    {
+                    "field": "Entrant", "tupe": "nominal", "sort": "ID",
+                    "axis": {"labelAngle": 45}},
                 "y":    {
                     "field": "sum", "type": "quantitative", 
                     "scale": {"domain": [0, y_max]},

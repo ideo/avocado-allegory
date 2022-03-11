@@ -6,7 +6,7 @@ TEST_JENNAS_NUMBERS = False
 class Simulation:
     def __init__(
             self, guac_df, num_townspeople, st_dev, fullness_factor = 0.0,
-            assigned_guacs=20, perc_fra=0.0, perc_pepe=0.0, method="sum"
+            assigned_guacs=20, perc_fra=0.0, perc_pepe=0.0, perc_carlos=0.0
         ):
         self.guac_df = guac_df
         self.num_townspeople = num_townspeople
@@ -15,8 +15,9 @@ class Simulation:
         self.assigned_guacs = assigned_guacs
         self.perc_fra = perc_fra
         self.perc_pepe = perc_pepe
+        self.perc_carlos = perc_carlos
         self.results_df = None
-        self.method = method
+        # self.method = method
         self.objective_winner = guac_df[["Objective Ratings"]].idxmax()[0]
         self.sum_winner = None
         self.success = False
@@ -32,23 +33,24 @@ class Simulation:
     def simulate(self, cazzo=False):
 
         #introducing characters to the simulation
-        #num_pepes tend to score people lower
+        #num_pepes tend to score people higher
         num_pepes = round(self.num_townspeople * self.perc_pepe)
 
-        #num_fras tend to score people higher
+        #num_fras tend to score people lower
         num_fras = round(self.num_townspeople * self.perc_fra)
 
+        #num_carlos are colluding to vote Carlos the best
+        num_carlos = round(self.num_townspeople * self.perc_carlos)
+
         #num_reasonable tend to score people fair
-        num_reasonable = self.num_townspeople - num_pepes - num_fras
+        num_reasonable = self.num_townspeople - num_pepes - num_fras - num_carlos
 
-
-        person_types = [num_reasonable, num_pepes, num_fras]
         #this is by how much we'll be moving the standard deviation used to sample from the Guac God give scores
+        person_types = [num_reasonable, num_pepes, num_fras]
         mean_offsets = [0, 3, -3]
 
-        
         #Creating the DF that will store the ballots
-        self.results_df = pd.DataFrame(list(self.guac_df.index), columns = ['Entrant'])
+        self.results_df = pd.DataFrame(list(self.guac_df.index), columns = ["ID"])
 
         #creating the matrix sum. We'll increment this in the condorcet object
         ballots_matrix_sum = numpy.zeros([len(self.guac_df),len(self.guac_df)])
@@ -58,14 +60,33 @@ class Simulation:
             last_person=False
 
             for np in range(num_people):
-                if np == num_people-1:last_person=True
-                person = Townsperson(person_number=np, st_dev=self.st_dev, assigned_guacs=self.assigned_guacs, mean_offset=offset, test_jennas_numbers = TEST_JENNAS_NUMBERS)
+                if np == num_people-1:
+                    last_person=True
+
+                person = Townsperson(person_number=np, st_dev=self.st_dev, assigned_guacs=self.assigned_guacs, mean_offset=offset, test_jennas_numbers=TEST_JENNAS_NUMBERS)
                 #creating the elements to compute the condorcet winner
                 condorcet_elements = person.taste_and_vote(self.guac_df, ballots_matrix_sum, last_person)
-                self.results_df[f"Score Person {person.number}"] = self.results_df['Entrant'].apply(lambda x: condorcet_elements.ballot_dict.get(x, None))
+                # self.results_df[f"Score Person {person.number}"] = self.results_df["ID"].apply(lambda x: condorcet_elements.ballot_dict.get(x, None))
+                self.results_df[f"Score Person {person.number}"] = self.guac_df["Entrant"].apply(lambda x: condorcet_elements.ballot_dict.get(x, None))
 
 
-        self.results_df.set_index(['Entrant'], inplace = True)
+        for np in range(num_carlos):
+            if np == num_people-1:
+                last_person=True
+
+            person = Townsperson(
+                person_number=np, 
+                st_dev=self.st_dev, 
+                assigned_guacs=self.assigned_guacs, 
+                mean_offset=offset, 
+                test_jennas_numbers = TEST_JENNAS_NUMBERS,
+                carlos_crony=True)
+
+            condorcet_elements = person.taste_and_vote(self.guac_df, ballots_matrix_sum, last_person)
+            self.results_df[f"Score Person {person.number}"] = self.guac_df["Entrant"].apply(lambda x: condorcet_elements.ballot_dict.get(x, None))
+
+
+        self.results_df.set_index(["ID"], inplace = True)
         columns_to_consider = self.results_df.columns
         self.results_df["sum"] = self.results_df[columns_to_consider].sum(axis=1)
         self.results_df["Mean"] = self.results_df[columns_to_consider].mean(axis=1)
