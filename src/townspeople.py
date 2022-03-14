@@ -82,7 +82,6 @@ class Townsperson:
             obj_rating = row_data[0]
             mu = obj_rating + self.mean_offset + fullness_offset
             subj = np.random.normal(mu, self.st_dev)
-            subj = round(subj)
             subj = 10 if subj > 10 else subj
             subj = 0 if subj < 0 else subj
             return subj
