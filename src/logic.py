@@ -166,7 +166,16 @@ def animate_results(sim, key):
         # if sim.assigned_guacs < results_df.shape[0]:
         #     message_var = results_df.shape[0] - sim.assigned_guacs
         # success_message(key, sim.success, message_var)
-        
+
+#this is an experiment, to include an image with the winner        
+def get_winner_image(sim, key):
+    col1, col2 = st.columns([2,5])
+    start_btn = col1.button("Simulate", key=key)
+
+    if start_btn:
+        col1, col2, col3 = st.columns(3)
+        col2.image("img/badge2.png", width=100, caption="badge test.")
+
 
 def format_spec(sim, subtitle, y_max, col_limit=None):
     """Format the chart to be shown in each frame of the animation"""
@@ -291,7 +300,7 @@ def types_of_voters():
 
     pepe /= 100
     fra /= 100
-    # carlos /= 100
+    carlos /= 100
     return pepe, fra, carlos
 
 

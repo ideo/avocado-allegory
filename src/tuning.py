@@ -4,63 +4,76 @@ import numpy as np
 
 from .simulation import Simulation
 import matplotlib.pyplot as plt
+from .config import COLORS, ENTRANTS
 
-def create_histogram(guac_df):
+def wrap_my_head_around_it():
+        
+    df = pd.DataFrame(data=ENTRANTS)
+
+    scenario = 'One Clear Winner'
+
+    guac_df = df[['ID', 'Entrant', scenario]]
+    guac_df.rename(columns = {scenario: "Objective Ratings"}, inplace = True)
+    
+    collect_data(guac_df, scenario)
+
+
+    scenario = 'A Close Call'
+
+    guac_df = df[['ID', 'Entrant', scenario]]
+    guac_df.rename(columns = {scenario: "Objective Ratings"}, inplace = True)
+        
+    collect_data(guac_df, scenario)
+
+
+    scenario = 'A Lot of Contenders'
+
+    guac_df = df[['ID', 'Entrant', scenario]]
+    guac_df.rename(columns = {scenario: "Objective Ratings"}, inplace = True)
+        
+    collect_data(guac_df, scenario)
+
+    print('DONE')
+
+
+
+
+def collect_data(guac_df, scenario):
+
 
     num_guacs = 20
     nt_color_map = {50: 'orange', 100: 'blue', 200: 'green', 400: 'grey'}
 
     
+    rows = []
     for std in [1,2,3]:
-        rows = []
         for nt in [50,100,200]:
-            row = {}    
-            row['std'] = std
-            row['nt'] = nt
 
-            min_guac_to_recover_winners = run_a_bunch_of_simulations(num_guacs, guac_df, nt, std)
+            for n in range(200):
+                print('std = ', std, 'nt = ', nt, 'n = ', n)
+                row = {}  
+                row['loop_step'] = n  
+                row['standard_dev'] = std
+                row['number_town_people'] = nt
 
-            row['guacs_limit'] = '|'.join([str(i) for i in min_guac_to_recover_winners])
+                for ngpp in range(num_guacs, 0, -1):                    
+                    sim = Simulation(guac_df, nt, std, fullness_factor=1.0, assigned_guacs=ngpp)                    
+                    sim.simulate() 
 
-            plt.hist(min_guac_to_recover_winners, 
-                    density = True, 
-                    label = nt, 
-                    color = nt_color_map[nt], 
-                    alpha = 0.5)
-            rows.append(row)
+                    if len(sim.results_df[sim.results_df['Mean'].isnull()]) > 0:
+                        print('Not all quacs assigned!')
+                        row[f"guac_{ngpp}"] = 'not_all_assigned'
+                    else:
+                        if sim.objective_winner == sim.condorcet_winner:
+                            row[f"guac_{ngpp}"] = 'true'
+                        else:
+                            row[f"guac_{ngpp}"] = 'false'
 
-        df = pd.DataFrame(rows)
-        df.to_csv(f"Distribution_varying_townpeople_{std}_std_{num_guacs}total_guacs.csv")
-        plt.xlabel('# guacs/person yielding true winner')
-        plt.ylabel('%')
-        plt.title(f"Initial number of guacs = {num_guacs}, standard dev on people score = {std}")
-        plt.legend(loc = 2)
-        plt.ylim(0, 0.8)
-        plt.savefig(f"Distribution_varying_townpeople_{std}stev_{num_guacs}total_guacs.pdf")
-        plt.close()
-    # import pdb;pdb.set_trace()
-
-def run_a_bunch_of_simulations(num_guacs, guac_df, nt, std):
-    min_guac_to_recover_winners = []
-    min_guac_to_recover_winner = 20
-    for n in range(200):
-        print('nt = ', nt, 'n = ', n)
-        
-        for ngpp in range(num_guacs, 0, -1):
-
-            sim = Simulation(guac_df, nt, std, assigned_guacs=ngpp)
+                rows.append(row)
             
-            sim.simulate() 
-            
-            if sim.objective_winner == sim.condorcet_winner:
-                min_guac_to_recover_winner = ngpp
-            else:
-                min_guac_to_recover_winners.append(min_guac_to_recover_winner)
-                break
-    
-    return min_guac_to_recover_winners
-    
-
+    df = pd.DataFrame(rows)
+    scenario = '-'.join(scenario.split(' ')).lower()
+    df.to_csv(f"data/param_space_for_recovering_winner_total_guacs{num_guacs}_{scenario}_fullness_factor.csv")
 
 def tune_simulation(guac_df):
     st.subheader("Tuning the Simulation")
