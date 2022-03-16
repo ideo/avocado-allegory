@@ -20,6 +20,8 @@ class Townsperson:
         self.max_allowed_vote = max_allowed_vote
         self.carlos_crony = carlos_crony
         self.carlos_index = None
+        self.voted_for_our_boy = False
+        self.ballot = None
         self.test_jennas_numbers=test_jennas_numbers
 
 
@@ -40,6 +42,7 @@ class Townsperson:
 
         sample_guac_df = guac_df.sample(n=self.assigned_guacs, replace=False)
         sample_guac_df['Subjective Ratings'] = sample_guac_df[["Objective Ratings"]].apply(lambda x: self.taste(x, sample_guac_df.index), axis=1)
+        self.ballot = sample_guac_df
 
         if self.test_jennas_numbers:
             jennas_data = {}
@@ -71,6 +74,7 @@ class Townsperson:
 
         if self.carlos_crony and row_data.name==self.carlos_index:
             # We votin' for our boy!
+            self.voted_for_our_boy = True
             return self.max_allowed_vote
 
         else:

@@ -99,5 +99,11 @@ sim3.simulate()
 lg.animate_results(sim3, key=section_title)
 # lg.success_message(sim3)
 
+num_cronies = sum(townie.carlos_crony for townie in sim3.townspeople)
+num_effective_cronies = sum(townie.voted_for_our_boy for townie in sim3.townspeople)
+st.caption(f"Tallying the votes by just adding them all up was a {'success' if sim3.sum_success else 'failure'}!")
+st.caption(f"Tallying the votes using the condorcet method was a {'success' if sim3.sum_success else 'failure'}!")
+st.caption(f"{num_cronies} of Carlos's cronies voted in the contest and {num_effective_cronies} were able to vote for him.")
+
 
 st.markdown("---")

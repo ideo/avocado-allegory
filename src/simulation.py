@@ -10,6 +10,7 @@ class Simulation:
         ):
         self.guac_df = guac_df
         self.num_townspeople = num_townspeople
+        self.townspeople = []
         self.st_dev = st_dev
         self.fullness_factor = fullness_factor
         self.assigned_guacs = assigned_guacs
@@ -51,10 +52,6 @@ class Simulation:
             if num_people == 0: continue
             condorcet_elements = self.collect_results(ballots_matrix_sum, num_people, offset, carlos_crony)
 
-        # #FIXME to add what this character does. Will we be basically use the same votes across carlos?
-        # if num_carlos > 0:
-        #     condorcet_elements = self.collect_results(ballots_matrix_sum, num_carlos)
-
         #putting the results together
         self.results_df.set_index(["ID"], inplace = True)
         columns_to_consider = self.results_df.columns
@@ -63,13 +60,13 @@ class Simulation:
         self.sum_winner = self.results_df[["sum"]].idxmax()[0]
         self.condorcet_winner = condorcet_elements.declare_winner(self.results_df)
 
-        if self.assigned_guacs == len(self.guac_df):
-            self.success = self.sum_winner == self.objective_winner
-        else:
-            self.success = self.condorcet_winner == self.objective_winner
-        
-        # if num_carlos > 0:
-        #     import pdb;pdb.set_trace()
+        # if self.assigned_guacs == len(self.guac_df):
+        #     self.success = self.sum_winner == self.objective_winner
+        # else:
+        #     self.success = self.condorcet_winner == self.objective_winner
+        self.sum_success = self.sum_winner == self.objective_winner
+        self.condo_success = self.condorcet_winner == self.objective_winner
+        self.success = self.sum_success
 
 
     def create_personas(self):
@@ -89,7 +86,7 @@ class Simulation:
         #num_carlos are colluding to vote Carlos the best
         num_carlos = round(self.num_townspeople * self.perc_carlos)
 
-        #num_reasonable tend to score people fair
+        #num_reasonable tend to score people fairly
         num_reasonable = self.num_townspeople - num_pepes - num_fras - num_carlos
         return num_pepes, num_fras, num_carlos, num_reasonable
 
@@ -120,6 +117,7 @@ class Simulation:
                 test_jennas_numbers=TEST_JENNAS_NUMBERS,
                 carlos_crony=carlos_crony
                 )
+            self.townspeople.append(person)
 
             #creating the elements to compute the condorcet winner
             condorcet_elements = person.taste_and_vote(self.guac_df, ballots_matrix_sum, last_person)
