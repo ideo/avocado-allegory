@@ -23,6 +23,7 @@ class Townsperson:
         self.voted_for_our_boy = False
         self.ballot = None
         self.test_jennas_numbers=test_jennas_numbers
+        random.seed(person_number)
 
 
     def taste_and_vote(self, guac_df, ballots_matrix_sum, last_person):
