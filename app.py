@@ -5,8 +5,10 @@ from src.story import STORY
 import src.logic as lg
 from src.simulation import Simulation
 from src.simulation_unknown_best import Simulation_unknown_best
-# from src.tuning import tune_simulation, create_histogram
+from src.tuning import tune_simulation, wrap_my_head_around_it
 
+
+# wrap_my_head_around_it()
 
 st.set_page_config(
     page_title="Guacamole Contest",
@@ -62,9 +64,13 @@ guac_limit = col2.slider(
 
 sim2 = Simulation(guac_df, num_townspeople, st_dev, assigned_guacs=guac_limit)
 sim2.simulate()
-lg.animate_results(sim2, key=section_title)
-if st.session_state[f"{section_title}_keep_chart_visible"]:
-    lg.success_message(section_title, sim2.success, guac_limit)
+
+lg.get_winner_image(sim2, key=section_title)
+# if st.session_state[f"{section_title}_keep_chart_visible"]:
+#     lg.success_message(section_title, sim2.success, guac_limit)
+# lg.animate_results(sim2, key=section_title)
+# if st.session_state[f"{section_title}_keep_chart_visible"]:
+#     lg.success_message(section_title, sim2.success, guac_limit)
 
 
 st.markdown("---")
@@ -73,6 +79,7 @@ section_title = "simulation_3"
 lg.write_story(section_title)
 lg.write_instructions(section_title)
 pepe, fra, carlos = lg.types_of_voters()
+
 sim3 = Simulation(guac_df, num_townspeople, st_dev, 
     assigned_guacs=guac_limit,
     perc_fra=fra,
