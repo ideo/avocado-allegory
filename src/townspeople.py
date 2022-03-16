@@ -70,7 +70,7 @@ class Townsperson:
         taste_order = df_index.get_loc(row_data.name)
 
         if self.carlos_crony and row_data.name==self.carlos_index:
-            # We voting for our boy!
+            # We votin' for our boy!
             return self.max_allowed_vote
 
         else:

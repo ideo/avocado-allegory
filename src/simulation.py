@@ -35,8 +35,9 @@ class Simulation:
         num_pepes, num_fras, num_carlos, num_reasonable = self.create_personas()
          
         #this is by how much we'll be moving the standard deviation used to sample from the Guac God give scores
-        person_types = [num_reasonable, num_pepes, num_fras]
-        mean_offsets = [0, 3, -3]
+        person_types = [num_reasonable, num_pepes, num_fras, num_carlos]
+        mean_offsets = [0, 3, -3, 0]
+        carlos_cronies = [False, False, False, True]
 
         #Creating the DF that will store the ballots
         self.results_df = pd.DataFrame(list(self.guac_df.index), columns = ["ID"])
@@ -46,13 +47,13 @@ class Simulation:
         
         #filling in the ballots dataframe,for the various characters
         condorcet_elements = None
-        for num_people, offset in zip(person_types, mean_offsets):
+        for num_people, offset, carlos_crony in zip(person_types, mean_offsets, carlos_cronies):
             if num_people == 0: continue
-            condorcet_elements = self.collect_results(ballots_matrix_sum, num_people, offset)
+            condorcet_elements = self.collect_results(ballots_matrix_sum, num_people, offset, carlos_crony)
 
-        #FIXME to add what this character does. Will we be basically use the same votes across carlos?
-        if num_carlos > 0:
-            condorcet_elements = self.collect_results(ballots_matrix_sum, num_carlos)
+        # #FIXME to add what this character does. Will we be basically use the same votes across carlos?
+        # if num_carlos > 0:
+        #     condorcet_elements = self.collect_results(ballots_matrix_sum, num_carlos)
 
         #putting the results together
         self.results_df.set_index(["ID"], inplace = True)
@@ -93,7 +94,7 @@ class Simulation:
         return num_pepes, num_fras, num_carlos, num_reasonable
 
 
-    def collect_results(self, ballots_matrix_sum, num_people, mean_offset = 0):
+    def collect_results(self, ballots_matrix_sum, num_people, mean_offset=0, carlos_crony=False):
         """This function collects the results of a simulation on a set of people
 
         Args:
@@ -116,7 +117,8 @@ class Simulation:
                 st_dev=self.st_dev, 
                 assigned_guacs=self.assigned_guacs, 
                 mean_offset=mean_offset, 
-                test_jennas_numbers=TEST_JENNAS_NUMBERS
+                test_jennas_numbers=TEST_JENNAS_NUMBERS,
+                carlos_crony=carlos_crony
                 )
 
             #creating the elements to compute the condorcet winner
