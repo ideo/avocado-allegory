@@ -67,8 +67,8 @@ class Simulation:
         else:
             self.success = self.condorcet_winner == self.objective_winner
         
-        if num_carlos > 0:
-            import pdb;pdb.set_trace()
+        # if num_carlos > 0:
+        #     import pdb;pdb.set_trace()
 
     def create_personas(self):
         """This function creates the counts for the different personas.

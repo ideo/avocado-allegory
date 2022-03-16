@@ -6,6 +6,7 @@ from .simulation import Simulation
 import matplotlib.pyplot as plt
 from .config import COLORS, ENTRANTS
 
+
 def wrap_my_head_around_it():
         
     df = pd.DataFrame(data=ENTRANTS)
