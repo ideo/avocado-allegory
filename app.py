@@ -56,35 +56,48 @@ lg.write_story(section_title)
 
 col1, col2 = st.columns(2)
 lg.write_instructions(section_title, col1)
-guac_limit = col2.slider(
+guac_limit2 = col2.slider(
     "How many guacs will tasters try? Start by just removing a couple and then push it from there.",
     value=18, 
     min_value=1, 
     max_value=20)
 
-sim2 = Simulation(guac_df, num_townspeople, st_dev, assigned_guacs=guac_limit)
+sim2 = Simulation(guac_df, num_townspeople, st_dev, assigned_guacs=guac_limit2)
 sim2.simulate()
-
-lg.get_winner_image(sim2, key=section_title)
-# if st.session_state[f"{section_title}_keep_chart_visible"]:
-#     lg.success_message(section_title, sim2.success, guac_limit)
 # lg.animate_results(sim2, key=section_title)
+
+# lg.get_winner_image(sim2, key=section_title)
 # if st.session_state[f"{section_title}_keep_chart_visible"]:
 #     lg.success_message(section_title, sim2.success, guac_limit)
+lg.animate_results(sim2, key=section_title)
+if st.session_state[f"{section_title}_keep_chart_visible"]:
+    lg.success_message(section_title, sim2.success, guac_limit2)
 
 
 st.markdown("---")
-st.subheader("Different types of voters")
+lg.write_story("transition_2_to_3")
+st.subheader("Different People, Different Tastes")
 section_title = "simulation_3"
 lg.write_story(section_title)
-lg.write_instructions(section_title)
+st.text("")
+lg.write_instructions(section_title+"_a")
 pepe, fra, carlos = lg.types_of_voters()
+col1, col2 = st.columns(2)
+lg.write_instructions(section_title+"_b", col1)
+guac_limit3 = col2.slider(
+    "How many guacamoles does each voter get to try?",
+    value=15, 
+    min_value=1, 
+    max_value=20)
 
 sim3 = Simulation(guac_df, num_townspeople, st_dev, 
-    assigned_guacs=guac_limit,
+    assigned_guacs=guac_limit3,
     perc_fra=fra,
     perc_pepe=pepe,
     perc_carlos=carlos)
 sim3.simulate()
-lg.animate_results(sim2, key=section_title)
+lg.animate_results(sim3, key=section_title)
+# lg.success_message(sim3)
 
+
+st.markdown("---")

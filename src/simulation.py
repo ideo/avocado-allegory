@@ -70,6 +70,7 @@ class Simulation:
         # if num_carlos > 0:
         #     import pdb;pdb.set_trace()
 
+
     def create_personas(self):
         """This function creates the counts for the different personas.
 
@@ -89,8 +90,8 @@ class Simulation:
 
         #num_reasonable tend to score people fair
         num_reasonable = self.num_townspeople - num_pepes - num_fras - num_carlos
-
         return num_pepes, num_fras, num_carlos, num_reasonable
+
 
     def collect_results(self, ballots_matrix_sum, num_people, mean_offset = 0):
         """This function collects the results of a simulation on a set of people
