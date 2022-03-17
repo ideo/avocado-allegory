@@ -59,7 +59,9 @@ class Simulation:
         columns_to_consider = self.results_df.columns
         self.results_df["sum"] = self.results_df[columns_to_consider].sum(axis=1)
         self.results_df["Mean"] = self.results_df[columns_to_consider].mean(axis=1)
-        self.sum_winner = self.results_df[["sum"]].idxmax()[0]
+        
+        self.sum_winner = self.get_sum_winner()
+        
         self.condorcet_winner = condorcet_elements.declare_winner(self.results_df)
 
         if self.assigned_guacs == len(self.guac_df):
@@ -69,6 +71,26 @@ class Simulation:
         
         # if num_carlos > 0:
         #     import pdb;pdb.set_trace()
+
+    def get_sum_winner(self):
+        """This function determines the winner considering the sum.
+
+        Returns:
+            integer: guac ID of winner
+        """
+        sorted_scores = self.results_df.sort_values(by='sum', ascending=False)
+        sorted_scores['Entrant'] = sorted_scores.index
+        
+        top1_score = sorted_scores.iloc[0]['sum']
+        top1_winner = sorted_scores.iloc[0]['Entrant']
+
+        top2_score = sorted_scores.iloc[1]['sum']
+        
+        #Just to be aware of the possibility of getting the same sum
+        if top1_score == top2_score:
+            print("\n\n\nMULTIPLE WINNERS! PICKING ONE AT RANDOM...\n\n\n")
+        
+        return top1_winner
 
     def create_personas(self):
         """This function creates the counts for the different personas.
