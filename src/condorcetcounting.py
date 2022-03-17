@@ -141,7 +141,7 @@ class Condorcetcounting():
 
         Args:
             results_df (dataframe): dataframe with the scores
-
+            ballots_matrix_list (list): list of numpy matrices
         Returns:
             winning guac
         """
@@ -159,10 +159,11 @@ class Condorcetcounting():
         self.smith_schwartz_set_df['ID'] = self.smith_schwartz_set_df.index
 
         #filter out the winners
-        self.winner = self.get_winners(ballots_matrix_list)
+        self.winner = self.get_winners(ballots_matrix_list, results_df)
+        return self.winner
 
 
-    def get_winners(self, ballots_matrix_list):
+    def get_winners(self, ballots_matrix_list, results_df):
         """This function computes the winner(s) from the smith_or_schwartz sets
 
         Args:
@@ -182,6 +183,7 @@ class Condorcetcounting():
         
         #get the winning mean
         winning_mean = winners_df.iloc[0]['Mean']
+        
         #create a dictionary of means - winners to catch multiple winners
         mean_winners_dict = {}
         for m, w in zip(winners_df['Mean'].tolist(), winners_df['ID'].tolist()):
@@ -198,29 +200,50 @@ class Condorcetcounting():
             return self.winners[0]
         #if there are multiple winners
         else:
-            # self.break_tie(ballots_matrix_list)
+            # self.break_tie(ballots_matrix_list, results_df)
             print ("Picking winner at random among winners, for simplicity")
 
             # print(f"\n\n\nWinner = {self.winners.iloc[0]['ID']}")
             return self.winners[0]
 
 
-    def break_tie(self, ballots_matrix_list):
-        # remove all rows and columns, apart for the winners:
+    #this below is WIP
+    def break_tie(self, ballots_matrix_list, results_df):
 
-        # winners_id = [9,12]
-        to_delete = [i for i in self.guac_df['ID'].tolist() if i not in self.winners]
+        #select columns with a score
+        scores_cols = [i for i in results_df.columns if 'Score Person' in i]
 
-        ballots_matrix_winners_list = []
-        for mb in ballots_matrix_list:
-            #delete the rows and columns of non winning guacs
-            mb_lite = np.delete(mb, to_delete, 0)
-            mb_lite = np.delete(mb_lite, to_delete, 1)
-            print(mb_lite.shape)
+        #slice the results to only concentrate on the winners
+        results_df_slice = results_df[results_df.index.isin(self.winners)].copy()
 
-            ballots_matrix_winners_list.append(mb_lite)
-            
+        #create the ballot matrices and the ballot matrix sum
+        ballot_matrix_list = []
         import pdb;pdb.set_trace()
+
+        for sc in scores_cols:
+            #get ballot for that person:
+            results_df_slice[sc].fillna(0, inplace=True)
+            ballot_dict = dict(zip(results_df_slice.index, results_df_slice[sc].tolist()))
+            ballot_matrix_list.append(self.create_ballot_matrix())
+        
+        import pdb;pdb.set_trace()
+        self.declare_winner(results_df, ballots_matrix_list)
+
+
+
+        # # winners_id = [9,12]
+        # to_delete = [i for i in self.guac_df['ID'].tolist() if i not in self.winners]
+
+        # ballots_matrix_winners_list = []
+        # for mb in ballots_matrix_list:
+        #     #delete the rows and columns of non winning guacs
+        #     mb_lite = np.delete(mb, to_delete, 0)
+        #     mb_lite = np.delete(mb_lite, to_delete, 1)
+        #     print(mb_lite.shape)
+
+        #     ballots_matrix_winners_list.append(mb_lite)
+            
+        
         pass
 
     def sum_ballot_matrices(self, ballots_matrix_list):

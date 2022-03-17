@@ -20,7 +20,10 @@ class Simulation:
         # self.method = method
         self.objective_winner = guac_df[["Objective Ratings"]].idxmax()[0]
         self.sum_winner = None
+        self.sum_winners = []
         self.success = False
+        self.condorcet_winners = []
+        self.condorcet_winner = None
         # self.method = method.lower()
 
         if TEST_JENNAS_NUMBERS:
@@ -61,6 +64,7 @@ class Simulation:
         self.sum_winner = self.get_sum_winner()
         
         self.condorcet_winner = condorcet_elements.declare_winner(self.results_df, ballots_matrix_list)
+        self.condorcet_winners = condorcet_elements.winners
 
         self.sum_success = self.sum_winner == self.objective_winner
         self.condo_success = self.condorcet_winner == self.objective_winner
@@ -74,20 +78,29 @@ class Simulation:
         Returns:
             integer: guac ID of winner
         """
-        sorted_scores = self.results_df.sort_values(by='sum', ascending=False)
-        sorted_scores['Entrant'] = sorted_scores.index
         
-        top1_score = sorted_scores.iloc[0]['sum']
-        top1_winner = sorted_scores.iloc[0]['Entrant']
+        #sort the scores to have the sum at the top
+        this_score = 'sum'
+        sorted_scores = self.results_df.sort_values(by=this_score, ascending=False)
+        sorted_scores['ID'] = sorted_scores.index
 
-        top2_score = sorted_scores.iloc[1]['sum']
-        
-        #Just to be aware of the possibility of getting the same sum
-        #FIXME
-        if top1_score == top2_score:
-            print("\n\n\nMULTIPLE WINNERS! PICKING ONE AT RANDOM...\n\n\n")
-         
-        return top1_winner
+        #extract highest sum        
+        winning_sum = sorted_scores.iloc[0][this_score]
+
+        #create a dictionary of sums - winners to catch multiple winners
+        sum_winners_dict = {}
+        for s, w in zip(sorted_scores[this_score].tolist(), sorted_scores['ID'].tolist()):
+            if s in sum_winners_dict.keys():
+                sum_winners_dict[s].append(w)
+            else:
+                sum_winners_dict[s] = [w]
+
+        self.sum_winners = sum_winners_dict[winning_sum]
+
+        if len(self.sum_winners) > 1:
+            print("\n\n\nMultiple sum winners, picking one at random...\n\n\n")
+
+        return self.sum_winners[0]
 
     def create_personas(self):
         """This function creates the counts for the different personas.
