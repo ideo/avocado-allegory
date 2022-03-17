@@ -163,6 +163,14 @@ class Condorcetcounting():
 
 
     def get_winners(self, ballots_matrix_list):
+        """This function computes the winner(s) from the smith_or_schwartz sets
+
+        Args:
+            ballots_matrix_list (list): list of numpy matrices with the ballots
+
+        Returns:
+            integer winner
+        """
 
         #filter out the winners
         winners_df = self.smith_schwartz_set_df[self.smith_schwartz_set_df['in_set'] == True].copy()
@@ -184,7 +192,6 @@ class Condorcetcounting():
         
         #extract the winners from the dictionary
         self.winners = mean_winners_dict[winning_mean]
-        print(self.winners)
 
         #if there's 1 winner
         if len(self.winners)  == 1:
