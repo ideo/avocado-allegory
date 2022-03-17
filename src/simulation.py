@@ -45,13 +45,12 @@ class Simulation:
         #this is by how much we'll be moving the standard deviation used to sample from the Guac God give scores
         person_types = [num_reasonable, num_pepes, num_fras]
         mean_offsets = [0, 3, -3]
-        for num_person_type, offset_type in zip(person_types, mean_offsets):
-            if num_person_type == 0: continue
-            condorcet_elements, ballots_matrix_list = self.collect_results(ballots_matrix_list, num_person_type, offset_type)
-                    
-        if num_carlos > 0:
-            condorcet_elements, ballots_matrix_list = self.collect_results(ballots_matrix_list, num_carlos)
+        carlos_cronies = [False, False, False, True]
 
+        for num_people_type, offset_type, carlos_crony in zip(person_types, mean_offsets, carlos_cronies):
+            if num_people_type == 0: continue
+            condorcet_elements, ballots_matrix_list = self.collect_results(ballots_matrix_list, num_people_type, offset_type, carlos_crony)
+                    
         #putting the results together
         self.results_df.set_index(["ID"], inplace = True)
         columns_to_consider = self.results_df.columns
@@ -62,10 +61,11 @@ class Simulation:
         
         self.condorcet_winner = condorcet_elements.declare_winner(self.results_df, ballots_matrix_list)
 
-        if self.assigned_guacs == len(self.guac_df):
-            self.success = self.sum_winner == self.objective_winner
-        else:
-            self.success = self.condorcet_winner == self.objective_winner
+        self.sum_success = self.sum_winner == self.objective_winner
+        self.condo_success = self.condorcet_winner == self.objective_winner
+        #FIXME reminder you have this one in here. I assume it will become an if/else at some point. 
+        self.success = self.sum_success
+
         
     def get_sum_winner(self):
         """This function determines the winner considering the sum.
@@ -110,7 +110,7 @@ class Simulation:
 
         return num_pepes, num_fras, num_carlos, num_reasonable
 
-    def collect_results(self, ballots_matrix_list, num_people, mean_offset = 0):
+    def collect_results(self, ballots_matrix_list, num_people, mean_offset = 0, carlos_crony=False):
         """This function collects the results of a simulation on a set of people
 
         Args:

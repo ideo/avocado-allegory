@@ -82,7 +82,7 @@ class Townsperson:
             subj = np.random.normal(mu, self.st_dev)
             #allowing townspeople to use decimal points, but not more precision than that...
             subj = round(subj,1)
-            subj = 10 if subj > 10 else subj
-            subj = 0 if subj < 0 else subj
+            subj = self.max_allowed_vote if subj > self.max_allowed_vote else subj
+            subj = self.min_allowed_vote if subj < self.min_allowed_vote else subj
             return subj
 
