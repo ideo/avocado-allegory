@@ -1,5 +1,4 @@
 import pandas as pd
-import numpy
 from .townspeople import Townsperson
 
 TEST_JENNAS_NUMBERS = False
@@ -34,25 +33,24 @@ class Simulation:
 
         num_pepes, num_fras, num_carlos, num_reasonable = self.create_personas()
          
-        #this is by how much we'll be moving the standard deviation used to sample from the Guac God give scores
-        person_types = [num_reasonable, num_pepes, num_fras]
-        mean_offsets = [0, 3, -3]
-
         #Creating the DF that will store the ballots
         self.results_df = pd.DataFrame(list(self.guac_df.index), columns = ["ID"])
 
-        #creating the matrix sum. We'll increment this in the condorcet object
-        ballots_matrix_sum = numpy.zeros([len(self.guac_df),len(self.guac_df)])
+        #creating the list that will contain each matrix ballot (needed for condorcet)
+        ballots_matrix_list = []
         
         #filling in the ballots dataframe,for the various characters
         condorcet_elements = None
-        for num_people, offset in zip(person_types, mean_offsets):
-            if num_people == 0: continue
-            condorcet_elements = self.collect_results(ballots_matrix_sum, num_people, offset)
 
-        #FIXME to add what this character does. Will we be basically use the same votes across carlos?
+        #this is by how much we'll be moving the standard deviation used to sample from the Guac God give scores
+        person_types = [num_reasonable, num_pepes, num_fras]
+        mean_offsets = [0, 3, -3]
+        for num_person_type, offset_type in zip(person_types, mean_offsets):
+            if num_person_type == 0: continue
+            condorcet_elements, ballots_matrix_list = self.collect_results(ballots_matrix_list, num_person_type, offset_type)
+                    
         if num_carlos > 0:
-            condorcet_elements = self.collect_results(ballots_matrix_sum, num_carlos)
+            condorcet_elements, ballots_matrix_list = self.collect_results(ballots_matrix_list, num_carlos)
 
         #putting the results together
         self.results_df.set_index(["ID"], inplace = True)
@@ -62,16 +60,13 @@ class Simulation:
         
         self.sum_winner = self.get_sum_winner()
         
-        self.condorcet_winner = condorcet_elements.declare_winner(self.results_df)
+        self.condorcet_winner = condorcet_elements.declare_winner(self.results_df, ballots_matrix_list)
 
         if self.assigned_guacs == len(self.guac_df):
             self.success = self.sum_winner == self.objective_winner
         else:
             self.success = self.condorcet_winner == self.objective_winner
         
-        # if num_carlos > 0:
-        #     import pdb;pdb.set_trace()
-
     def get_sum_winner(self):
         """This function determines the winner considering the sum.
 
@@ -87,9 +82,10 @@ class Simulation:
         top2_score = sorted_scores.iloc[1]['sum']
         
         #Just to be aware of the possibility of getting the same sum
+        #FIXME
         if top1_score == top2_score:
             print("\n\n\nMULTIPLE WINNERS! PICKING ONE AT RANDOM...\n\n\n")
-        
+         
         return top1_winner
 
     def create_personas(self):
@@ -114,7 +110,7 @@ class Simulation:
 
         return num_pepes, num_fras, num_carlos, num_reasonable
 
-    def collect_results(self, ballots_matrix_sum, num_people, mean_offset = 0):
+    def collect_results(self, ballots_matrix_list, num_people, mean_offset = 0):
         """This function collects the results of a simulation on a set of people
 
         Args:
@@ -125,13 +121,9 @@ class Simulation:
         Returns:
             condorcet counting object containing the details of the condorcet method to compute the winner
         """
-        #for each characted, loop through the counts for that
-        last_person=False
         condorcet_elements = None
-        for np in range(num_people):
-            if np == num_people-1:
-                last_person=True
 
+        for np in range(num_people):
             person = Townsperson(
                 person_number=np, 
                 st_dev=self.st_dev, 
@@ -141,11 +133,17 @@ class Simulation:
                 )
 
             #creating the elements to compute the condorcet winner
-            condorcet_elements = person.taste_and_vote(self.guac_df, ballots_matrix_sum, last_person)
+            condorcet_elements = person.taste_and_vote(self.guac_df)
+
+            #collect ballox matrices
+            ballots_matrix_list.append(condorcet_elements.ballot_matrix)
 
             #add the results to the results dataframe with a new column name
-            self.results_df[f"Score Person {person.number}"] = self.guac_df["Entrant"].apply(lambda x: condorcet_elements.ballot_dict.get(x, None))
+            self.results_df[f"Score Person {person.number}"] = self.guac_df["ID"].apply(lambda x: condorcet_elements.ballot_dict.get(x, None))
 
+            if len(self.results_df[self.results_df[f"Score Person {person.number}"].isnull()]) == len(self.results_df):
+                sys.exit(f"No scores recorder from person.number {person.number}. Something is wrong...") 
+            
         #returning the last condorcet element calculated. 
-        return condorcet_elements
+        return condorcet_elements, ballots_matrix_list
         
