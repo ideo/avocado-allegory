@@ -167,6 +167,7 @@ def animate_results(sim, key):
         #     message_var = results_df.shape[0] - sim.assigned_guacs
         # success_message(key, sim.success, message_var)
 
+
 #this is an experiment, to include an image with the winner        
 def get_winner_image(sim, key):
     col1, col2 = st.columns([2,5])
@@ -229,14 +230,6 @@ def success_message(section_key, success, guac_limit=None):
             st.caption(paragraph)
 
 
-# def overwrite_chart(st_col, chart_obj, chart_df, spec):
-#     """I wish we could use this but cannot overwrite a copy of the chart_obj"""
-#     if chart_obj is not None:
-#         chart_obj.vega_lite_chart(chart_df, spec)
-#     else:
-#         chart_obj = st_col.vega_lite_chart(chart_df, spec)
-
-
 def tally_votes(sim, key):
     col1, col2 = st.columns([2,5])
 
@@ -277,22 +270,30 @@ def declare_a_winner(sim, y_field):
 def types_of_voters():
     col1, col2, col3 = st.columns(3)
     pepe = col1.slider(
-        "What percentage of people in town are like Precocious Pepe?",
+        """
+        What percentage of people in town are like Perky Pepe, who loves 
+        guacamole so much he'll have a hard time giving anyone a bad score?
+        """,
         value=10,
         min_value=0,
         max_value=30,
         format="%g%%")
 
     fra = col2.slider(
-        "What percentage of people in town are like Finicky Francisca?",
+        """
+        What percentage of people in town are like Finicky Francisca, who
+        thinks all guacamole is basically mush and won't score any entry too high?
+        """,
         value=8,
         min_value=0,
         max_value=30,
         format="%g%%")
 
-    # carlos=None
     carlos = col3.slider(
-        "What percentage of people in town are friends with Cliquey Carlos?",
+        """
+        What percentage of people in town are friends with Cliquey Carlos, and
+        will score high guacamole as high as possible no matter what?
+        """,
         value=12,
         min_value=0,
         max_value=30,

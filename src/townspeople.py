@@ -6,19 +6,24 @@ from .condorcetcounting import Condorcetcounting
 
 # Base Class
 class Townsperson:
-    def __init__(self, person_number, fullness_factor = 0.0, st_dev=1, assigned_guacs=20, mean_offset=0, 
-                min_allowed_vote = 1, max_allowed_vote = 10, carlos_crony=False,
+    def __init__(self, person_number, fullness_factor = 0.0, st_dev=1, 
+                assigned_guacs=20, 
+                min_allowed_vote = 1, max_allowed_vote = 10, 
+                mean_offset=0, carlos_crony=False,
                 test_jennas_numbers = False):
         self.number = person_number
         self.st_dev = st_dev
         self.fullness_factor = fullness_factor
         self.assigned_guacs = int(assigned_guacs)
-        self.mean_offset=0
+        self.mean_offset = mean_offset
         self.min_allowed_vote = min_allowed_vote
         self.max_allowed_vote = max_allowed_vote
         self.carlos_crony = carlos_crony
         self.carlos_index = None
+        self.voted_for_our_boy = False
+        self.ballot = None
         self.test_jennas_numbers=test_jennas_numbers
+        random.seed(person_number)
 
 
     def taste_and_vote(self, guac_df):
@@ -36,6 +41,7 @@ class Townsperson:
 
         sample_guac_df = guac_df.sample(n=self.assigned_guacs, replace=False)
         sample_guac_df['Subjective Ratings'] = sample_guac_df[["Objective Ratings"]].apply(lambda x: self.taste(x, sample_guac_df.index), axis=1)
+        self.ballot = sample_guac_df
 
         if self.test_jennas_numbers:
             jennas_data = {}
@@ -66,8 +72,9 @@ class Townsperson:
         taste_order = df_index.get_loc(row_data.name)
 
         if self.carlos_crony and row_data.name==self.carlos_index:
-            # We voting for our boy!
-            return 10
+            # We votin' for our boy!
+            self.voted_for_our_boy = True
+            return self.max_allowed_vote
 
         else:
             # Here the fullness_offset is modeled as a straight line going from -1 to +1. 
@@ -80,6 +87,7 @@ class Townsperson:
             obj_rating = row_data[0]
             mu = obj_rating + self.mean_offset + fullness_offset
             subj = np.random.normal(mu, self.st_dev)
+
             #allowing townspeople to use decimal points, but not more precision than that...
             subj = round(subj,1)
             subj = self.max_allowed_vote if subj > self.max_allowed_vote else subj

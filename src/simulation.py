@@ -9,6 +9,7 @@ class Simulation:
         ):
         self.guac_df = guac_df
         self.num_townspeople = num_townspeople
+        self.townspeople = []
         self.st_dev = st_dev
         self.fullness_factor = fullness_factor
         self.assigned_guacs = assigned_guacs
@@ -41,7 +42,7 @@ class Simulation:
         
         #filling in the ballots dataframe,for the various characters
         condorcet_elements = None
-
+        
         #this is by how much we'll be moving the standard deviation used to sample from the Guac God give scores
         person_types = [num_reasonable, num_pepes, num_fras]
         mean_offsets = [0, 3, -3]
@@ -105,9 +106,8 @@ class Simulation:
         #num_carlos are colluding to vote Carlos the best
         num_carlos = round(self.num_townspeople * self.perc_carlos)
 
-        #num_reasonable tend to score people fair
+        #num_reasonable tend to score people fairly
         num_reasonable = self.num_townspeople - num_pepes - num_fras - num_carlos
-
         return num_pepes, num_fras, num_carlos, num_reasonable
 
     def collect_results(self, ballots_matrix_list, num_people, mean_offset = 0, carlos_crony=False):
@@ -129,8 +129,10 @@ class Simulation:
                 st_dev=self.st_dev, 
                 assigned_guacs=self.assigned_guacs, 
                 mean_offset=mean_offset, 
-                test_jennas_numbers=TEST_JENNAS_NUMBERS
+                test_jennas_numbers=TEST_JENNAS_NUMBERS,
+                carlos_crony=carlos_crony
                 )
+            self.townspeople.append(person)
 
             #creating the elements to compute the condorcet winner
             condorcet_elements = person.taste_and_vote(self.guac_df)
