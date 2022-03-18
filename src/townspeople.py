@@ -26,20 +26,18 @@ class Townsperson:
         random.seed(person_number)
 
 
-    def taste_and_vote(self, guac_df, ballots_matrix_sum, last_person):
+    def taste_and_vote(self, guac_df):
         """This function takes a subset of the guac god data frame and it assigns subjective ratings to each
         guac. The subjective ratings are sampled by a normal distribution centered at the guac god given score (objective ratings) and with a user defined
         standard deviation.
 
         Args:
             guac_df (datafrane): dataframe with objective scores
-            ballots_matrix_sum (numpy matrix): matrix containing the sum of all wins
-            last_person (bool): if we're at the last person in the loop. This is to control some operations that need to happen at the very end.
-
         Returns:
             A Condorcetcounting object
         """
-        self.carlos_index = guac_df[guac_df["Entrant"] == "Cliquey Carlos"].index[0]
+        if self.test_jennas_numbers == False:
+            self.carlos_index = guac_df[guac_df["Entrant"] == "Cliquey Carlos"].index[0]
 
         sample_guac_df = guac_df.sample(n=self.assigned_guacs, replace=False)
         sample_guac_df['Subjective Ratings'] = sample_guac_df[["Objective Ratings"]].apply(lambda x: self.taste(x, sample_guac_df.index), axis=1)
@@ -56,7 +54,7 @@ class Townsperson:
             jennas_data[6] = [(0,6),(1,8),(3,10),(4,7)]        
             sample_guac_df = pd.DataFrame(jennas_data[self.number], columns = ["ID", 'Subjective Ratings'])
 
-        condorcet_elements = Condorcetcounting(guac_df, sample_guac_df, ballots_matrix_sum, last_person)
+        condorcet_elements = Condorcetcounting(guac_df, sample_guac_df)
         return condorcet_elements
 
 
@@ -89,6 +87,9 @@ class Townsperson:
             obj_rating = row_data[0]
             mu = obj_rating + self.mean_offset + fullness_offset
             subj = np.random.normal(mu, self.st_dev)
+
+            #allowing townspeople to use decimal points, but not more precision than that...
+            subj = round(subj,1)
             subj = self.max_allowed_vote if subj > self.max_allowed_vote else subj
             subj = self.min_allowed_vote if subj < self.min_allowed_vote else subj
             subj = round(subj)

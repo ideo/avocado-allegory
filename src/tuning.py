@@ -11,6 +11,14 @@ def wrap_my_head_around_it():
         
     df = pd.DataFrame(data=ENTRANTS)
 
+    scenario = 'A Lot of Contenders'
+
+    guac_df = df[['ID', 'Entrant', scenario]]
+    guac_df.rename(columns = {scenario: "Objective Ratings"}, inplace = True)
+        
+    collect_data(guac_df, scenario)
+
+
     scenario = 'One Clear Winner'
 
     guac_df = df[['ID', 'Entrant', scenario]]
@@ -26,14 +34,6 @@ def wrap_my_head_around_it():
         
     collect_data(guac_df, scenario)
 
-
-    scenario = 'A Lot of Contenders'
-
-    guac_df = df[['ID', 'Entrant', scenario]]
-    guac_df.rename(columns = {scenario: "Objective Ratings"}, inplace = True)
-        
-    collect_data(guac_df, scenario)
-
     print('DONE')
 
 
@@ -43,26 +43,23 @@ def collect_data(guac_df, scenario):
 
 
     num_guacs = 20
-    nt_color_map = {50: 'orange', 100: 'blue', 200: 'green', 400: 'grey'}
-
     
     rows = []
     for std in [1,2,3]:
         for nt in [50,100,200]:
-
             for n in range(200):
-                print('std = ', std, 'nt = ', nt, 'n = ', n)
+                print('scenario = ', scenario, ', std = ', std, ', nt = ', nt, ', n = ', n)
                 row = {}  
                 row['loop_step'] = n  
                 row['standard_dev'] = std
                 row['number_town_people'] = nt
 
-                for ngpp in range(num_guacs, 0, -1):                    
-                    sim = Simulation(guac_df, nt, std, fullness_factor=1.0, assigned_guacs=ngpp)                    
+                for ngpp in range(num_guacs, 1, -1):                    
+                    sim = Simulation(guac_df, nt, std, fullness_factor=0.0, assigned_guacs=ngpp)                    
                     sim.simulate() 
 
                     if len(sim.results_df[sim.results_df['Mean'].isnull()]) > 0:
-                        print('Not all quacs assigned!')
+                        # print('Not all quacs assigned!')
                         row[f"guac_{ngpp}"] = 'not_all_assigned'
                     else:
                         if sim.objective_winner == sim.condorcet_winner:

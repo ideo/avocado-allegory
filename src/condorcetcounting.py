@@ -11,31 +11,23 @@ class Condorcetcounting():
     def __init__(
             self, 
             guac_df, 
-            sample_guac_df, 
-            sum_ballots_matrix, 
-            last_person=False, 
+            sample_guac_df,
             cazzo=False):
         
+        self.winners=[]
+        self.winner=None
+
+        self.smith_schwartz_set_df=pd.DataFrame()
         #for debugging
         self.cazzo = cazzo
+        self.guac_df = guac_df
         self.guac_names = list(guac_df.index)
         self.num_guacs = len(guac_df)
         self.sample_guac_df = sample_guac_df
         
         self.ballot_dict = self.get_ballot_dictionary()        
         self.ballot_matrix = self.create_ballot_matrix()
-        
-    
-        #as ballots are created, we sum the matrices on the fly
-        sum_ballots_matrix += self.ballot_matrix
-        
-        if last_person:
-            #passing things explicitly for clarity
-            matrix_of_more_preferred = self.get_schwartz_relations_matrix(sum_ballots_matrix)
-            self.smith_schwartz_set_df = self.get_smith_or_schwartz_set_statuses(matrix_of_more_preferred)
-            
-
-        
+                    
 
     def create_ballot_matrix(self):
         """This function converts a ballot containing a score for each guac into
@@ -85,7 +77,7 @@ class Condorcetcounting():
         Returns:
             guac:vote dictionary
         """
-        ballot_dict = dict(zip(self.sample_guac_df['Entrant'], self.sample_guac_df['Subjective Ratings'])) 
+        ballot_dict = dict(zip(self.sample_guac_df['ID'], self.sample_guac_df['Subjective Ratings']))         
         return ballot_dict
 
     def get_schwartz_relations_matrix(self, sum_ballots_matrix):
@@ -143,7 +135,7 @@ class Condorcetcounting():
         smith_schwartz_set_df['in_set'] = is_in_smith_or_schwartz_set
         return smith_schwartz_set_df
         
-    def declare_winner(self,results_df):
+    def declare_winner(self,results_df, ballots_matrix_list):
         """This function computes the condorcet winner by ranking the guacs
         belonging to the smith set and ranking them by their average score
 
@@ -153,18 +145,95 @@ class Condorcetcounting():
         Returns:
             winning guac
         """
-        self.smith_schwartz_set_df = self.smith_schwartz_set_df.join(results_df[['Mean']]) 
-        self.smith_schwartz_set_df['Entrant'] = self.smith_schwartz_set_df.index
-        winners = self.smith_schwartz_set_df[self.smith_schwartz_set_df['in_set'] == True].copy()
-        winners.sort_values(by = ['Mean'], ascending = False, inplace = True)
+        #sum all ballot matrices
+        ballot_matrices_sum = self.sum_ballot_matrices(ballots_matrix_list)
 
+        #find the runners more preferred
+        matrix_of_more_preferred = self.get_schwartz_relations_matrix(ballot_matrices_sum)
+
+        #find the sets of winners and loosers
+        self.smith_schwartz_set_df = self.get_smith_or_schwartz_set_statuses(matrix_of_more_preferred)
         
-        if len(winners)  == 0:
-            sys.exit("No condorcet winner") 
-        elif len(winners)  == 1:
-            return winners.iloc[0]['Entrant']
-        else:
-            if winners.iloc[0]['Mean'] == winners.iloc[1]['Mean']:
-                print ("Picking winner at random among winners, for simplicity")
+        #add to the sets of winners and loosers the mean to find the absolute winner
+        self.smith_schwartz_set_df = self.smith_schwartz_set_df.join(results_df[['Mean']]) 
+        self.smith_schwartz_set_df['ID'] = self.smith_schwartz_set_df.index
 
-            return winners.iloc[0]['Entrant']
+        #filter out the winners
+        self.winner = self.get_winners(ballots_matrix_list)
+
+
+    def get_winners(self, ballots_matrix_list):
+
+        #filter out the winners
+        winners_df = self.smith_schwartz_set_df[self.smith_schwartz_set_df['in_set'] == True].copy()
+        winners_df.sort_values(by = ['Mean'], ascending = False, inplace = True)
+
+        #if there's no winner
+        if len(winners_df)  == 0:
+            sys.exit("No condorcet winner")         
+        
+        #get the winning mean
+        winning_mean = winners_df.iloc[0]['Mean']
+        #create a dictionary of means - winners to catch multiple winners
+        mean_winners_dict = {}
+        for m, w in zip(winners_df['Mean'].tolist(), winners_df['ID'].tolist()):
+            if m in mean_winners_dict.keys():
+                mean_winners_dict[m].append(w)
+            else:
+                mean_winners_dict[m] = [w]
+        
+        #extract the winners from the dictionary
+        self.winners = mean_winners_dict[winning_mean]
+        print(self.winners)
+
+        #if there's 1 winner
+        if len(self.winners)  == 1:
+            return self.winners[0]
+        #if there are multiple winners
+        else:
+            # self.break_tie(ballots_matrix_list)
+            print ("Picking winner at random among winners, for simplicity")
+
+            # print(f"\n\n\nWinner = {self.winners.iloc[0]['ID']}")
+            return self.winners[0]
+
+
+    def break_tie(self, ballots_matrix_list):
+        # remove all rows and columns, apart for the winners:
+
+        # winners_id = [9,12]
+        to_delete = [i for i in self.guac_df['ID'].tolist() if i not in self.winners]
+
+        ballots_matrix_winners_list = []
+        for mb in ballots_matrix_list:
+            #delete the rows and columns of non winning guacs
+            mb_lite = np.delete(mb, to_delete, 0)
+            mb_lite = np.delete(mb_lite, to_delete, 1)
+            print(mb_lite.shape)
+
+            ballots_matrix_winners_list.append(mb_lite)
+            
+        import pdb;pdb.set_trace()
+        pass
+
+    def sum_ballot_matrices(self, ballots_matrix_list):
+        """This function sums all the ballot matrices
+
+        Args:
+            ballots_matrix_list (list): list of numpy matrices
+
+        Returns:
+            numpy matrix containing the sum of matrix ballots
+        """
+        null_matrix = np.zeros([len(self.guac_df),len(self.guac_df)])
+        
+        ballots_matrix_sum = null_matrix.copy()
+        
+        for bm in ballots_matrix_list:
+            ballots_matrix_sum += bm
+
+        if np.array_equal(ballots_matrix_sum, null_matrix) == True:
+            import pdb;pdb.set_trace()
+            sys.exit("Ballot matrix sum is null, something is wrong...") 
+
+        return ballots_matrix_sum
