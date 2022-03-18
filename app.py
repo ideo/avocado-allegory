@@ -21,10 +21,10 @@ num_townspeople, st_dev, fullness_factor = lg.sidebar()
 
 
 st.title("The Allegory of the Avocados")
-st.write("""
-Here is the link to our 
-[Google Doc](https://docs.google.com/document/d/1CA9NXp8I9b6ds16khcJLrY1ZL7ZBABK6KRu9SvBL5JI/edit?usp=sharing) 
-where we're developing and commenting on the story.""")
+# st.write("""
+# Here is the link to our 
+# [Google Doc](https://docs.google.com/document/d/1CA9NXp8I9b6ds16khcJLrY1ZL7ZBABK6KRu9SvBL5JI/edit?usp=sharing) 
+# where we're developing and commenting on the story.""")
 
 st.subheader("Welcome to Sunnyvale")
 lg.write_story("Introduction")
