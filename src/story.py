@@ -1,3 +1,6 @@
+from re import M
+
+
 STORY = {
     "Introduction":  [
         "Welcome to the town of Sunnyvale, whose citizens are obsessed with all things avocado. They put them on their eggs in the morning, in their tacos midday, and transform them into guacamole for the evening. Everyone agrees that guacamole is the best use of the beloved avocado, but that’s about the only thing they can agree on. No one can agree whose guacamole recipe is the best, with most insisting it’s how their mama does it!",
@@ -31,6 +34,18 @@ STORY = {
 
     "simulation_3": [
         "Up in Horchata Heaven, walking through your fields on celestial cilantro, you wonder for a minute whether the townspeople would agree with your assessment of how the guacamoles compare to each other. You know some people, like Perky Pepe, like guac so much that they’ll probably score every entrant generously. Others, like Finicky Francisca, are quite critical and will have no problem picking out flaws. They’ll probably score things quite harshly. Hopefully, folks like them won’t skew the results too much. The only person you’re really worried about is Cliquey Carlos. He’s the ring leader of a pretty loyal group of farmers. Plus, he always throws the best parties! It’s pretty clear anyone who wants to stay on his good side is going to be voting for him no matter how good his guac actually is.",
+    ],
+
+    "condorcet_1":  [
+        "Our Mayor designed the ballots so that tasters score each guac on a scale from one to ten, with one for barely edible and ten for the best guacamole of all time. This was as opposed to asking tasters to sort all the guacs they tried from worst to best. His thinking was that with so many entrants in the competition, keeping track of how all those guacamoles compare to each other would be too mentally taxing. Much easier to simply ask people rate them independently. That way they can just enjoy the guac party and not get all confused keeping track of their ballot. A big assumption baked into this method, however, is that people don’t let their experience with one guac affect their vote of another guac.",
+        "Imagine Pepe, who loves all guac but is trying his best to be a fair voter. The first guac he tries, he just loves. Scores it a nine. The next guac he tries just knocks his socks off. Wow, didn’t know guacamole could be made that good. Scores it a ten. But wait, it’s definitely more that just one point better than that first one. Better revise that down to a seven.",
+        "The problem with our Mayor’s naive attempt at a simple one through ten scale is that no one has a fixed understanding of how good the ten is or how bad the one is. People will naturally develop their mental scale by comparing all the guacs they’ve tried. So, as Emilia explains to him over a late night Topo Chico after the big contest as wrapped up, it’s better to interpret people’s ballots not as raw scores but as implicit rankings.",
+        "She grabs a napkin to make herself more clear. Imagine someone submits a ballot like this:",
+    ],
+
+    "condorcet_2": [
+        "This person only got to taste five guacamoles, giving them scores of 8, 4, 4, 6, and 1. From this, it’s probably not right to say Guac#2 is twice as good as Guac#4. But we can definitely say, of the guacamoles that this person got to try, they think #2 was the best, #15 was second best, #4 and #7 were equally mediocre, and #20 was crap.",
+        "So for next year, Emilia suggests, we could use the same ballots, but look at each one as a short list of rankings. Then, instead of adding up all the scores, we collect all the short lists of rankings into one grand list of rankings. We wouldn’t be able to tally by hand anymore; she’ll have to write some code to do it. But that will be even faster anyway!",
     ],
 
     # "Unknown Best":  [
@@ -67,6 +82,14 @@ INSTRUCTIONS = {
     "simulation_3_b": [
         "In our third contest, the town will vote differently depending on how many of type of person you chose above. Like before, you can also try limiting how many guacamoles each person gets to sample.",
     ],
+
+    "condorcet_1": [
+        "In our next contest, we’ll be tallying ballots using Emilia’s new method of comparing implicit rankings, but you can control all the same parameters.",
+    ],
+
+    "condorcet_2": [
+        "Set how many guacamoles each person gets to try.",
+    ],
 }
 
 
@@ -91,6 +114,15 @@ SUCCESS_MESSAGES = {
     },
 
     "simulation_3": {
+        True:  [
+            "Success!",
+            ],
+        False:  [
+            "Oh no!"
+        ]
+    },
+
+    "condorcet": {
         True:  [
             "Success!",
             ],

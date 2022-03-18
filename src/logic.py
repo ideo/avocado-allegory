@@ -16,6 +16,7 @@ def initialize_session_state():
         "simulation_1_keep_chart_visible":  False,
         "simulation_2_keep_chart_visible":  False,
         "simulation_3_keep_chart_visible":  False,
+        "condorcet_keep_chart_visible":     False,
     }
 
     for key, value in initial_values.items():
@@ -254,20 +255,20 @@ def tally_votes(sim, key):
     return y_field
 
 
-def declare_a_winner(sim, y_field):
-    winning_guac = sim.results_df[[y_field]].idxmax()[0]
-    top_score = sim.results_df[[y_field]].max()
+# def declare_a_winner(sim, y_field):
+#     winning_guac = sim.results_df[[y_field]].idxmax()[0]
+#     top_score = sim.results_df[[y_field]].max()
 
-    # Make sure only one guac got the top score
-    if (sim.results_df[[y_field]] == top_score).astype(int).sum(axis=0)[0] > 1:
-        st.text("Oh no! We have a tie!")
-    elif winning_guac == sim.objective_winner:
-        st.text("Hooray! Democracy Prevails!")
-    else:
-        st.text("Oh no! We done fucked up!")
+#     # Make sure only one guac got the top score
+#     if (sim.results_df[[y_field]] == top_score).astype(int).sum(axis=0)[0] > 1:
+#         st.text("Oh no! We have a tie!")
+#     elif winning_guac == sim.objective_winner:
+#         st.text("Hooray! Democracy Prevails!")
+#     else:
+#         st.text("Oh no! We done fucked up!")
 
 
-def types_of_voters():
+def types_of_voters(key):
     col1, col2, col3 = st.columns(3)
     pepe = col1.slider(
         """
@@ -277,7 +278,8 @@ def types_of_voters():
         value=10,
         min_value=0,
         max_value=30,
-        format="%g%%")
+        format="%g%%",
+        key=key+"pepe")
 
     fra = col2.slider(
         """
@@ -287,7 +289,8 @@ def types_of_voters():
         value=8,
         min_value=0,
         max_value=30,
-        format="%g%%")
+        format="%g%%",
+        key=key+"fra")
 
     carlos = col3.slider(
         """
@@ -297,7 +300,8 @@ def types_of_voters():
         value=12,
         min_value=0,
         max_value=30,
-        format="%g%%")
+        format="%g%%",
+        key=key+"carlos")
 
     pepe /= 100
     fra /= 100
@@ -354,4 +358,31 @@ def plot_votes(sim, day_title = 1):
     st.vega_lite_chart(chart_df, spec)
 
     
+def animate_condorcet_simulation(sim, key=None):
+    col1, col2 = st.columns([2,5])
+    start_btn = col1.button("Simulate", key=key)
+
+    if start_btn:
+        st.session_state[f"{key}_keep_chart_visible"] = True
+        
+    if st.session_state[f"{key}_keep_chart_visible"]:
+        results_msg = format_condorcet_results(sim)
+        col2.markdown(results_msg)
+
+
+def format_condorcet_results(sim):
+    if len(sim.condorcet_winners) > 1:
+        msg = "And the winners are..."
+        for ii, entrant_id in enumerate(sim.condorcet_winners):
+            name = sim.guac_df["Entrant"].iloc[entrant_id]
+            msg += f"\n - {ii}: Guacamole No. {entrant_id} by {name}!"
+    
+    else:
+        entrant_id = sim.condorcet_winner
+        name = sim.guac_df["Entrant"].iloc[entrant_id]
+        msg = f"""
+            And the winner is...
+            1. Guacamole No. {entrant_id} by {name}!
+        """
+    return msg
 

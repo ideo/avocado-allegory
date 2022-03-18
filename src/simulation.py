@@ -47,8 +47,8 @@ class Simulation:
         condorcet_elements = None
         
         #this is by how much we'll be moving the standard deviation used to sample from the Guac God give scores
-        person_types = [num_reasonable, num_pepes, num_fras]
-        mean_offsets = [0, 3, -3]
+        person_types = [num_reasonable, num_pepes, num_fras, num_carlos]
+        mean_offsets = [0, 3, -3, 0]
         carlos_cronies = [False, False, False, True]
 
         for num_people_type, offset_type, carlos_crony in zip(person_types, mean_offsets, carlos_cronies):
@@ -69,7 +69,7 @@ class Simulation:
         self.sum_success = self.sum_winner == self.objective_winner
         self.condo_success = self.condorcet_winner == self.objective_winner
         #FIXME reminder you have this one in here. I assume it will become an if/else at some point. 
-        self.success = self.sum_success
+        # self.success = self.sum_success
 
         
     def get_sum_winner(self):
@@ -102,6 +102,7 @@ class Simulation:
 
         return self.sum_winners[0]
 
+
     def create_personas(self):
         """This function creates the counts for the different personas.
 
@@ -122,6 +123,7 @@ class Simulation:
         #num_reasonable tend to score people fairly
         num_reasonable = self.num_townspeople - num_pepes - num_fras - num_carlos
         return num_pepes, num_fras, num_carlos, num_reasonable
+
 
     def collect_results(self, ballots_matrix_list, num_people, mean_offset = 0, carlos_crony=False):
         """This function collects the results of a simulation on a set of people
