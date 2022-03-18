@@ -65,7 +65,7 @@ INSTRUCTIONS = {
     ],
 
     "simulation_3_b": [
-        "In our third contest, the town will vote differently depending on how many of type of person you chose above. Like before, you can also try limiting how many guacamoles each person gets to sample.",
+        "In our third contest, the town will vote differently depending on how many of each type of person you chose above. Like before, you can also limit how many guacamoles each person gets to sample.",
     ],
 }
 

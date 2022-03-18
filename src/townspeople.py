@@ -91,5 +91,6 @@ class Townsperson:
             subj = np.random.normal(mu, self.st_dev)
             subj = self.max_allowed_vote if subj > self.max_allowed_vote else subj
             subj = self.min_allowed_vote if subj < self.min_allowed_vote else subj
+            subj = round(subj)
             return subj
 
