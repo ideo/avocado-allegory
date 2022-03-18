@@ -11,70 +11,106 @@ def wrap_my_head_around_it():
         
     df = pd.DataFrame(data=ENTRANTS)
 
-    scenario = 'One Clear Winner'
+    scenarios = ['A Lot of Contenders', 'One Clear Winner', 'A Close Call']
 
-    guac_df = df[['ID', 'Entrant', scenario]]
-    guac_df.rename(columns = {scenario: "Objective Ratings"}, inplace = True)
-    
-    collect_data(guac_df, scenario)
-
-
-    scenario = 'A Close Call'
-
-    guac_df = df[['ID', 'Entrant', scenario]]
-    guac_df.rename(columns = {scenario: "Objective Ratings"}, inplace = True)
+    for scenario in scenarios:
+        guac_df = df[['ID', 'Entrant', scenario]]
+        guac_df.rename(columns = {scenario: "Objective Ratings"}, inplace = True)
         
-    collect_data(guac_df, scenario)
+        collect_data(guac_df, scenario)
 
 
-    scenario = 'A Lot of Contenders'
-
-    guac_df = df[['ID', 'Entrant', scenario]]
-    guac_df.rename(columns = {scenario: "Objective Ratings"}, inplace = True)
+    has_fullness = True
+    for scenario in scenarios:
+        guac_df = df[['ID', 'Entrant', scenario]]
+        guac_df.rename(columns = {scenario: "Objective Ratings"}, inplace = True)
         
-    collect_data(guac_df, scenario)
+        collect_data(guac_df, scenario, has_fullness)
 
     print('DONE')
 
 
+def get_common_fields(row, n, std, nt):
+    row['loop_step'] = n  
+    row['standard_dev'] = std
+    row['number_town_people'] = nt
+    return row
+
+def check_winner(objective_winner, subjective_winner, row, ngpp):
+    if objective_winner == subjective_winner:
+        row[f"guac_{ngpp}"] = 'true'
+    else:
+        row[f"guac_{ngpp}"] = 'false'
+    return row
 
 
-def collect_data(guac_df, scenario):
-
+def collect_data(guac_df, scenario, has_fullness = False):
 
     num_guacs = 20
-    nt_color_map = {50: 'orange', 100: 'blue', 200: 'green', 400: 'grey'}
+    total_number_simulations = 200
+    number_townpeople = [50,100,250]
+    standard_deviations = [1,2,3]
 
+    scenario = '-'.join(scenario.split(' ')).lower()
+
+    if has_fullness:
+        my_fullness_factor = 1.0
+        common_text = f"param_space_for_recovering_winner_total_guacs{num_guacs}_{scenario}_fullness_factor"
+        my_filename_condorcet = f"data/condorcet_{common_text}.csv"
+        my_filename_sum = f"data/sum_{common_text}.csv"
+    else:
+        my_fullness_factor = 0.0
+        common_text = f"param_space_for_recovering_winner_total_guacs{num_guacs}_{scenario}"
+        my_filename_condorcet = f"data/condorcet_{common_text}.csv"
+        my_filename_sum = f"data/sum_{common_text}.csv"
     
-    rows = []
-    for std in [1,2,3]:
-        for nt in [50,100,200]:
+    rows_con = []
+    rows_sum = []
+    
+    for std in standard_deviations:
+        for nt in number_townpeople:
+            for n in range(total_number_simulations):
+                print('scenario = ', scenario, ', std = ', std, ', nt = ', nt, ', n = ', n, ', has fullness = ', has_fullness)
+                row_con = {}  
+                row_sum = {}  
 
-            for n in range(200):
-                print('std = ', std, 'nt = ', nt, 'n = ', n)
-                row = {}  
-                row['loop_step'] = n  
-                row['standard_dev'] = std
-                row['number_town_people'] = nt
+                row_con = get_common_fields(row_con, n, std, nt)
+                row_sum = get_common_fields(row_sum, n, std, nt)
 
-                for ngpp in range(num_guacs, 0, -1):                    
-                    sim = Simulation(guac_df, nt, std, fullness_factor=1.0, assigned_guacs=ngpp)                    
+                count_multiple_condorcet_winners = 0
+                count_multiple_sum_winners = 0
+
+                for ngpp in range(num_guacs, 1, -1):                    
+                    sim = Simulation(guac_df, nt, std, fullness_factor=my_fullness_factor, assigned_guacs=ngpp)                    
                     sim.simulate() 
+                    if len(sim.condorcet_winners) > 1: 
+                        print('multiple condorcet winners')
+                        count_multiple_condorcet_winners += 1
+
+                    if len(sim.sum_winners) > 1: 
+                        print('multiple sum winners')
+                        count_multiple_sum_winners += 1
 
                     if len(sim.results_df[sim.results_df['Mean'].isnull()]) > 0:
-                        print('Not all quacs assigned!')
-                        row[f"guac_{ngpp}"] = 'not_all_assigned'
+                        # print('Not all quacs assigned!')
+                        row_con[f"guac_{ngpp}"] = 'not_all_assigned'
+                        row_sum[f"guac_{ngpp}"] = 'not_all_assigned'
+                    
                     else:
-                        if sim.objective_winner == sim.condorcet_winner:
-                            row[f"guac_{ngpp}"] = 'true'
-                        else:
-                            row[f"guac_{ngpp}"] = 'false'
+                        row_con = check_winner(sim.objective_winner, sim.condorcet_winner, row_con, ngpp)
+                        row_sum = check_winner(sim.objective_winner, sim.sum_winner, row_sum, ngpp)
 
-                rows.append(row)
+                row_con['fraction_multiple_condorcet_winners'] = float(count_multiple_condorcet_winners/total_number_simulations)
+                row_sum['fraction_multiple_sum_winners'] = float(count_multiple_sum_winners/total_number_simulations)
+
+                rows_con.append(row_con)
+                rows_sum.append(row_sum)
             
-    df = pd.DataFrame(rows)
-    scenario = '-'.join(scenario.split(' ')).lower()
-    df.to_csv(f"data/param_space_for_recovering_winner_total_guacs{num_guacs}_{scenario}_fullness_factor.csv")
+    df = pd.DataFrame(rows_con)
+    df.to_csv(my_filename_condorcet)
+
+    df = pd.DataFrame(rows_sum)
+    df.to_csv(my_filename_sum)
 
 def tune_simulation(guac_df):
     st.subheader("Tuning the Simulation")

@@ -24,13 +24,14 @@ STORY = {
         "Seeing the distress on her Mayor’s face, Earnest Emilia approaches with an idea. She’s just taken an online course in data analytics and really enjoyed learning the clever ways purposeful randomness can useful. What if not everyone needs to try every guac, she suggests. What if, we intentionally let people only try some, but randomly assign a different some to each person?",
     ],
 
-    "simulation_3": [
-        "(WIP) You think for a minute on whether the townspeople would agree of your assessment of which is best? You know some people, like Precocious Pepe, like guac so much that they’ll probably score every entrant generously. Others, like Finicky Francisca, are quite critical and will have no problem picking out flaws. They’ll probably score things quite harshly. But as you watch everyone set up, you’re pretty confident that most people will assess the submissions fairly, give or take a few points. The only person you’re really worried about is Cliquey Carlos. He’s the ring leader of a pretty loyal group of farmers. Plus, he always throws the best parties! It’s pretty clear anyone who wants to stay on his good side is going to be voting for him.",
+    "transition_2_to_3":    [
+        "The previous contest worked well, to a point. You may have seen that when there is one clear winner among the guacamoles, we can limit how many guacs each voter tastes to a pretty small number. That could help stretch a limited amount of dip across a huge audience of participants. But as the race got closer and closer, limiting the sample of the contest each person gets to try starts to affect the results.",
+        "Our previous simulations also assumed every person had more or less the same opinions of each guac, with slight variations for how hungry or full they were by the time they tried each one. Is that realistic? Let’s try again, and this time meet some of our townspeople!",
     ],
 
-    # "Voter Types":  [
-    #     "You think for a minute on whether the townspeople would agree of your assessment of which is best? You know some people, like Precocious Pepe, like guac so much that they’ll probably score every entrant generously. Others, like Finicky Francisca, are quite critical and will have no problem picking out flaws. They’ll probably score things quite harshly. But as you watch everyone set up, you’re pretty confident that most people will assess the submissions fairly, give or take a few points. The only person you’re really worried about is Cliquey Carlos. He’s the ring leader of a pretty loyal group of farmers. Plus, he always throws the best parties! It’s pretty clear anyone who wants to stay on his good side is going to be voting for him.",
-    # ],
+    "simulation_3": [
+        "Up in Horchata Heaven, walking through your fields on celestial cilantro, you wonder for a minute whether the townspeople would agree with your assessment of how the guacamoles compare to each other. You know some people, like Perky Pepe, like guac so much that they’ll probably score every entrant generously. Others, like Finicky Francisca, are quite critical and will have no problem picking out flaws. They’ll probably score things quite harshly. Hopefully, folks like them won’t skew the results too much. The only person you’re really worried about is Cliquey Carlos. He’s the ring leader of a pretty loyal group of farmers. Plus, he always throws the best parties! It’s pretty clear anyone who wants to stay on his good side is going to be voting for him no matter how good his guac actually is.",
+    ],
 
     # "Unknown Best":  [
     #     "What if we don't know who is the best and just decide to go with people's guts? On day 1 of the competition everyone tries all the guacs, and a winner is found. However, the judges realize that trying all guacs turns out to be way too much food. So, on day two they decide to do an experiment. What if we only assign to each judge a random subset of guacs? How small does this subset have to be before the winner identify on day 1 is lost?",
@@ -59,8 +60,12 @@ INSTRUCTIONS = {
         "In our second contest, try limiting how many guacamoles each taster gets to try. Like before, tasters will taste in random orders and get slightly less generous with their scores as they get full."
     ],
 
-    "simulation_3": [
-        "Choose what percentage of of the town is like each character."
+    "simulation_3_a": [
+        "Choose what percentage of of the town is like each character.",
+    ],
+
+    "simulation_3_b": [
+        "In our third contest, the town will vote differently depending on how many of type of person you chose above. Like before, you can also try limiting how many guacamoles each person gets to sample.",
     ],
 }
 
