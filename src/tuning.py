@@ -12,13 +12,20 @@ def wrap_my_head_around_it():
     df = pd.DataFrame(data=ENTRANTS)
 
     scenarios = ['A Lot of Contenders', 'One Clear Winner', 'A Close Call']
-    scenarios = ['A Lot of Contenders']
 
     for scenario in scenarios:
         guac_df = df[['ID', 'Entrant', scenario]]
         guac_df.rename(columns = {scenario: "Objective Ratings"}, inplace = True)
         
         collect_data(guac_df, scenario)
+
+
+    has_fullness = True
+    for scenario in scenarios:
+        guac_df = df[['ID', 'Entrant', scenario]]
+        guac_df.rename(columns = {scenario: "Objective Ratings"}, inplace = True)
+        
+        collect_data(guac_df, scenario, has_fullness)
 
     print('DONE')
 
@@ -40,11 +47,10 @@ def check_winner(objective_winner, subjective_winner, row, ngpp):
 def collect_data(guac_df, scenario, has_fullness = False):
 
     num_guacs = 20
-    total_number_simulations = 5
+    total_number_simulations = 200
     number_townpeople = [50,100,250]
-    number_townpeople = [50]
     standard_deviations = [1,2,3]
-    standard_deviations = [1]
+
     scenario = '-'.join(scenario.split(' ')).lower()
 
     if has_fullness:
