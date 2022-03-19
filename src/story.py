@@ -27,6 +27,10 @@ STORY = {
         "Seeing the distress on her Mayor’s face, Earnest Emilia approaches with an idea. She’s just taken an online course in data analytics and really enjoyed learning the clever ways purposeful randomness can useful. What if not everyone needs to try every guac, she suggests. What if, we intentionally let people only try some, but randomly assign a different some to each person?",
     ],
 
+    "simulation_2_a": [
+        "Now that we've injected a certain amount of randomness into the contest, it's possible that it could turn out different ways if different times. Let's see what would happen if we help this same contest 100 times.",
+    ],
+
     "transition_2_to_3":    [
         "The previous contest worked well, to a point. You may have seen that when there is one clear winner among the guacamoles, we can limit how many guacs each voter tastes to a pretty small number. That could help stretch a limited amount of dip across a huge audience of participants. But as the race got closer and closer, limiting the sample of the contest each person gets to try starts to affect the results.",
         "Our previous simulations also assumed every person had more or less the same opinions of each guac, with slight variations for how hungry or full they were by the time they tried each one. Is that realistic? Let’s try again, and this time meet some of our townspeople!",

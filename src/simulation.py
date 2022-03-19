@@ -4,7 +4,7 @@ from .townspeople import Townsperson
 TEST_JENNAS_NUMBERS = False
 class Simulation:
     def __init__(
-            self, guac_df, num_townspeople, st_dev, fullness_factor = 0.0,
+            self, guac_df, num_townspeople=200, st_dev=1.0, fullness_factor = 0.0,
             assigned_guacs=20, perc_fra=0.0, perc_pepe=0.0, perc_carlos=0.0
         ):
         self.guac_df = guac_df
