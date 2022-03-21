@@ -150,6 +150,35 @@ ENTRANTS = [
 ]
 
 
+DEMO_CONTEST = [
+    {
+        "ID":                   0,
+        "Entrant":              "Scrupulous Susie",
+        "Objective Ratings":    9,
+    },
+    {
+        "ID":                   1,
+        "Entrant":              "Articulate Arnold",
+        "Objective Ratings":    2,
+    },
+    {
+        "ID":                   2,
+        "Entrant":              "Gregarious Gregory",
+        "Objective Ratings":    6,
+    },
+    # {
+    #     "ID":                   3,
+    #     "Entrant":              "Scrupulous Susie",
+    #     "Objective Ratings":    4,
+    # },
+    # {
+    #     "ID":                   4,
+    #     "Entrant":              "Scrupulous Susie",
+    #     "Objective Ratings":    4,
+    # },
+]
+
+
 # OBJECTIVE_RATINGS = {
 #     "One Clear Winner": [
 #         4,
