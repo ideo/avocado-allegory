@@ -14,9 +14,7 @@ def simulate_N_times(sim_params, scenario, N=100):
     filename = f"data/simulate_{N}_times_sum.csv"
     results_df = load_dataframe(sim_params, filename)
 
-    # print(results_df)
     sim = Simulation(guac_df, **sim_params)
-
     winners = []
     for ii in range(N):
         sim.simulate()
@@ -42,14 +40,7 @@ def load_dataframe(sim_params, filename):
         df.drop(columns=["Unnamed: 0"], inplace=True)
     except FileNotFoundError:
         # Create Dataframe
-        columns = list(sim_params.keys())
-        columns += ["scenario"]
-        # scenarios = [
-        #     "One Clear Winner",
-        #     "A Close Call",
-        #     "A Lot of Contenders",
-        # ]
-
+        columns = list(sim_params.keys()) + ["scenario"]
         df = pd.DataFrame(columns=columns)
     return df
 
@@ -60,7 +51,7 @@ if __name__ == "__main__":
 
         sim_params = {
             "num_townspeople":  200,
-            "st_dev":           1.0,
+            "st_dev":           3.0,
             "assigned_guacs":   assigned_guacs,
             "perc_fra":         0.0,
             "perc_pepe":        0.0,

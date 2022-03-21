@@ -1,11 +1,14 @@
 from decimal import InvalidContext
 from ssl import CHANNEL_BINDING_TYPES
+from tracemalloc import start
+from turtle import onclick
 import streamlit as st
 import pandas as pd
 import time
 
 from .story import STORY, INSTRUCTIONS, SUCCESS_MESSAGES
-from .config import COLORS, ENTRANTS
+from .config import COLORS, ENTRANTS, DEMO_CONTEST
+from .simulation import Simulation
 
 
 import warnings
@@ -18,6 +21,7 @@ def initialize_session_state():
         "simulation_2_keep_chart_visible":  False,
         "simulation_3_keep_chart_visible":  False,
         "condorcet_keep_chart_visible":     False,
+        "entrant_num":                      0,
     }
 
     for key, value in initial_values.items():
@@ -454,3 +458,46 @@ def format_condorcet_results(sim):
         """
     return msg
 
+
+def demo_contest(st_dev):
+    df = pd.DataFrame(data=DEMO_CONTEST)
+    sim = Simulation(df, 5, st_dev, 
+        assigned_guacs=df.shape[0],
+        fullness_factor=0,
+        seed=42)
+    sim.simulate()
+
+    start_btn = next_contestant(sim)
+    if start_btn:
+        st.button("Next Contestant", on_click=increment_entrant_num)
+    
+
+def next_contestant(sim):
+    col1, col2, col3 = st.columns(3)
+    entrant_num = st.session_state["entrant_num"]
+    col1.image(f"img/guac_icon_{entrant_num}.png", width=100)
+
+    name =  sim.guac_df.loc[entrant_num]['Entrant']
+    score = sim.guac_df.loc[entrant_num]['Objective Ratings']
+    score = int(round(score))
+    col2.markdown(f"**{name}'s Guacamole**")
+    col2.metric("Your Assesment:", score)
+
+    start_btn = col3.button("Taste and Score")
+
+    if start_btn:
+        columns = st.columns(5)
+        for ii, col in enumerate(columns):
+            person = sim.townspeople[ii]
+            score = person.ballot.loc[entrant_num]["Subjective Ratings"]
+            score = int(round(score))
+            col.metric(f"Taster No. {person.number}", score)
+
+    return start_btn
+
+
+def increment_entrant_num():
+    if st.session_state["entrant_num"] < 2:
+        st.session_state["entrant_num"] += 1
+    else:
+        st.session_state["entrant_num"] = 0
