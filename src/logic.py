@@ -395,20 +395,20 @@ def num_people_and_guac_per_person_slider():
     return num_townspeople, num_guac_per_person
 
 
-def num_people_slider(key):
-    num_townspeople = st.slider(key, 
-        value=250, 
-        min_value=10, 
-        max_value=500)
-    return num_townspeople
+# def num_people_slider(key):
+#     num_townspeople = st.slider(key, 
+#         value=250, 
+#         min_value=10, 
+#         max_value=500)
+#     return num_townspeople
 
 
-def num_guac_per_person_slider(key):
-    num_guac_per_person = st.slider(key, 
-        value=10, 
-        min_value=1, 
-        max_value=20)
-    return num_guac_per_person
+# def num_guac_per_person_slider(key):
+#     num_guac_per_person = st.slider(key, 
+#         value=10, 
+#         min_value=1, 
+#         max_value=20)
+#     return num_guac_per_person
 
 
 def plot_votes(sim, day_title = 1):

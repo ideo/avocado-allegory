@@ -36,7 +36,7 @@ lg.write_instructions("Guac God")
 guac_df, scenario = lg.choose_scenario()
 
 lg.demo_contest(st_dev)
-st.image("img/holy_guacamole.jpeg", width=400, caption="This is you, the Guacamole Goddess.")
+# st.image("img/holy_guacamole.jpeg", width=400, caption="This is you, the Guacamole Goddess.")
 
 
 st.markdown("---")
