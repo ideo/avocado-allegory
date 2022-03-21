@@ -5,7 +5,7 @@ STORY = {
     "Introduction":  [
         "Welcome to the town of Sunnyvale, whose citizens are obsessed with all things avocado. They put them on their eggs in the morning, in their tacos midday, and transform them into guacamole for the evening. Everyone agrees that guacamole is the best use of the beloved avocado, but that’s about the only thing they can agree on. No one can agree whose guacamole recipe is the best, with most insisting it’s how their mama does it!",
         "Sensing an opportunity for some friendly competition, Mayor Michelada suggests the town hold a contest to settle once and for all who can make the best guac. Anyone who thinks their recipe is particularly special can bring a bowl of their best stuff to the town plaza this Sunday. The town will gather, try each one, and vote for the best! Everyone loves the idea. People immediately start signing up and texting their friends to do so too.",
-        "That Sunday, the whole town – 250 people! – shows up for the contest. Everyone’s excited to get to spend the afternoon indulging in their favorite dip while playing food critic. The entrants, twenty three people with big bowls of their family’s pride and joy, gather in the center of the plaza.",
+        "That Sunday, the whole town – 250 people! – shows up for the contest. Everyone’s excited to get to spend the afternoon indulging in their favorite dip while playing food critic. The entrants, twenty people with big bowls of their family’s pride and joy, gather in the center of the plaza.",
     ],
 
     "Guac God": [
@@ -23,8 +23,12 @@ STORY = {
 
     "simulation_2":   [
         "Mayor Michelada looks around at the huge crowd that’s gathered. He’s thrilled so many people were excited by his idea for a contest, but he’s wishing he had told the entrants to make more guacamole. Will they have enough to go around? Heck, they might run out of chips! He is sweating trying to figure out how they can save the competition. Clearly they’re going to have to limit how many people can participate – there’s just no way for everyone to try everything!",
-        "But how should they pick who gets to be a taster? Well, one of the few things everyone can agree on is that their mom makes the best guac. Maybe they just the mom’s vote? That could work. But people will be upset if they came all this way and don’t get to try any guac. And, truthfully, the Mayor knows his townspeople. They like to have their own say in the matter, especially the younger ones. Almost on principle they’re going to disagree with whatever their parents say!",
+        "But how should they pick who gets to be a taster? Well, one of the few things everyone can agree on is that their mom makes the best guac. Maybe just only moms vote? That could work. But people will be upset if they came all this way and don’t get to try any guac. And, truthfully, the Mayor knows his townspeople. They like to have their own say in the matter, especially the younger ones. Almost on principle they’re going to disagree with whatever their parents say!",
         "Seeing the distress on her Mayor’s face, Earnest Emilia approaches with an idea. She’s just taken an online course in data analytics and really enjoyed learning the clever ways purposeful randomness can useful. What if not everyone needs to try every guac, she suggests. What if, we intentionally let people only try some, but randomly assign a different some to each person?",
+    ],
+
+    "simulation_2_a": [
+        "Now that we've injected a certain amount of randomness into the contest, it's possible that it could turn out different ways if different times. Let's see what would happen if we help this same contest 100 times.",
     ],
 
     "transition_2_to_3":    [

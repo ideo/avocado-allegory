@@ -33,8 +33,10 @@ lg.write_story("Introduction")
 st.subheader("Let’s Play Guac God")
 lg.write_story("Guac God")
 lg.write_instructions("Guac God")
-guac_df = lg.choose_scenario()
-st.image("img/holy_guacamole.jpeg", width=400, caption="This is you, the Guacamole Goddess.")
+guac_df, scenario = lg.choose_scenario()
+
+lg.demo_contest(st_dev)
+# st.image("img/holy_guacamole.jpeg", width=400, caption="This is you, the Guacamole Goddess.")
 
 
 st.markdown("---")
@@ -65,14 +67,15 @@ guac_limit2 = col2.slider(
 
 sim2 = Simulation(guac_df, num_townspeople, st_dev, assigned_guacs=guac_limit2)
 sim2.simulate()
-# lg.animate_results(sim2, key=section_title)
 
-# lg.get_winner_image(sim2, key=section_title)
-# if st.session_state[f"{section_title}_keep_chart_visible"]:
-#     lg.success_message(section_title, sim2.success, guac_limit)
 lg.animate_results(sim2, key=section_title)
 if st.session_state[f"{section_title}_keep_chart_visible"]:
     lg.success_message(section_title, sim2.sum_success, guac_limit2)
+
+st.write("")
+st.write("")
+lg.write_story("simulation_2_a")
+lg.animate_results_of_100_runs(sim2, scenario, section_title)
 
 
 st.markdown("---")

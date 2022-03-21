@@ -218,7 +218,7 @@ class Condorcetcounting():
 
         #create the ballot matrices and the ballot matrix sum
         ballot_matrix_list = []
-        import pdb;pdb.set_trace()
+        # import pdb;pdb.set_trace()
 
         for sc in scores_cols:
             #get ballot for that person:
@@ -226,7 +226,7 @@ class Condorcetcounting():
             ballot_dict = dict(zip(results_df_slice.index, results_df_slice[sc].tolist()))
             ballot_matrix_list.append(self.create_ballot_matrix())
         
-        import pdb;pdb.set_trace()
+        # import pdb;pdb.set_trace()
         self.declare_winner(results_df, ballots_matrix_list)
 
 
@@ -263,7 +263,7 @@ class Condorcetcounting():
             ballots_matrix_sum += bm
 
         if np.array_equal(ballots_matrix_sum, null_matrix) == True:
-            import pdb;pdb.set_trace()
+            # import pdb;pdb.set_trace()
             sys.exit("Ballot matrix sum is null, something is wrong...") 
 
         return ballots_matrix_sum
