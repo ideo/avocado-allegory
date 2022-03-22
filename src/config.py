@@ -44,7 +44,7 @@ ENTRANTS = [
         },
         {
         "ID":                   5,
-        "Entrant":              "Yellin' Yazmin",
+        "Entrant":              "Yodelin' Yazmin",
         "One Clear Winner":     10,
         "A Close Call":         8,
         "A Lot of Contenders":  8,

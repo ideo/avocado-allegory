@@ -35,7 +35,8 @@ lg.write_story("Guac God")
 lg.write_instructions("Guac God")
 guac_df, scenario = lg.choose_scenario()
 
-lg.demo_contest(st_dev)
+lg.write_story("demo_voting")
+lg.demo_contest(scenario, st_dev)
 # st.image("img/holy_guacamole.jpeg", width=400, caption="This is you, the Guacamole Goddess.")
 
 
@@ -106,9 +107,7 @@ lg.success_message(section_title, sim3.sum_success)
 
 num_cronies = sum(townie.carlos_crony for townie in sim3.townspeople)
 num_effective_cronies = sum(townie.voted_for_our_boy for townie in sim3.townspeople)
-# st.caption(f"Tallying the votes by just adding them all up was a {'success' if sim3.sum_success else 'failure'}!")
-# st.caption(f"Tallying the votes using the condorcet method was a {'success' if sim3.sum_success else 'failure'}!")
-st.caption(f"{num_cronies} of Carlos's cronies voted in the contest and {num_effective_cronies} were able to vote for him.")
+st.caption(f"Also, {num_cronies} of Carlos's cronies voted in the contest and {num_effective_cronies} were able to vote for him.")
 
 
 st.markdown("---")
@@ -120,18 +119,24 @@ lg.write_story(section_title + "_2")
 
 st.text("")
 st.text("")
-# lg.write_instructions(section_title+"_1")
-pepe_4, fra_4, carlos_4 = lg.types_of_voters(section_title)
+lg.write_instructions(section_title)
+pepe_4, fra_4, carlos_4 = lg.types_of_voters(section_title, pepe, fra, carlos)
 col1, col2 = st.columns(2)
-lg.write_instructions(section_title+"_1", col1)
-guac_limit4 = col2.slider(
+guac_limit4 = col1.slider(
     "How many guacamoles does each voter get to try?",
     value=guac_limit3, 
     min_value=1, 
     max_value=20,
     key=section_title)
+num_townspeople4 = col2.slider(
+    "How many townspeople vote in the contest?",
+    value=num_townspeople,
+    min_value=10,
+    max_value=500,
+    step=10
+)
 
-sim4 = Simulation(guac_df, num_townspeople, st_dev, 
+sim4 = Simulation(guac_df, num_townspeople4, st_dev, 
     assigned_guacs=guac_limit4,
     perc_fra=fra,
     perc_pepe=pepe,
@@ -140,10 +145,14 @@ sim4.simulate()
 lg.animate_condorcet_simulation(sim4, key=section_title)
 lg.success_message(section_title, sim4.condo_success)
 
+num_cronies = sum(townie.carlos_crony for townie in sim4.townspeople)
+num_effective_cronies = sum(townie.voted_for_our_boy for townie in sim4.townspeople)
+st.caption(f"Also, {num_cronies} of Carlos's cronies voted in the contest and {num_effective_cronies} were able to vote for him.")
+
 
 st.markdown("---")
-st.subheader("Conclusion")
-st.write("Let's say something smart here.")
+st.subheader("Out in the Real World")
+lg.write_story("conclusion")
 
 
 st.markdown("---")

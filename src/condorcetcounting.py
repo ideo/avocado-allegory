@@ -77,8 +77,9 @@ class Condorcetcounting():
         Returns:
             guac:vote dictionary
         """
-        ballot_dict = dict(zip(self.sample_guac_df['ID'], self.sample_guac_df['Subjective Ratings']))         
+        ballot_dict = dict(zip(self.sample_guac_df['ID'], self.sample_guac_df['Subjective Ratings']))        
         return ballot_dict
+
 
     def get_schwartz_relations_matrix(self, sum_ballots_matrix):
         """This function creates a matrix of the preferences.
@@ -101,6 +102,7 @@ class Condorcetcounting():
                     matrix_of_more_preferred[runner][opponent] = True # Victory (no tie)
 
         return matrix_of_more_preferred
+
 
     def get_smith_or_schwartz_set_statuses(self, matrix_of_more_preferred):
         """Uses Floyd-Warshall algorithm to find out which candidates are in the Smith or Schwartz Set.
@@ -135,6 +137,7 @@ class Condorcetcounting():
         smith_schwartz_set_df['in_set'] = is_in_smith_or_schwartz_set
         return smith_schwartz_set_df
         
+
     def declare_winner(self,results_df, ballots_matrix_list):
         """This function computes the condorcet winner by ranking the guacs
         belonging to the smith set and ranking them by their average score

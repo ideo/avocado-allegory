@@ -69,11 +69,10 @@ class Townsperson:
         obj_rating = row_data[0]
         taste_order = df_index.get_loc(row_data.name)
 
-        if self.carlos_crony:
-            if row_data.name==self.carlos_index:
-                # We votin' for our boy!
-                self.voted_for_our_boy = True
-                return self.max_allowed_vote
+        if self.carlos_crony and row_data.name==self.carlos_index:
+            # We votin' for our boy!
+            self.voted_for_our_boy = True
+            return self.max_allowed_vote
 
         else:
             # Here the fullness_offset is modeled as a straight line going from -1 to +1. 
