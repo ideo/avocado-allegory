@@ -91,12 +91,8 @@ INSTRUCTIONS = {
         "In our third contest, the town will vote differently depending on how many of type of person you chose above. Like before, you can also try limiting how many guacamoles each person gets to sample.",
     ],
 
-    "condorcet_1": [
-        "In our next contest, we’ll be tallying ballots using Emilia’s new method of comparing implicit rankings, but you can control all the same parameters.",
-    ],
-
-    "condorcet_2": [
-        "Set how many guacamoles each person gets to try.",
+    "condorcet": [
+        "In our next contest, we’ll be tallying ballots using Emilia’s new method of comparing implicit rankings. You can control all the same parameters as before, and in addition, you can also try changing the number of townspeople who participate.",
     ],
 }
 
