@@ -35,47 +35,47 @@ lg.write_story("Guac God")
 lg.write_instructions("Guac God")
 guac_df, scenario = lg.choose_scenario()
 
-lg.demo_contest(st_dev)
+# lg.demo_contest(st_dev)
 # st.image("img/holy_guacamole.jpeg", width=400, caption="This is you, the Guacamole Goddess.")
 
 
-st.markdown("---")
-st.subheader("Let's Taste and Vote!")
-section_title = "simulation_1"
-lg.write_story(section_title)
-lg.write_instructions(section_title)
-sim1 = Simulation(guac_df, num_townspeople, st_dev, fullness_factor=fullness_factor)
-sim1.simulate()
-lg.animate_results(sim1, key=section_title)
-if st.session_state[f"{section_title}_keep_chart_visible"]:
-    lg.success_message(section_title, sim1.sum_success)
+# st.markdown("---")
+# st.subheader("Let's Taste and Vote!")
+# section_title = "simulation_1"
+# lg.write_story(section_title)
+# lg.write_instructions(section_title)
+# sim1 = Simulation(guac_df, num_townspeople, st_dev, fullness_factor=fullness_factor)
+# sim1.simulate()
+# lg.animate_results(sim1, key=section_title)
+# if st.session_state[f"{section_title}_keep_chart_visible"]:
+#     lg.success_message(section_title, sim1.sum_success)
 
 
-st.markdown("---")
-lg.write_story("transition_1_to_2")
-st.subheader("Not Enough Guac to Go Around")
-section_title = "simulation_2"
-lg.write_story(section_title)
+# st.markdown("---")
+# lg.write_story("transition_1_to_2")
+# st.subheader("Not Enough Guac to Go Around")
+# section_title = "simulation_2"
+# lg.write_story(section_title)
 
-col1, col2 = st.columns(2)
-lg.write_instructions(section_title, col1)
-guac_limit2 = col2.slider(
-    "How many guacs will tasters try? Start by just removing a couple and then push it from there.",
-    value=18, 
-    min_value=1, 
-    max_value=20)
+# col1, col2 = st.columns(2)
+# lg.write_instructions(section_title, col1)
+# guac_limit2 = col2.slider(
+#     "How many guacs will tasters try? Start by just removing a couple and then push it from there.",
+#     value=18, 
+#     min_value=1, 
+#     max_value=20)
 
-sim2 = Simulation(guac_df, num_townspeople, st_dev, assigned_guacs=guac_limit2)
-sim2.simulate()
+# sim2 = Simulation(guac_df, num_townspeople, st_dev, assigned_guacs=guac_limit2)
+# sim2.simulate()
 
-lg.animate_results(sim2, key=section_title)
-if st.session_state[f"{section_title}_keep_chart_visible"]:
-    lg.success_message(section_title, sim2.sum_success, guac_limit2)
+# lg.animate_results(sim2, key=section_title)
+# if st.session_state[f"{section_title}_keep_chart_visible"]:
+#     lg.success_message(section_title, sim2.sum_success, guac_limit2)
 
-st.write("")
-st.write("")
-lg.write_story("simulation_2_a")
-lg.animate_results_of_100_runs(sim2, scenario, section_title)
+# st.write("")
+# st.write("")
+# lg.write_story("simulation_2_a")
+# lg.animate_results_of_100_runs(sim2, scenario, section_title)
 
 
 st.markdown("---")

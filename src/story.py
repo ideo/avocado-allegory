@@ -28,7 +28,7 @@ STORY = {
     ],
 
     "simulation_2_a": [
-        "Now that we've injected a certain amount of randomness into the contest, it's possible that it could turn out different ways if different times. Let's see what would happen if we help this same contest 100 times.",
+        "Now that we've injected a certain amount of randomness into the contest, it's possible that it could turn out different ways if done different times. Let's see what would happen if we help this same contest 100 times.",
     ],
 
     "transition_2_to_3":    [
