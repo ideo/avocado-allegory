@@ -1,14 +1,23 @@
+from decimal import InvalidContext
 from ssl import CHANNEL_BINDING_TYPES
+from tracemalloc import start
+from turtle import onclick
+from xml.dom.minidom import Entity
 import streamlit as st
 import pandas as pd
 import time
+import inflect
 
 from .story import STORY, INSTRUCTIONS, SUCCESS_MESSAGES
-from .config import COLORS, ENTRANTS
+from .config import COLORS, ENTRANTS, DEMO_CONTEST
+from .simulation import Simulation
 
 
 import warnings
 warnings.simplefilter(action='ignore', category=UserWarning)
+
+
+p = inflect.engine()
 
 
 def initialize_session_state():
@@ -17,6 +26,7 @@ def initialize_session_state():
         "simulation_2_keep_chart_visible":  False,
         "simulation_3_keep_chart_visible":  False,
         "condorcet_keep_chart_visible":     False,
+        "entrant_num":                      0,
     }
 
     for key, value in initial_values.items():
@@ -43,6 +53,16 @@ def write_instructions(section_title, st_col=None):
             st.caption(paragraph)
 
 
+def success_message(section_key, success, guac_limit=None, name=None, percent=None):
+    for paragraph in SUCCESS_MESSAGES[section_key][success]:
+        if guac_limit is not None:
+            st.caption(paragraph.replace("GUAC_LIMIT", str(guac_limit)).replace("MISSING_GUACS", str(20-guac_limit)))
+        if name is not None:
+            st.caption(paragraph.replace("NAME", name).replace("PERCENT", percent))
+        else:
+            st.caption(paragraph)
+
+
 def sidebar():
     """
     Let's put all the sidebar controls here!
@@ -54,7 +74,7 @@ def sidebar():
     """
     st.sidebar.write(keep_out)
     num_townspeople = st.sidebar.slider("How many townspeople are there?", 
-        value=250, 
+        value=200, 
         min_value=10, 
         max_value=500,
         step=10)
@@ -127,7 +147,7 @@ def choose_scenario():
     }
 
     col2.vega_lite_chart(df, spec)
-    return df
+    return df, scenario
 
 
 def animate_results(sim, key):
@@ -192,7 +212,7 @@ def format_spec(sim, subtitle, y_max, col_limit=None):
     chart_df["Entrant"] = sim.guac_df["Entrant"]
     if col_limit is None:
         subtitle += f"Guacamole No. {sim.sum_winner}!"
-        chart_df = format_bar_colors(sim, chart_df)
+        chart_df = format_bar_colors(sim, chart_df, sim.objective_winner, sim.sum_winner)
         color_spec = {"field": "Color", "type": "nomical", "scale": None}
 
     spec = {
@@ -200,7 +220,7 @@ def format_spec(sim, subtitle, y_max, col_limit=None):
             "mark": {"type": "bar"},
             "encoding": {
                 "x":    {
-                    "field": "Entrant", "tupe": "nominal", "sort": "ID",
+                    "field": "Entrant", "type": "nominal", "sort": "ID",
                     "axis": {"labelAngle": 45}},
                 "y":    {
                     "field": "sum", "type": "quantitative", 
@@ -216,66 +236,147 @@ def format_spec(sim, subtitle, y_max, col_limit=None):
     return chart_df, spec
 
 
-def format_bar_colors(sim, chart_df):
-    chart_df["Color"] = pd.Series([COLORS["blue"]]*chart_df.shape[0])
-    chart_df.at[sim.sum_winner, "Color"] = COLORS["red"]
-    chart_df.at[sim.objective_winner, "Color"] = COLORS["green"]
+def format_bar_colors(sim, chart_df, should_win, actually_won):
+    chart_df["Color"] = pd.Series([COLORS["blue"]]*chart_df.shape[0], index=chart_df.index)
+    chart_df.at[actually_won, "Color"] = COLORS["red"]
+    chart_df.at[should_win, "Color"] = COLORS["green"]
     return chart_df
 
 
-def success_message(section_key, success, guac_limit=None):
-    for paragraph in SUCCESS_MESSAGES[section_key][success]:
-        if guac_limit is not None:
-            st.caption(paragraph.replace("GUAC_LIMIT", str(guac_limit)).replace("MISSING_GUACS", str(20-guac_limit)))
-        else:
-            st.caption(paragraph)
-
-
-def tally_votes(sim, key):
+def animate_results_of_100_runs(sim, scenario, key):
     col1, col2 = st.columns([2,5])
+    start_btn = col1.button("Simulate 100 Times", key=key)
 
-    col1.button("Simulate!")
-    y_field = "sum"
-    chart_df = sim.results_df[[y_field]].copy()
+    chart_df = get_row_and_format_dataframe(sim, scenario)
+    spec = format_N_times_chart_spec(chart_df)
+    bar_chart = col2.vega_lite_chart(chart_df, spec)
 
-    #this is to accomodate mine and joe's simulations
-    winning_guac = chart_df.idxmax()[0]
-    chart_df["Entrant"] = sim.guac_df["Entrant"]
+    list_who_else_won(chart_df, sim)
 
-    spec = {
-        "mark": {"type": "bar"},
-        "encoding": {
-            "x":    {"field": "Entrant", "tupe": "nominal"},
-            "y":    {"field": y_field, "type": "quantitative"},
-        },
-        "title":    f"Our Winner is Guacamole No. {winning_guac}!",   
+
+def get_row_and_format_dataframe(sim, scenario):
+    df = pd.read_csv("data/simulate_100_times_sum.csv")
+    df.drop(columns=["Unnamed: 0"], inplace=True)
+    chart_df = df[
+        (df["num_townspeople"] == sim.num_townspeople) & \
+        (df["st_dev"] == sim.st_dev) & \
+        (df["assigned_guacs"] == sim.assigned_guacs) & \
+        (df["perc_fra"] == sim.perc_fra) & \
+        (df["perc_pepe"] == sim.perc_pepe) & \
+        (df["perc_carlos"] == sim.perc_carlos) & \
+        (df["scenario"] == scenario)
+    ]
+    columns = [
+        "num_townspeople",
+        "st_dev",
+        "assigned_guacs",
+        "perc_fra",
+        "perc_pepe",
+        "perc_carlos",
+        "scenario",
+    ]
+    should_win = {
+        "One Clear Winner":     5,
+        "A Close Call":         9,
+        "A Lot of Contenders":  12,
     }
-    col2.vega_lite_chart(chart_df, spec)
-    # st.write(sim.results_df)
-    return y_field
+
+    chart_df.drop(columns=columns, inplace=True)
+    chart_df.fillna(value=0.0, inplace=True)
+    _index = chart_df.index[0]
+    chart_df = chart_df.T
+    chart_df.rename(columns={_index: "No Times Won"}, inplace=True)
+    chart_df["No Times Won"] = chart_df["No Times Won"].astype(int)
+    chart_df.index = chart_df.index.astype(int)
+    chart_df = format_bar_colors(sim, chart_df, should_win[scenario], chart_df["No Times Won"].idxmax())
+    chart_df.index.name = "ID"
+    chart_df.reset_index(inplace=True)
+    chart_df.sort_values(by="ID", inplace=True)
+    chart_df["Entrant"] = chart_df["ID"].apply(lambda x: [ent["Entrant"] for ent in ENTRANTS if ent["ID"]==x][0])
+    return chart_df
 
 
-# def declare_a_winner(sim, y_field):
-#     winning_guac = sim.results_df[[y_field]].idxmax()[0]
-#     top_score = sim.results_df[[y_field]].max()
+def format_N_times_chart_spec(chart_df):
+    spec = {
+            "height":   250,
+            "mark": {"type": "bar"},
+            "encoding": {
+                "x":    {
+                    "field": "Entrant", "type": "nominal", "sort": "ID",
+                    "axis": {"labelAngle": 45}},
+                "y":    {
+                    "field": "No Times Won", "type": "quantitative", 
+                    "scale": {"domain": [0, 100]},
+                    "title": "No. Times Won"},
+                "color":    {
+                    "field": "Color", 
+                    "type": "nomical", 
+                    "scale": None},
+            },
+            "title":    {
+                "text": f"Simulating the Contest 100 Times",
+                "subtitle": "How often was each person's guac voted best?", 
+            }  
+        }
+    return spec
 
-#     # Make sure only one guac got the top score
-#     if (sim.results_df[[y_field]] == top_score).astype(int).sum(axis=0)[0] > 1:
-#         st.text("Oh no! We have a tie!")
-#     elif winning_guac == sim.objective_winner:
-#         st.text("Hooray! Democracy Prevails!")
-#     else:
-#         st.text("Oh no! We done fucked up!")
+
+def list_who_else_won(df, sim):
+    df = df[df["No Times Won"] > 0]
+    df.sort_values(by="No Times Won", ascending=False, inplace=True)
+    
+    name = df.iloc[0]["Entrant"]
+    wins = df.iloc[0]["No Times Won"]
+    success = wins > 50
+    if success:
+        percent = f"{wins}%"
+    else:
+        percent = f"{100 - wins}%"
+    success_message("100_times", success, name=name, percent=percent)
+
+    msg = f"**{p.plural('Result', df.shape[0])} of 100 Contests**"
+    for ii in range(0, df.shape[0]):
+        entrant = df.iloc[ii]["Entrant"]
+        obj_score = sim.guac_df[sim.guac_df["Entrant"] == entrant]["Objective Ratings"].iloc[0]
+        wins = df.iloc[ii]["No Times Won"]
+        msg += f"\n- {entrant}, with an objective guac score of {obj_score}, won **{wins}** {p.plural('time', wins)}"
+
+    st.markdown(msg)
 
 
-def types_of_voters(key):
+
+# def tally_votes(sim, key):
+#     col1, col2 = st.columns([2,5])
+
+#     col1.button("Simulate!")
+#     y_field = "sum"
+#     chart_df = sim.results_df[[y_field]].copy()
+
+#     #this is to accomodate mine and joe's simulations
+#     winning_guac = chart_df.idxmax()[0]
+#     chart_df["Entrant"] = sim.guac_df["Entrant"]
+
+#     spec = {
+#         "mark": {"type": "bar"},
+#         "encoding": {
+#             "x":    {"field": "Entrant", "tupe": "nominal"},
+#             "y":    {"field": y_field, "type": "quantitative"},
+#         },
+#         "title":    f"Our Winner is Guacamole No. {winning_guac}!",   
+#     }
+#     col2.vega_lite_chart(chart_df, spec)
+#     # st.write(sim.results_df)
+#     return y_field
+
+
+def types_of_voters(key, pepe=None, fra=None, carlos=None):
     col1, col2, col3 = st.columns(3)
     pepe = col1.slider(
         """
         What percentage of people in town are like Perky Pepe, who loves 
         guacamole so much he'll have a hard time giving anyone a bad score?
         """,
-        value=10,
+        value=int(pepe*100) if pepe else 10,
         min_value=0,
         max_value=30,
         format="%g%%",
@@ -286,7 +387,7 @@ def types_of_voters(key):
         What percentage of people in town are like Finicky Francisca, who
         thinks all guacamole is basically mush and won't score any entry too high?
         """,
-        value=8,
+        value=int(fra*100) if fra else 8,
         min_value=0,
         max_value=30,
         format="%g%%",
@@ -297,7 +398,7 @@ def types_of_voters(key):
         What percentage of people in town are friends with Cliquey Carlos, and
         will score high guacamole as high as possible no matter what?
         """,
-        value=12,
+        value=int(carlos*100) if carlos else 12,
         min_value=0,
         max_value=30,
         format="%g%%",
@@ -309,53 +410,52 @@ def types_of_voters(key):
     return pepe, fra, carlos
 
 
-def num_people_and_guac_per_person_slider():
-    col1, _, col2 = st.columns([4, 1, 4])
-    num_townspeople = col1.slider("How many townspeople showed up?", 
-        value=250, 
-        min_value=10, 
-        max_value=500)
-    num_guac_per_person = col2.slider("How many guacs can everyone try?",
-        value=10,
-        min_value=1,
-        max_value=20,
-        )
-    return num_townspeople, num_guac_per_person
+# def num_people_and_guac_per_person_slider():
+#     col1, _, col2 = st.columns([4, 1, 4])
+#     num_townspeople = col1.slider("How many townspeople showed up?", 
+#         value=250, 
+#         min_value=10, 
+#         max_value=500)
+#     num_guac_per_person = col2.slider("How many guacs can everyone try?",
+#         value=10,
+#         min_value=1,
+#         max_value=20,
+#         )
+#     return num_townspeople, num_guac_per_person
 
 
-def num_people_slider(key):
-    num_townspeople = st.slider(key, 
-        value=250, 
-        min_value=10, 
-        max_value=500)
-    return num_townspeople
+# def num_people_slider(key):
+#     num_townspeople = st.slider(key, 
+#         value=250, 
+#         min_value=10, 
+#         max_value=500)
+#     return num_townspeople
 
 
-def num_guac_per_person_slider(key):
-    num_guac_per_person = st.slider(key, 
-        value=10, 
-        min_value=1, 
-        max_value=20)
-    return num_guac_per_person
+# def num_guac_per_person_slider(key):
+#     num_guac_per_person = st.slider(key, 
+#         value=10, 
+#         min_value=1, 
+#         max_value=20)
+#     return num_guac_per_person
 
 
-def plot_votes(sim, day_title = 1):
-    
-    y_field = 'Avg'
-    chart_df = sim.results_df[[y_field]].copy()
-    chart_df["Entrant"] = chart_df.index
+# def plot_votes(sim, day_title = 1):
+#     y_field = 'Avg'
+#     chart_df = sim.results_df[[y_field]].copy()
+#     chart_df["Entrant"] = chart_df.index
 
-    winning_guac = sim.sum_winner
+#     winning_guac = sim.sum_winner
         
-    spec = {
-        "mark": {"type": "bar"},
-        "encoding": {
-            "x":    {"field": "Entrant", "tupe": "nominal"},
-            "y":    {"field": y_field, "type": "quantitative"},
-        },
-        "title":    f"Day {day_title}: Our Winner is Guacamole No. {winning_guac}!",   
-    }
-    st.vega_lite_chart(chart_df, spec)
+#     spec = {
+#         "mark": {"type": "bar"},
+#         "encoding": {
+#             "x":    {"field": "Entrant", "tupe": "nominal"},
+#             "y":    {"field": y_field, "type": "quantitative"},
+#         },
+#         "title":    f"Day {day_title}: Our Winner is Guacamole No. {winning_guac}!",   
+#     }
+#     st.vega_lite_chart(chart_df, spec)
 
     
 def animate_condorcet_simulation(sim, key=None):
@@ -386,3 +486,58 @@ def format_condorcet_results(sim):
         """
     return msg
 
+
+def demo_contest(scenario, st_dev):
+    """TKTK"""
+    if scenario == "One Clear Winner":
+        data = [ENTRANTS[5], ENTRANTS[11], ENTRANTS[12]]
+    elif scenario == "A Close Call":
+        data = [ENTRANTS[9], ENTRANTS[11], ENTRANTS[12]]
+    elif scenario == "A Lot of Contenders":
+        data = [ENTRANTS[12], ENTRANTS[0], ENTRANTS[9]]
+
+    df = pd.DataFrame(data=data)
+    df["ID"] = pd.Series([0, 1, 2])
+    df.rename(columns={scenario: "Objective Ratings"}, inplace=True)
+    df = df[["ID", "Entrant", "Objective Ratings"]].copy()
+
+    sim = Simulation(df, 5, st_dev, 
+        assigned_guacs=df.shape[0],
+        fullness_factor=0,
+        seed=42)
+    sim.simulate()
+
+    start_btn = next_contestant(sim)
+    if start_btn:
+        st.button("Next Contestant", on_click=increment_entrant_num)
+    
+
+def next_contestant(sim):
+    col1, col2, col3 = st.columns(3)
+    entrant_num = st.session_state["entrant_num"]
+    col1.image(f"img/guac_icon_{entrant_num}.png", width=100)
+
+    name =  sim.guac_df.loc[entrant_num]['Entrant']
+    score = sim.guac_df.loc[entrant_num]['Objective Ratings']
+    score = int(round(score))
+    col2.markdown(f"**{name}'s Guacamole**")
+    col2.metric("Your Assesment:", score)
+
+    start_btn = col3.button("Taste and Score")
+
+    if start_btn:
+        columns = st.columns(5)
+        for ii, col in enumerate(columns):
+            person = sim.townspeople[ii]
+            score = person.ballot.loc[entrant_num]["Subjective Ratings"]
+            score = int(round(score))
+            col.metric(f"Taster No. {person.number}", score)
+
+    return start_btn
+
+
+def increment_entrant_num():
+    if st.session_state["entrant_num"] < 2:
+        st.session_state["entrant_num"] += 1
+    else:
+        st.session_state["entrant_num"] = 0

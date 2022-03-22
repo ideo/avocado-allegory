@@ -77,8 +77,9 @@ class Condorcetcounting():
         Returns:
             guac:vote dictionary
         """
-        ballot_dict = dict(zip(self.sample_guac_df['ID'], self.sample_guac_df['Subjective Ratings']))         
+        ballot_dict = dict(zip(self.sample_guac_df['ID'], self.sample_guac_df['Subjective Ratings']))        
         return ballot_dict
+
 
     def get_schwartz_relations_matrix(self, sum_ballots_matrix):
         """This function creates a matrix of the preferences.
@@ -101,6 +102,7 @@ class Condorcetcounting():
                     matrix_of_more_preferred[runner][opponent] = True # Victory (no tie)
 
         return matrix_of_more_preferred
+
 
     def get_smith_or_schwartz_set_statuses(self, matrix_of_more_preferred):
         """Uses Floyd-Warshall algorithm to find out which candidates are in the Smith or Schwartz Set.
@@ -135,6 +137,7 @@ class Condorcetcounting():
         smith_schwartz_set_df['in_set'] = is_in_smith_or_schwartz_set
         return smith_schwartz_set_df
         
+
     def declare_winner(self,results_df, ballots_matrix_list):
         """This function computes the condorcet winner by ranking the guacs
         belonging to the smith set and ranking them by their average score
@@ -218,7 +221,7 @@ class Condorcetcounting():
 
         #create the ballot matrices and the ballot matrix sum
         ballot_matrix_list = []
-        import pdb;pdb.set_trace()
+        # import pdb;pdb.set_trace()
 
         for sc in scores_cols:
             #get ballot for that person:
@@ -226,7 +229,7 @@ class Condorcetcounting():
             ballot_dict = dict(zip(results_df_slice.index, results_df_slice[sc].tolist()))
             ballot_matrix_list.append(self.create_ballot_matrix())
         
-        import pdb;pdb.set_trace()
+        # import pdb;pdb.set_trace()
         self.declare_winner(results_df, ballots_matrix_list)
 
 
@@ -263,7 +266,7 @@ class Condorcetcounting():
             ballots_matrix_sum += bm
 
         if np.array_equal(ballots_matrix_sum, null_matrix) == True:
-            import pdb;pdb.set_trace()
+            # import pdb;pdb.set_trace()
             sys.exit("Ballot matrix sum is null, something is wrong...") 
 
         return ballots_matrix_sum

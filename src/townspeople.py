@@ -1,6 +1,5 @@
 import numpy as np
 import pandas as pd
-import random
 from .condorcetcounting import Condorcetcounting
 
 
@@ -23,7 +22,6 @@ class Townsperson:
         self.voted_for_our_boy = False
         self.ballot = None
         self.test_jennas_numbers=test_jennas_numbers
-        random.seed(person_number)
 
 
     def taste_and_vote(self, guac_df):
@@ -36,7 +34,7 @@ class Townsperson:
         Returns:
             A Condorcetcounting object
         """
-        if self.test_jennas_numbers == False:
+        if self.test_jennas_numbers == False and self.carlos_crony:
             self.carlos_index = guac_df[guac_df["Entrant"] == "Cliquey Carlos"].index[0]
 
         sample_guac_df = guac_df.sample(n=self.assigned_guacs, replace=False)
@@ -89,7 +87,7 @@ class Townsperson:
             subj = np.random.normal(mu, self.st_dev)
 
             #allowing townspeople to use decimal points, but not more precision than that...
-            subj = round(subj,1)
+            subj = round(subj, 1)
             subj = self.max_allowed_vote if subj > self.max_allowed_vote else subj
             subj = self.min_allowed_vote if subj < self.min_allowed_vote else subj
             return subj

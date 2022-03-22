@@ -5,11 +5,15 @@ STORY = {
     "Introduction":  [
         "Welcome to the town of Sunnyvale, whose citizens are obsessed with all things avocado. They put them on their eggs in the morning, in their tacos midday, and transform them into guacamole for the evening. Everyone agrees that guacamole is the best use of the beloved avocado, but that’s about the only thing they can agree on. No one can agree whose guacamole recipe is the best, with most insisting it’s how their mama does it!",
         "Sensing an opportunity for some friendly competition, Mayor Michelada suggests the town hold a contest to settle once and for all who can make the best guac. Anyone who thinks their recipe is particularly special can bring a bowl of their best stuff to the town plaza this Sunday. The town will gather, try each one, and vote for the best! Everyone loves the idea. People immediately start signing up and texting their friends to do so too.",
-        "That Sunday, the whole town – 250 people! – shows up for the contest. Everyone’s excited to get to spend the afternoon indulging in their favorite dip while playing food critic. The entrants, twenty three people with big bowls of their family’s pride and joy, gather in the center of the plaza.",
+        "That Sunday, the whole town – 250 people! – shows up for the contest. Everyone’s excited to get to spend the afternoon indulging in their favorite dip while playing food critic. The entrants, twenty people with big bowls of their family’s pride and joy, gather in the center of the plaza.",
     ],
 
     "Guac God": [
         "Looking down from Horchata Heaven, you are the Guacamole God. You are so pleased that the beings of your creation have fallen for your favorite dip and also proud of their embrace of democratic values. And while you admire everyone’s hard work, since you are hors d'oeuvre omniscient, you can already clearly spot the winner.",
+    ],
+
+    "demo_voting":  [
+        "Above you’ve selected how each guacamole in this contest should objectively be scored, but the townspeople of Sunnyvale are not computers. They’ll have their own subjective opinions. Luckily they’re pretty reasonable and will tend to agree with your assessment, plus or minus a point or two. Click below to see how a few townspeople will judge some of the submissions.",
     ],
 
     "simulation_1":   [
@@ -23,8 +27,12 @@ STORY = {
 
     "simulation_2":   [
         "Mayor Michelada looks around at the huge crowd that’s gathered. He’s thrilled so many people were excited by his idea for a contest, but he’s wishing he had told the entrants to make more guacamole. Will they have enough to go around? Heck, they might run out of chips! He is sweating trying to figure out how they can save the competition. Clearly they’re going to have to limit how many people can participate – there’s just no way for everyone to try everything!",
-        "But how should they pick who gets to be a taster? Well, one of the few things everyone can agree on is that their mom makes the best guac. Maybe they just the mom’s vote? That could work. But people will be upset if they came all this way and don’t get to try any guac. And, truthfully, the Mayor knows his townspeople. They like to have their own say in the matter, especially the younger ones. Almost on principle they’re going to disagree with whatever their parents say!",
+        "But how should they pick who gets to be a taster? Well, one of the few things everyone can agree on is that their mom makes the best guac. Maybe just only moms vote? That could work. But people will be upset if they came all this way and don’t get to try any guac. And, truthfully, the Mayor knows his townspeople. They like to have their own say in the matter, especially the younger ones. Almost on principle they’re going to disagree with whatever their parents say!",
         "Seeing the distress on her Mayor’s face, Earnest Emilia approaches with an idea. She’s just taken an online course in data analytics and really enjoyed learning the clever ways purposeful randomness can useful. What if not everyone needs to try every guac, she suggests. What if, we intentionally let people only try some, but randomly assign a different some to each person?",
+    ],
+
+    "simulation_2_a": [
+        "Now that we've injected a certain amount of randomness into the contest, it's possible that it could turn out different ways if done different times. Let's see what would happen if we help this same contest 100 times.",
     ],
 
     "transition_2_to_3":    [
@@ -46,6 +54,12 @@ STORY = {
     "condorcet_2": [
         "This person only got to taste five guacamoles, giving them scores of 8, 4, 4, 6, and 1. From this, it’s probably not right to say Guac#2 is twice as good as Guac#4. But we can definitely say, of the guacamoles that this person got to try, they think #2 was the best, #15 was second best, #4 and #7 were equally mediocre, and #20 was crap.",
         "So for next year, Emilia suggests, we could use the same ballots, but look at each one as a short list of rankings. Then, instead of adding up all the scores, we collect all the short lists of rankings into one grand list of rankings. We wouldn’t be able to tally by hand anymore; she’ll have to write some code to do it. But that will be even faster anyway!",
+    ],
+
+    "conclusion":   [
+        "Now obviously, in real contests like this, whether we’re assessing which coworker makes the best chili or which movie should take home the academy award, there is no divinely decreed correct answer. That invention simply allows to compare different methods for their consistency and fairness.",
+        "From these simulated contests we’ve seen that we don’t need every judge in our contest to assess every single entry for the competition to have a fair outcome. And rather than just a safety feature that allows us to ensure a limited supply of guacamole lasts till the end of the contest, limiting how many entries each judge gets to assess creates an opportunity to invite more participants into the contest. Also, with less entries to judge, this feature allows each participant to be more discerning than they perhaps could be otherwise. Further, when we switched to comparing implicit rankings over raw totals, we found that our contest was more robust to the whims of particular opinions or attempts at collusion.",
+        "Are there other voting methods you’d like to try? We’ve written this simulation to be extensible. Please check out our [Github repo](https://github.com/ideo/avocado-allegory) if you’d like to collaborate or learn more about how these simulations work under the hood.",
     ],
 
     # "Unknown Best":  [
@@ -83,12 +97,8 @@ INSTRUCTIONS = {
         "In our third contest, the town will vote differently depending on how many of type of person you chose above. Like before, you can also try limiting how many guacamoles each person gets to sample.",
     ],
 
-    "condorcet_1": [
-        "In our next contest, we’ll be tallying ballots using Emilia’s new method of comparing implicit rankings, but you can control all the same parameters.",
-    ],
-
-    "condorcet_2": [
-        "Set how many guacamoles each person gets to try.",
+    "condorcet": [
+        "In our next contest, we’ll be tallying ballots using Emilia’s new method of comparing implicit rankings. You can control all the same parameters as before, and in addition, you can also try changing the number of townspeople who participate.",
     ],
 }
 
@@ -120,6 +130,15 @@ SUCCESS_MESSAGES = {
         False:  [
             "Oh no!"
         ]
+    },
+
+    "100_times": {
+        True:   [
+            "Across 100 simulations, NAME still took home the trophy more than anyone else, winning PERCENT of the contents. Take a look at who else took home the trophy at times and whether or not their guacamole deserved the win.",
+        ],
+        False:  [
+            "Across 100 simulations, NAME took home the trophy more than anyone else, but they did so less than half the time. In PERCENT of our contents, someone other than whom you decided had the best guacamole took home the win. Take a look at who they were and if they deserved it.",
+        ],
     },
 
     "condorcet": {

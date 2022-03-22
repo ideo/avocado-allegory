@@ -44,7 +44,7 @@ ENTRANTS = [
         },
         {
         "ID":                   5,
-        "Entrant":              "Yellin' Yazmin",
+        "Entrant":              "Yodelin' Yazmin",
         "One Clear Winner":     10,
         "A Close Call":         8,
         "A Lot of Contenders":  8,
@@ -147,6 +147,35 @@ ENTRANTS = [
         "A Close Call":         4,
         "A Lot of Contenders":  4,
         },
+]
+
+
+DEMO_CONTEST = [
+    {
+        "ID":                   0,
+        "Entrant":              "Scrupulous Susie",
+        "Objective Ratings":    9,
+    },
+    {
+        "ID":                   1,
+        "Entrant":              "Articulate Arnold",
+        "Objective Ratings":    2,
+    },
+    {
+        "ID":                   2,
+        "Entrant":              "Gregarious Gregory",
+        "Objective Ratings":    6,
+    },
+    # {
+    #     "ID":                   3,
+    #     "Entrant":              "Scrupulous Susie",
+    #     "Objective Ratings":    4,
+    # },
+    # {
+    #     "ID":                   4,
+    #     "Entrant":              "Scrupulous Susie",
+    #     "Objective Ratings":    4,
+    # },
 ]
 
 

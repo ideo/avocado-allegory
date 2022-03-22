@@ -1,11 +1,16 @@
+import sys
+import random
+
 import pandas as pd
+
 from .townspeople import Townsperson
 
 TEST_JENNAS_NUMBERS = False
 class Simulation:
     def __init__(
-            self, guac_df, num_townspeople, st_dev, fullness_factor = 0.0,
-            assigned_guacs=20, perc_fra=0.0, perc_pepe=0.0, perc_carlos=0.0
+            self, guac_df, num_townspeople=200, st_dev=1.0, fullness_factor = 0.0,
+            assigned_guacs=20, perc_fra=0.0, perc_pepe=0.0, perc_carlos=0.0,
+            seed=None
         ):
         self.guac_df = guac_df
         self.num_townspeople = num_townspeople
@@ -17,7 +22,6 @@ class Simulation:
         self.perc_pepe = perc_pepe
         self.perc_carlos = perc_carlos
         self.results_df = None
-        # self.method = method
         self.objective_winner = guac_df[["Objective Ratings"]].idxmax()[0]
         self.sum_winner = None
         self.sum_winners = []
@@ -25,6 +29,9 @@ class Simulation:
         self.condorcet_winners = []
         self.condorcet_winner = None
         # self.method = method.lower()
+        if seed:
+            random.seed(seed)
+
 
         if TEST_JENNAS_NUMBERS:
             self.num_townspeople = 7
@@ -62,7 +69,7 @@ class Simulation:
         self.results_df["Mean"] = self.results_df[columns_to_consider].mean(axis=1)
         
         self.sum_winner = self.get_sum_winner()
-        
+
         self.condorcet_winner = condorcet_elements.declare_winner(self.results_df, ballots_matrix_list)
         self.condorcet_winners = condorcet_elements.winners
 

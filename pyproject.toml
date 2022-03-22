@@ -8,6 +8,7 @@ authors = ["Joe Gambino <joe@gam.bingo>"]
 python = ">=3.7.1,<4.0"
 pandas = "1.2.5"
 streamlit = "^1.6.0"
+inflect = "^5.4.0"
 
 [tool.poetry.dev-dependencies]
 watchdog = "^2.1.6"
