@@ -27,7 +27,7 @@ st.title("The Allegory of the Avocados")
 # where we're developing and commenting on the story.""")
 
 st.subheader("Welcome to Sunnyvale")
-# lg.write_story("Introduction")
+lg.write_story("Introduction")
 
 
 st.subheader("Let’s Play Guac God")
