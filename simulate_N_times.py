@@ -47,23 +47,23 @@ def load_dataframe(sim_params, filename):
 
 if __name__ == "__main__":
 
-    for st_dev in [2, 3]:
-        for assigned_guacs in range(2, 21):
+    st_dev = 1.0
+    for assigned_guacs in range(2, 21):
 
-            sim_params = {
-                "num_townspeople":  200,
-                "st_dev":           st_dev,
-                "assigned_guacs":   assigned_guacs,
-                "perc_fra":         0.0,
-                "perc_pepe":        0.0,
-                "perc_carlos":      0.0,
-            }
-            scenarios = [
-                "One Clear Winner",
-                "A Close Call",
-                "A Lot of Contenders",
-            ]
-            N = 100
+        sim_params = {
+            "num_townspeople":  200,
+            "st_dev":           st_dev,
+            "assigned_guacs":   assigned_guacs,
+            "perc_fra":         0.0,
+            "perc_pepe":        0.0,
+            "perc_carlos":      0.0,
+        }
+        scenarios = [
+            "One Clear Winner",
+            "A Close Call",
+            "A Lot of Contenders",
+        ]
+        N = 100
 
-            for scenario in scenarios:
-                simulate_N_times(sim_params, scenario, N)
+        for scenario in scenarios:
+            simulate_N_times(sim_params, scenario, N)
