@@ -3,10 +3,12 @@ A good chunk of this script is courtesy of
 Alex Fink and Russell McClellan,aka the original iZotope 
 guac voting system creators
 '''
-from unittest import runner
+# from unittest import runner
 import numpy as np
 import pandas as pd
 import sys
+
+
 class Condorcetcounting():
     def __init__(
             self, 

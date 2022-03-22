@@ -2,7 +2,7 @@
 import streamlit as st
 # import pandas as pd
 
-from src.story import STORY
+# from src.story import STORY
 import src.logic as lg
 from src.simulation import Simulation
 # from src.simulation_unknown_best import Simulation_unknown_best
@@ -27,7 +27,7 @@ st.title("The Allegory of the Avocados")
 # where we're developing and commenting on the story.""")
 
 st.subheader("Welcome to Sunnyvale")
-lg.write_story("Introduction")
+# lg.write_story("Introduction")
 
 
 st.subheader("Let’s Play Guac God")
