@@ -1,3 +1,4 @@
+import sys
 import random
 
 import pandas as pd
@@ -68,7 +69,7 @@ class Simulation:
         self.results_df["Mean"] = self.results_df[columns_to_consider].mean(axis=1)
         
         self.sum_winner = self.get_sum_winner()
-        
+
         self.condorcet_winner = condorcet_elements.declare_winner(self.results_df, ballots_matrix_list)
         self.condorcet_winners = condorcet_elements.winners
 

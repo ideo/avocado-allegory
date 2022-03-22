@@ -2,6 +2,7 @@ from decimal import InvalidContext
 from ssl import CHANNEL_BINDING_TYPES
 from tracemalloc import start
 from turtle import onclick
+from xml.dom.minidom import Entity
 import streamlit as st
 import pandas as pd
 import time
@@ -459,8 +460,20 @@ def format_condorcet_results(sim):
     return msg
 
 
-def demo_contest(st_dev):
-    df = pd.DataFrame(data=DEMO_CONTEST)
+def demo_contest(scenario, st_dev):
+    """TKTK"""
+    if scenario == "One Clear Winner":
+        data = [ENTRANTS[5], ENTRANTS[11], ENTRANTS[12]]
+    elif scenario == "A Close Call":
+        data = [ENTRANTS[9], ENTRANTS[11], ENTRANTS[12]]
+    elif scenario == "A Lot of Contenders":
+        data = [ENTRANTS[12], ENTRANTS[0], ENTRANTS[9]]
+
+    df = pd.DataFrame(data=data)
+    df["ID"] = pd.Series([0, 1, 2])
+    df.rename(columns={scenario: "Objective Ratings"}, inplace=True)
+    df = df[["ID", "Entrant", "Objective Ratings"]].copy()
+
     sim = Simulation(df, 5, st_dev, 
         assigned_guacs=df.shape[0],
         fullness_factor=0,

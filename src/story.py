@@ -12,6 +12,10 @@ STORY = {
         "Looking down from Horchata Heaven, you are the Guacamole God. You are so pleased that the beings of your creation have fallen for your favorite dip and also proud of their embrace of democratic values. And while you admire everyone’s hard work, since you are hors d'oeuvre omniscient, you can already clearly spot the winner.",
     ],
 
+    "demo_voting":  [
+        "Above you’ve selected how each guacamole in this contest should objectively be scored, but the townspeople of Sunnyvale are not computers. They’ll have their own subjective opinions. Luckily they’re pretty reasonable and will tend to agree with your assessment, plus or minus a point or two. Click below to see how a few townspeople will judge some of the submissions.",
+    ],
+
     "simulation_1":   [
         "Mayor Michelada is busy handing out bowls of tortilla chips. Obviously, if this is going to be a fair competition, everyone is going to need to use the same kind of chip. He also begins handing out the score cards so people can score each guac on a scale from 1 to 10. He thought about asking everyone to try each guac and and then sorting them from worst to best, but there are just too many guacs! Try to keep track of 20 different guacamoles would be too hard. It’ll much easier for people to just score them independently and then add up the scores. Whichever guac gets the highest score wins! Easy enough.",
         "For a moment, Mayor Michelada worries that perhaps 20 guacamoles is too many. Do people have that much room in their stomachs? Will everyone just prefer the first one they try, when they’re the most hungry? Then, by the time they’re full, will they all think the last one is nothing special? But looking around at the huge crowd as everyone jockeys to get close, he realizes that folks will end up tasting in different orders, so hopefully people getting full at different times will just even itself out.",
