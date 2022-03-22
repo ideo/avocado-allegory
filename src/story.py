@@ -130,6 +130,15 @@ SUCCESS_MESSAGES = {
         ]
     },
 
+    "100_times": {
+        True:   [
+            "Across 100 simulations, NAME still took home the trophy more than anyone else, winning PERCENT of the contents. Take a look at who else took home the trophy at times and whether or not their guacamole deserved the win.",
+        ],
+        False:  [
+            "Across 100 simulations, NAME took home the trophy more than anyone else, but they did so less than half the time. In PERCENT of our contents, someone other than whom you decided had the best guacamole took home the win. Take a look at who they were and if they deserved it.",
+        ],
+    },
+
     "condorcet": {
         True:  [
             "Success!",
