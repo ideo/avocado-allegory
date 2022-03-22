@@ -56,6 +56,12 @@ STORY = {
         "So for next year, Emilia suggests, we could use the same ballots, but look at each one as a short list of rankings. Then, instead of adding up all the scores, we collect all the short lists of rankings into one grand list of rankings. We wouldn’t be able to tally by hand anymore; she’ll have to write some code to do it. But that will be even faster anyway!",
     ],
 
+    "conclusion":   [
+        "Now obviously, in real contests like this, whether we’re assessing which coworker makes the best chili or which movie should take home the academy award, there is no divinely decreed correct answer. That invention simply allows to compare different methods for their consistency and fairness.",
+        "From these simulated contests we’ve seen that we don’t need every judge in our contest to assess every single entry for the competition to have a fair outcome. And rather than just a safety feature that allows us to ensure a limited supply of guacamole lasts till the end of the contest, limiting how many entries each judge gets to assess creates an opportunity to invite more participants into the contest. Also, with less entries to judge, this feature allows each participant to be more discerning than they perhaps could be otherwise. Further, when we switched to comparing implicit rankings over raw totals, we found that our contest was more robust to the whims of particular opinions or attempts at collusion.",
+        "Are there other voting methods you’d like to try? We’ve written this simulation to be extensible. Please check out our [Github repo](https://github.com/ideo/avocado-allegory) if you’d like to collaborate or learn more about how these simulations work under the hood.",
+    ],
+
     # "Unknown Best":  [
     #     "What if we don't know who is the best and just decide to go with people's guts? On day 1 of the competition everyone tries all the guacs, and a winner is found. However, the judges realize that trying all guacs turns out to be way too much food. So, on day two they decide to do an experiment. What if we only assign to each judge a random subset of guacs? How small does this subset have to be before the winner identify on day 1 is lost?",
     # ],

@@ -120,7 +120,7 @@ lg.write_story(section_title + "_2")
 st.text("")
 st.text("")
 lg.write_instructions(section_title)
-pepe_4, fra_4, carlos_4 = lg.types_of_voters(section_title)
+pepe_4, fra_4, carlos_4 = lg.types_of_voters(section_title, pepe, fra, carlos)
 col1, col2 = st.columns(2)
 guac_limit4 = col1.slider(
     "How many guacamoles does each voter get to try?",
@@ -151,8 +151,8 @@ st.caption(f"Also, {num_cronies} of Carlos's cronies voted in the contest and {n
 
 
 st.markdown("---")
-st.subheader("Conclusion")
-st.write("Let's say something smart here.")
+st.subheader("Out in the Real World")
+lg.write_story("conclusion")
 
 
 st.markdown("---")

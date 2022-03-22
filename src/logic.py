@@ -369,14 +369,14 @@ def list_who_else_won(df, sim):
 #     return y_field
 
 
-def types_of_voters(key):
+def types_of_voters(key, pepe=None, fra=None, carlos=None):
     col1, col2, col3 = st.columns(3)
     pepe = col1.slider(
         """
         What percentage of people in town are like Perky Pepe, who loves 
         guacamole so much he'll have a hard time giving anyone a bad score?
         """,
-        value=10,
+        value=int(pepe*100) if pepe else 10,
         min_value=0,
         max_value=30,
         format="%g%%",
@@ -387,7 +387,7 @@ def types_of_voters(key):
         What percentage of people in town are like Finicky Francisca, who
         thinks all guacamole is basically mush and won't score any entry too high?
         """,
-        value=8,
+        value=int(fra*100) if fra else 8,
         min_value=0,
         max_value=30,
         format="%g%%",
@@ -398,7 +398,7 @@ def types_of_voters(key):
         What percentage of people in town are friends with Cliquey Carlos, and
         will score high guacamole as high as possible no matter what?
         """,
-        value=12,
+        value=int(carlos*100) if carlos else 12,
         min_value=0,
         max_value=30,
         format="%g%%",
