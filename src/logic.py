@@ -172,7 +172,7 @@ def animate_results(sim, key):
                 bar_chart.vega_lite_chart(chart_df, spec)
             else:
                 bar_chart = col2.vega_lite_chart(chart_df, spec)
-            time.sleep(0.01/2)
+            time.sleep(.01/2)
 
     if st.session_state[f"{key}_keep_chart_visible"]:
         # Ensure the final chart stays visible

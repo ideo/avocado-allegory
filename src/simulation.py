@@ -1,5 +1,6 @@
 import sys
 import random
+from unittest import result
 from xml.dom.pulldom import parseString
 
 import pandas as pd
@@ -29,8 +30,8 @@ class Simulation:
         self.sum_winner = None
         self.sum_winners = []
         self.success = False
-        self.condorcet_winners = []
-        self.condorcet_winner = None
+        # self.condorcet_winners = []
+        # self.condorcet_winner = None
         self.method = method.lower()
         if seed:
             random.seed(seed)
@@ -43,8 +44,7 @@ class Simulation:
         #     self.guac_df['Objective Ratings'] = 0
 
 
-    def simulate(self, cazzo=False):
-
+    def simulate(self):
         self.create_agents()
         self.taste_and_vote()
         self.tally_votes()
@@ -61,50 +61,40 @@ class Simulation:
         if self.perc_pepe > 0:
             num_pepes = self.num_townspeople * self.perc_pepe
             num_pepes = int(round(num_pepes))
-            pepe = Townsperson(
-                st_dev=self.st_dev, 
-                assigned_guacs=self.assigned_guacs, 
-                mean_offset=3, 
-                carlos_crony=False,
-                )
-            self.townspeople += [pepe]*num_pepes
+            for _ in range(num_pepes):
+                self.add_agent(mean_offset=3, carlos_crony=False)
 
         #Fras tend to score people lower
         if self.perc_fra > 0:
             num_fras = self.num_townspeople * self.perc_fra
             num_fras = int(round(num_fras))
-            fra = Townsperson(
-                st_dev=self.st_dev, 
-                assigned_guacs=self.assigned_guacs, 
-                mean_offset=-3, 
-                carlos_crony=False,
-                )
-            self.townspeople += [fra]*num_fras
+            for _ in range(num_fras):
+                self.add_agent(mean_offset=-3, carlos_crony=False)
 
         #Carlos's Cronies are colluding to vote Carlos the best
         if self.perc_carlos > 0:
             num_carlos = self.num_townspeople * self.perc_carlos
             num_carlos = int(round(num_carlos))
-            carlos_crony = Townsperson(
-                st_dev=self.st_dev, 
-                assigned_guacs=self.assigned_guacs, 
-                mean_offset=0, 
-                carlos_crony=True,
-                )
-            self.townspeople += [carlos_crony]*num_carlos
+            for _ in range(num_carlos):
+                self.add_agent(mean_offset=0, carlos_crony=True)
         
         #Reasonable townspeopole tend to score people fairly
         num_reasonable = self.num_townspeople - len(self.townspeople)
-        regular_hard_working_folk = Townsperson(
-                st_dev=self.st_dev, 
-                assigned_guacs=self.assigned_guacs, 
-                mean_offset=0, 
-                carlos_crony=False,
-                )
-        self.townspeople += [regular_hard_working_folk]*num_reasonable
+        for _ in range(num_reasonable):
+                self.add_agent()
 
         for ii, person in enumerate(self.townspeople):
             person.number = ii
+
+
+    def add_agent(self, mean_offset=0, carlos_crony=False):
+        agent = Townsperson(
+            st_dev=self.st_dev, 
+            assigned_guacs=self.assigned_guacs, 
+            mean_offset=mean_offset, 
+            carlos_crony=carlos_crony,
+            )
+        self.townspeople.append(agent)
 
 
     def taste_and_vote(self):
@@ -134,8 +124,9 @@ class Simulation:
         """
         #putting the results together
         self.results_df.set_index(["ID"], inplace = True)
-        columns_to_consider = self.results_df.columns
-        self.results_df["sum"] = self.results_df[columns_to_consider].sum(axis=1)
+        # columns_to_consider = self.results_df.columns
+        # self.results_df["sum"] = self.results_df[columns_to_consider].sum(axis=1)
+        self.results_df["sum"] = self.results_df.sum(axis=1)
         # self.results_df["Mean"] = self.results_df[columns_to_consider].mean(axis=1)
         
         #sort the scores to have the sum at the top
