@@ -42,7 +42,7 @@ class Simulation:
 
     def simulate(self, cazzo=False):
 
-        num_pepes, num_fras, num_carlos, num_reasonable = self.create_personas()
+        self.create_agents()
          
         #Creating the DF that will store the ballots
         self.results_df = pd.DataFrame(list(self.guac_df.index), columns = ["ID"])
@@ -50,19 +50,20 @@ class Simulation:
         #creating the list that will contain each matrix ballot (needed for condorcet)
         ballots_matrix_list = []
         
-        #filling in the ballots dataframe,for the various characters
+        #filling in the ballots dataframe, for the various characters
         condorcet_elements = None
         
         #this is by how much we'll be moving the standard deviation used to sample from the Guac God give scores
-        person_types = [num_reasonable, num_pepes, num_fras, num_carlos]
-        mean_offsets = [0, 3, -3, 0]
-        carlos_cronies = [False, False, False, True]
+        # person_types = [num_reasonable, num_pepes, num_fras, num_carlos]
+        # mean_offsets = [0, 3, -3, 0]
+        # carlos_cronies = [False, False, False, True]
 
-        for num_people_type, offset_type, carlos_crony in zip(person_types, mean_offsets, carlos_cronies):
-            if num_people_type == 0: continue
-            condorcet_elements, ballots_matrix_list = self.collect_results(ballots_matrix_list, num_people_type, offset_type, carlos_crony)
+        # for num_people_type, offset_type, carlos_crony in zip(person_types, mean_offsets, carlos_cronies):
+        #     if num_people_type == 0: continue
+        condorcet_elements, ballots_matrix_list = self.collect_results(ballots_matrix_list)
                     
         #putting the results together
+
         self.results_df.set_index(["ID"], inplace = True)
         columns_to_consider = self.results_df.columns
         self.results_df["sum"] = self.results_df[columns_to_consider].sum(axis=1)
@@ -77,6 +78,71 @@ class Simulation:
         self.condo_success = self.condorcet_winner == self.objective_winner
         #FIXME reminder you have this one in here. I assume it will become an if/else at some point. 
         # self.success = self.sum_success
+
+
+    def create_agents(self):
+        """Create the agents to be used in the simulation
+
+        Returns:
+           None
+        """
+
+        #Pepes tend to score people higher
+        if self.perc_pepe > 0:
+            num_pepes = self.num_townspeople * self.perc_pepe
+            num_pepes = int(round(num_pepes))
+            pepe = Townsperson(
+                # person_number=person_number, 
+                st_dev=self.st_dev, 
+                assigned_guacs=self.assigned_guacs, 
+                mean_offset=3, 
+                # test_jennas_numbers=TEST_JENNAS_NUMBERS,
+                carlos_crony=False,
+                )
+            self.townspeople += [pepe]*num_pepes
+
+        #Fras tend to score people lower
+        if self.perc_fra > 0:
+            num_fras = self.num_townspeople * self.perc_fra
+            num_fras = int(round(num_fras))
+            fra = Townsperson(
+                # person_number=person_number, 
+                st_dev=self.st_dev, 
+                assigned_guacs=self.assigned_guacs, 
+                mean_offset=-3, 
+                # test_jennas_numbers=TEST_JENNAS_NUMBERS,
+                carlos_crony=False,
+                )
+            self.townspeople += [fra]*num_fras
+
+        #Carlos's Cronies are colluding to vote Carlos the best
+        if self.perc_carlos > 0:
+            num_carlos = self.num_townspeople * self.perc_carlos
+            num_carlos = int(round(num_carlos))
+            carlos_crony = Townsperson(
+                # person_number=person_number, 
+                st_dev=self.st_dev, 
+                assigned_guacs=self.assigned_guacs, 
+                mean_offset=0, 
+                # test_jennas_numbers=TEST_JENNAS_NUMBERS,
+                carlos_crony=True,
+                )
+            self.townspeople += [carlos_crony]*num_carlos
+        
+        #Reasonable townspeopole tend to score people fairly
+        num_reasonable = self.num_townspeople - len(self.townspeople)
+        regular_hard_working_folk = Townsperson(
+                # person_number=person_number, 
+                st_dev=self.st_dev, 
+                assigned_guacs=self.assigned_guacs, 
+                mean_offset=0, 
+                # test_jennas_numbers=TEST_JENNAS_NUMBERS,
+                carlos_crony=False,
+                )
+        self.townspeople += [regular_hard_working_folk]*num_reasonable
+
+        for ii, person in enumerate(self.townspeople):
+            person.number = ii
 
         
     def get_sum_winner(self):
@@ -110,29 +176,7 @@ class Simulation:
         return self.sum_winners[0]
 
 
-    def create_personas(self):
-        """This function creates the counts for the different personas.
-
-        Returns:
-           tuple of integers with the count for each persona
-        """
-
-        #introducing characters to the simulation
-        #num_pepes tend to score people higher
-        num_pepes = round(self.num_townspeople * self.perc_pepe)
-
-        #num_fras tend to score people lower
-        num_fras = round(self.num_townspeople * self.perc_fra)
-
-        #num_carlos are colluding to vote Carlos the best
-        num_carlos = round(self.num_townspeople * self.perc_carlos)
-
-        #num_reasonable tend to score people fairly
-        num_reasonable = self.num_townspeople - num_pepes - num_fras - num_carlos
-        return num_pepes, num_fras, num_carlos, num_reasonable
-
-
-    def collect_results(self, ballots_matrix_list, num_people, mean_offset = 0, carlos_crony=False):
+    def collect_results(self, ballots_matrix_list):
         """This function collects the results of a simulation on a set of people
 
         Args:
@@ -145,16 +189,16 @@ class Simulation:
         """
         condorcet_elements = None
 
-        for np in range(num_people):
-            person = Townsperson(
-                person_number=np, 
-                st_dev=self.st_dev, 
-                assigned_guacs=self.assigned_guacs, 
-                mean_offset=mean_offset, 
-                test_jennas_numbers=TEST_JENNAS_NUMBERS,
-                carlos_crony=carlos_crony
-                )
-            self.townspeople.append(person)
+        for person in self.townspeople:
+            # person = Townsperson(
+            #     person_number=np, 
+            #     st_dev=self.st_dev, 
+            #     assigned_guacs=self.assigned_guacs, 
+            #     mean_offset=mean_offset, 
+            #     test_jennas_numbers=TEST_JENNAS_NUMBERS,
+            #     carlos_crony=carlos_crony
+            #     )
+            # self.townspeople.append(person)
 
             #creating the elements to compute the condorcet winner
             condorcet_elements = person.taste_and_vote(self.guac_df)

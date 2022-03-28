@@ -45,11 +45,11 @@ st.subheader("Let's Taste and Vote!")
 section_title = "simulation_1"
 lg.write_story(section_title)
 lg.write_instructions(section_title)
-sim1 = Simulation(guac_df, num_townspeople, st_dev, fullness_factor=fullness_factor)
-sim1.simulate()
-lg.animate_results(sim1, key=section_title)
-if st.session_state[f"{section_title}_keep_chart_visible"]:
-    lg.success_message(section_title, sim1.sum_success)
+# sim1 = Simulation(guac_df, num_townspeople, st_dev, fullness_factor=fullness_factor)
+# sim1.simulate()
+# lg.animate_results(sim1, key=section_title)
+# if st.session_state[f"{section_title}_keep_chart_visible"]:
+#     lg.success_message(section_title, sim1.sum_success)
 
 
 st.markdown("---")
@@ -66,17 +66,17 @@ guac_limit2 = col2.slider(
     min_value=1, 
     max_value=20)
 
-sim2 = Simulation(guac_df, num_townspeople, st_dev, assigned_guacs=guac_limit2)
-sim2.simulate()
+# sim2 = Simulation(guac_df, num_townspeople, st_dev, assigned_guacs=guac_limit2)
+# sim2.simulate()
 
-lg.animate_results(sim2, key=section_title)
-if st.session_state[f"{section_title}_keep_chart_visible"]:
-    lg.success_message(section_title, sim2.sum_success, guac_limit2)
+# lg.animate_results(sim2, key=section_title)
+# if st.session_state[f"{section_title}_keep_chart_visible"]:
+#     lg.success_message(section_title, sim2.sum_success, guac_limit2)
 
-st.write("")
-st.write("")
-lg.write_story("simulation_2_a")
-lg.animate_results_of_100_runs(sim2, scenario, section_title)
+# st.write("")
+# st.write("")
+# lg.write_story("simulation_2_a")
+# lg.animate_results_of_100_runs(sim2, scenario, section_title)
 
 
 st.markdown("---")

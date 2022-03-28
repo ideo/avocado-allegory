@@ -138,7 +138,7 @@ class Condorcetcounting():
         return smith_schwartz_set_df
         
 
-    def declare_winner(self,results_df, ballots_matrix_list):
+    def declare_winner(self, results_df, ballots_matrix_list):
         """This function computes the condorcet winner by ranking the guacs
         belonging to the smith set and ranking them by their average score
 

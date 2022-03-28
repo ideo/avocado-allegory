@@ -1,3 +1,4 @@
+from re import sub
 import numpy as np
 import pandas as pd
 from .condorcetcounting import Condorcetcounting
@@ -5,10 +6,10 @@ from .condorcetcounting import Condorcetcounting
 
 # Base Class
 class Townsperson:
-    def __init__(self, person_number, fullness_factor = 0.0, st_dev=1, 
-                assigned_guacs=20, 
+    def __init__(self, st_dev = 1, assigned_guacs = 20, fullness_factor = 0.0, 
+                person_number = None, 
                 min_allowed_vote = 1, max_allowed_vote = 10, 
-                mean_offset=0, carlos_crony=False,
+                mean_offset = 0, carlos_crony = False,
                 test_jennas_numbers = False):
         self.number = person_number
         self.st_dev = st_dev
