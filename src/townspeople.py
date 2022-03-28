@@ -9,8 +9,7 @@ class Townsperson:
     def __init__(self, st_dev = 1, assigned_guacs = 20, fullness_factor = 0.0, 
                 person_number = None, 
                 min_allowed_vote = 1, max_allowed_vote = 10, 
-                mean_offset = 0, carlos_crony = False,
-                test_jennas_numbers = False):
+                mean_offset = 0, carlos_crony = False):
         self.number = person_number
         self.st_dev = st_dev
         self.fullness_factor = fullness_factor
@@ -22,7 +21,7 @@ class Townsperson:
         self.carlos_index = None
         self.voted_for_our_boy = False
         self.ballot = None
-        self.test_jennas_numbers=test_jennas_numbers
+        # self.test_jennas_numbers=test_jennas_numbers
 
 
     def taste_and_vote(self, guac_df):
@@ -35,26 +34,25 @@ class Townsperson:
         Returns:
             A Condorcetcounting object
         """
-        if self.test_jennas_numbers == False and self.carlos_crony:
-            self.carlos_index = guac_df[guac_df["Entrant"] == "Cliquey Carlos"].index[0]
+        # if self.test_jennas_numbers == False and self.carlos_crony:
+        #     self.carlos_index = guac_df[guac_df["Entrant"] == "Cliquey Carlos"].index[0]
 
         sample_guac_df = guac_df.sample(n=self.assigned_guacs, replace=False)
         sample_guac_df['Subjective Ratings'] = sample_guac_df[["Objective Ratings"]].apply(lambda x: self.taste(x, sample_guac_df.index), axis=1)
         self.ballot = sample_guac_df
+        # print(sample_guac_df)s
+        return sample_guac_df
 
-        if self.test_jennas_numbers:
-            jennas_data = {}
-            jennas_data[0] = [(2,2), (4,3), (5,1)]
-            jennas_data[1] = [(2,2), (4,5), (5,10)]
-            jennas_data[2] = [(2,7),(3,2), (4,3.3), (5,4)]
-            jennas_data[3] = [(0,9), (1,9.5), (2,10), (3,3)]
-            jennas_data[4] = [(0,9), (1,9.5), (3,0), (5,10)]
-            jennas_data[5] = [(1,5), (3,4), (4,8)]
-            jennas_data[6] = [(0,6),(1,8),(3,10),(4,7)]        
-            sample_guac_df = pd.DataFrame(jennas_data[self.number], columns = ["ID", 'Subjective Ratings'])
-
-        condorcet_elements = Condorcetcounting(guac_df, sample_guac_df)
-        return condorcet_elements
+        # if self.test_jennas_numbers:
+        #     jennas_data = {}
+        #     jennas_data[0] = [(2,2), (4,3), (5,1)]
+        #     jennas_data[1] = [(2,2), (4,5), (5,10)]
+        #     jennas_data[2] = [(2,7),(3,2), (4,3.3), (5,4)]
+        #     jennas_data[3] = [(0,9), (1,9.5), (2,10), (3,3)]
+        #     jennas_data[4] = [(0,9), (1,9.5), (3,0), (5,10)]
+        #     jennas_data[5] = [(1,5), (3,4), (4,8)]
+        #     jennas_data[6] = [(0,6),(1,8),(3,10),(4,7)]        
+        #     sample_guac_df = pd.DataFrame(jennas_data[self.number], columns = ["ID", 'Subjective Ratings'])
 
 
     def taste(self, row_data, df_index):

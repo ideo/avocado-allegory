@@ -212,7 +212,7 @@ def format_spec(sim, subtitle, y_max, col_limit=None):
     chart_df["Entrant"] = sim.guac_df["Entrant"]
     if col_limit is None:
         subtitle += f"Guacamole No. {sim.sum_winner}!"
-        chart_df = format_bar_colors(sim, chart_df, sim.objective_winner, sim.sum_winner)
+        chart_df = format_bar_colors(chart_df, sim.objective_winner, sim.sum_winner)
         color_spec = {"field": "Color", "type": "nomical", "scale": None}
 
     spec = {
@@ -236,7 +236,7 @@ def format_spec(sim, subtitle, y_max, col_limit=None):
     return chart_df, spec
 
 
-def format_bar_colors(sim, chart_df, should_win, actually_won):
+def format_bar_colors(chart_df, should_win, actually_won):
     chart_df["Color"] = pd.Series([COLORS["blue"]]*chart_df.shape[0], index=chart_df.index)
     chart_df.at[actually_won, "Color"] = COLORS["red"]
     chart_df.at[should_win, "Color"] = COLORS["green"]
@@ -288,7 +288,7 @@ def get_row_and_format_dataframe(sim, scenario):
     chart_df.rename(columns={_index: "No Times Won"}, inplace=True)
     chart_df["No Times Won"] = chart_df["No Times Won"].astype(int)
     chart_df.index = chart_df.index.astype(int)
-    chart_df = format_bar_colors(sim, chart_df, should_win[scenario], chart_df["No Times Won"].idxmax())
+    chart_df = format_bar_colors(chart_df, should_win[scenario], chart_df["No Times Won"].idxmax())
     chart_df.index.name = "ID"
     chart_df.reset_index(inplace=True)
     chart_df.sort_values(by="ID", inplace=True)
@@ -322,7 +322,7 @@ def format_N_times_chart_spec(chart_df):
 
 
 def list_who_else_won(df, sim):
-    df = df[df["No Times Won"] > 0]
+    df = df[df["No Times Won"] > 0].copy()
     df.sort_values(by="No Times Won", ascending=False, inplace=True)
     
     name = df.iloc[0]["Entrant"]
@@ -342,31 +342,6 @@ def list_who_else_won(df, sim):
         msg += f"\n- {entrant}, with an objective guac score of {obj_score}, won **{wins}** {p.plural('time', wins)}"
 
     st.markdown(msg)
-
-
-
-# def tally_votes(sim, key):
-#     col1, col2 = st.columns([2,5])
-
-#     col1.button("Simulate!")
-#     y_field = "sum"
-#     chart_df = sim.results_df[[y_field]].copy()
-
-#     #this is to accomodate mine and joe's simulations
-#     winning_guac = chart_df.idxmax()[0]
-#     chart_df["Entrant"] = sim.guac_df["Entrant"]
-
-#     spec = {
-#         "mark": {"type": "bar"},
-#         "encoding": {
-#             "x":    {"field": "Entrant", "tupe": "nominal"},
-#             "y":    {"field": y_field, "type": "quantitative"},
-#         },
-#         "title":    f"Our Winner is Guacamole No. {winning_guac}!",   
-#     }
-#     col2.vega_lite_chart(chart_df, spec)
-#     # st.write(sim.results_df)
-#     return y_field
 
 
 def types_of_voters(key, pepe=None, fra=None, carlos=None):
