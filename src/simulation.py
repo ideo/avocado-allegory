@@ -147,7 +147,7 @@ class Simulation:
 
         self.sum_winners = sum_winners_dict[winning_sum]
         self.sum_winner = self.sum_winners[0]
-        self.sum_success = self.sum_winner == self.objective_winner
+        # self.sum_success = self.sum_winner == self.objective_winner
 
         if len(self.sum_winners) > 1:
             print("\n\n\nMultiple sum winners, picking one at random...\n\n\n")
@@ -169,7 +169,7 @@ class Simulation:
         condorcet_elements, ballots_matrix_list = self.condorcet_results()
         self.condorcet_winner = condorcet_elements.declare_winner(self.results_df, ballots_matrix_list)
         self.condorcet_winners = condorcet_elements.winners
-        self.condo_success = self.condorcet_winner == self.objective_winner
+        # self.condo_success = self.condorcet_winner == self.objective_winner
         return self.condorcet_winner
 
 

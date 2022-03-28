@@ -49,7 +49,7 @@ sim1 = Simulation(guac_df, num_townspeople, st_dev, fullness_factor=fullness_fac
 sim1.simulate()
 lg.animate_results(sim1, key=section_title)
 if st.session_state[f"{section_title}_keep_chart_visible"]:
-    lg.success_message(section_title, sim1.sum_success)
+    lg.success_message(section_title, sim1.success)
 
 
 st.markdown("---")
@@ -71,7 +71,7 @@ sim2.simulate()
 
 lg.animate_results(sim2, key=section_title)
 if st.session_state[f"{section_title}_keep_chart_visible"]:
-    lg.success_message(section_title, sim2.sum_success, guac_limit2)
+    lg.success_message(section_title, sim2.success, guac_limit2)
 
 st.write("")
 st.write("")
@@ -103,7 +103,7 @@ sim3 = Simulation(guac_df, num_townspeople, st_dev,
     perc_carlos=carlos)
 sim3.simulate()
 lg.animate_results(sim3, key=section_title)
-lg.success_message(section_title, sim3.sum_success)
+lg.success_message(section_title, sim3.success)
 
 num_cronies = sum(townie.carlos_crony for townie in sim3.townspeople)
 num_effective_cronies = sum(townie.voted_for_our_boy for townie in sim3.townspeople)
@@ -144,7 +144,7 @@ sim4 = Simulation(guac_df, num_townspeople4, st_dev,
     method="condorcet")
 sim4.simulate()
 lg.animate_condorcet_simulation(sim4, key=section_title)
-lg.success_message(section_title, sim4.condo_success)
+lg.success_message(section_title, sim4.success)
 
 num_cronies = sum(townie.carlos_crony for townie in sim4.townspeople)
 num_effective_cronies = sum(townie.voted_for_our_boy for townie in sim4.townspeople)

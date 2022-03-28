@@ -167,7 +167,6 @@ def animate_results(sim, key):
         st.session_state[f"{key}_keep_chart_visible"] = True
         for NN in range(results_df.shape[1]):
             chart_df, spec = format_spec(sim, subtitle, y_max, col_limit=NN)
-            # overwrite_chart(col2, bar_chart, chart_df, spec)
             if bar_chart is not None:
                 bar_chart.vega_lite_chart(chart_df, spec)
             else:
@@ -177,7 +176,6 @@ def animate_results(sim, key):
     if st.session_state[f"{key}_keep_chart_visible"]:
         # Ensure the final chart stays visible
         chart_df, spec = format_spec(sim, subtitle, y_max)
-        # overwrite_chart(col2, bar_chart, chart_df, spec)
         if bar_chart is not None:
             bar_chart.vega_lite_chart(chart_df, spec)
         else:
