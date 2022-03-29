@@ -177,7 +177,7 @@ num_townspeople_sb = col2.slider(
     step=10,
     key=section_title)
 
-method_chosen = st.radio("How should we tally the votes?",
+method_chosen = st.selectbox("How should we tally the votes?",
     options=["Summing the Scores", "Tallying Implicit Rankings"])
 method_sb = "sum" if method_chosen == "Summing the Scores" else "condorcet"
 
