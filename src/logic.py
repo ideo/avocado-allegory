@@ -26,6 +26,7 @@ def initialize_session_state():
         "simulation_2_keep_chart_visible":  False,
         "simulation_3_keep_chart_visible":  False,
         "condorcet_keep_chart_visible":     False,
+        "sandbox_keep_chart_visible":       False,
         "entrant_num":                      0,
     }
 
@@ -93,7 +94,7 @@ def sidebar():
     return num_townspeople, st_dev, fullness_factor
 
 
-def choose_scenario():
+def choose_scenario(key="intro"):
     """
     The user selects a scenario, which determines the 'objective ratings' to be
     used in the simulation.
@@ -109,26 +110,18 @@ def choose_scenario():
 
     scenario = col1.radio(
         "Choose a scenario", 
-        # options=OBJECTIVE_RATINGS.keys(),
         options=options,
         index=0,
-        on_change=reset_visuals)
+        on_change=reset_visuals,
+        key=key)
 
     df = pd.DataFrame(data=ENTRANTS)
     df["Objective Ratings"] = df[scenario].copy()
-
-    #pull data based on corresponding scenario
-    # df = pd.DataFrame(
-    #     columns=["Objective Ratings"], 
-    #     data=OBJECTIVE_RATINGS[scenario])
-    # df["Entrant"] = df.index
-    # df["Entrant"] = df["Entrant"].apply(lambda x: ENTRANTS[x]["Name"])
     winner = df["Objective Ratings"].idxmax()
     winning_score = df["Objective Ratings"].max()
     df["Color"] = df["Objective Ratings"].apply(
         lambda x: COLORS["green"] if x==winning_score else COLORS["blue"])
 
-    # st.write(df)
     #draw the chart
     spec = {
         "height":   275,
@@ -151,6 +144,16 @@ def choose_scenario():
 
 
 def animate_results(sim, key):
+    """The one function to be called in app.py"""
+    if sim.method == "sum":
+        animate_summation_results(sim, key=key)
+    elif sim.method == "condorcet":
+        animate_condorcet_simulation(sim, key=key)
+    else:
+        st.write(f"The winner is: {sim.winner}")        
+
+
+def animate_summation_results(sim, key):
     """
     Creates the `Simulate` button, animated chart, and success/fail message
     """

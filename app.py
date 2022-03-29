@@ -133,8 +133,8 @@ num_townspeople4 = col2.slider(
     value=num_townspeople,
     min_value=10,
     max_value=500,
-    step=10
-)
+    step=10,
+    key=section_title)
 
 sim4 = Simulation(guac_df, num_townspeople4, st_dev, 
     assigned_guacs=guac_limit4,
@@ -143,7 +143,7 @@ sim4 = Simulation(guac_df, num_townspeople4, st_dev,
     perc_carlos=carlos,
     method="condorcet")
 sim4.simulate()
-lg.animate_condorcet_simulation(sim4, key=section_title)
+lg.animate_results(sim4, key=section_title)
 lg.success_message(section_title, sim4.success)
 
 num_cronies = sum(townie.carlos_crony for townie in sim4.townspeople)
@@ -158,6 +158,35 @@ lg.write_story("conclusion")
 
 st.markdown("---")
 st.subheader("Sandbox")
-st.write(
-    "If there's not yet a `sim` incorporating everything, we'll put it here!"
-    )
+section_title = "sandbox"
+lg.write_story(section_title)
+sandbox_df, sandbox_scenario = lg.choose_scenario(key=section_title)
+pepe_sb, fra_sb, carlos_sb = lg.types_of_voters(section_title, pepe, fra, carlos)
+col1, col2 = st.columns(2)
+guac_limit_sb = col1.slider(
+    "How many guacamoles does each voter get to try?",
+    value=guac_limit3, 
+    min_value=1, 
+    max_value=20,
+    key=section_title)
+num_townspeople_sb = col2.slider(
+    "How many townspeople vote in the contest?",
+    value=num_townspeople,
+    min_value=10,
+    max_value=500,
+    step=10,
+    key=section_title)
+
+method_chosen = st.radio("How should we tally the votes?",
+    options=["Summing the Scores", "Tallying Implicit Rankings"])
+method_sb = "sum" if method_chosen == "Summing the Scores" else "condorcet"
+
+sandbox_sim = Simulation(sandbox_df, num_townspeople_sb, st_dev, 
+    assigned_guacs=guac_limit_sb,
+    perc_fra=fra_sb,
+    perc_pepe=pepe_sb,
+    perc_carlos=carlos_sb,
+    method=method_sb)
+sandbox_sim.simulate()
+lg.animate_results(sandbox_sim, key=section_title)
+lg.success_message(section_title, sandbox_sim.success)
