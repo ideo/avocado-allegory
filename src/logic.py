@@ -165,6 +165,9 @@ def animate_summation_results(sim, key):
     subtitle = "And the winner is... "
     y_max = int(sim.results_df["sum"].max())
 
+    animation_duration = 1 #second
+    time_per_frame = animation_duration / results_df.shape[0] / 20
+
     bar_chart = None
     if start_btn:
         st.session_state[f"{key}_keep_chart_visible"] = True
@@ -174,7 +177,9 @@ def animate_summation_results(sim, key):
                 bar_chart.vega_lite_chart(chart_df, spec)
             else:
                 bar_chart = col2.vega_lite_chart(chart_df, spec)
-            time.sleep(.01/2)
+
+            # time.sleep(.01/2)
+            time.sleep(time_per_frame)
 
     if st.session_state[f"{key}_keep_chart_visible"]:
         # Ensure the final chart stays visible
