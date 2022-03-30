@@ -26,6 +26,18 @@ def construct_jenna_example_df():
     pass
 
 
+class TestCondorcetMethod(unittest.TestCase):
+    def setUp(self):
+        # df = construct_jenna_example_df()
+        pass
+
+
+    def test_jennas_example(self):
+        pass
+
+
+    def tearDown(self):
+        pass
 
         
 if __name__ == '__main__':
