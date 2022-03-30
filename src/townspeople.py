@@ -25,34 +25,19 @@ class Townsperson:
 
 
     def taste_and_vote(self, guac_df):
-        """This function takes a subset of the guac god data frame and it assigns subjective ratings to each
-        guac. The subjective ratings are sampled by a normal distribution centered at the guac god given score (objective ratings) and with a user defined
-        standard deviation.
+        """This function takes a subset of the guac god data frame and it 
+        assigns subjective ratings to each guac. The subjective ratings are 
+        sampled by a normal distribution centered at the guac god given score 
+        (objective ratings) and with a user defined standard deviation.
 
         Args:
             guac_df (datafrane): dataframe with objective scores
         Returns:
-            A Condorcetcounting object
+            This agent's ballot of subjective rankings
         """
-        # if self.test_jennas_numbers == False and self.carlos_crony:
-        #     self.carlos_index = guac_df[guac_df["Entrant"] == "Cliquey Carlos"].index[0]
-
-        sample_guac_df = guac_df.sample(n=self.assigned_guacs, replace=False)
-        sample_guac_df['Subjective Ratings'] = sample_guac_df[["Objective Ratings"]].apply(lambda x: self.taste(x, sample_guac_df.index), axis=1)
-        self.ballot = sample_guac_df
-        # print(sample_guac_df)s
-        return sample_guac_df
-
-        # if self.test_jennas_numbers:
-        #     jennas_data = {}
-        #     jennas_data[0] = [(2,2), (4,3), (5,1)]
-        #     jennas_data[1] = [(2,2), (4,5), (5,10)]
-        #     jennas_data[2] = [(2,7),(3,2), (4,3.3), (5,4)]
-        #     jennas_data[3] = [(0,9), (1,9.5), (2,10), (3,3)]
-        #     jennas_data[4] = [(0,9), (1,9.5), (3,0), (5,10)]
-        #     jennas_data[5] = [(1,5), (3,4), (4,8)]
-        #     jennas_data[6] = [(0,6),(1,8),(3,10),(4,7)]        
-        #     sample_guac_df = pd.DataFrame(jennas_data[self.number], columns = ["ID", 'Subjective Ratings'])
+        self.ballot = guac_df.sample(n=self.assigned_guacs, replace=False)
+        self.ballot['Subjective Ratings'] = self.ballot[["Objective Ratings"]].apply(lambda x: self.taste(x, self.ballot.index), axis=1)
+        return self.ballot
 
 
     def taste(self, row_data, df_index):

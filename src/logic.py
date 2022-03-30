@@ -1,8 +1,8 @@
-from decimal import InvalidContext
-from ssl import CHANNEL_BINDING_TYPES
-from tracemalloc import start
-from turtle import onclick
-from xml.dom.minidom import Entity
+# from decimal import InvalidContext
+# from ssl import CHANNEL_BINDING_TYPES
+# from tracemalloc import start
+# from turtle import onclick
+# from xml.dom.minidom import Entity
 import streamlit as st
 import pandas as pd
 import time
@@ -114,13 +114,8 @@ def choose_scenario(key="intro"):
         index=0,
         on_change=reset_visuals,
         key=key)
-
-    df = pd.DataFrame(data=ENTRANTS)
-    df["Objective Ratings"] = df[scenario].copy()
+    df = get_scenario_dataframe(scenario)
     winner = df["Objective Ratings"].idxmax()
-    winning_score = df["Objective Ratings"].max()
-    df["Color"] = df["Objective Ratings"].apply(
-        lambda x: COLORS["green"] if x==winning_score else COLORS["blue"])
 
     #draw the chart
     spec = {
@@ -141,6 +136,15 @@ def choose_scenario(key="intro"):
 
     col2.vega_lite_chart(df, spec)
     return df, scenario
+
+
+def get_scenario_dataframe(scenario):
+    df = pd.DataFrame(data=ENTRANTS)
+    df["Objective Ratings"] = df[scenario].copy()
+    winning_score = df["Objective Ratings"].max()
+    df["Color"] = df["Objective Ratings"].apply(
+        lambda x: COLORS["green"] if x==winning_score else COLORS["blue"])
+    return df
 
 
 def animate_results(sim, key):

@@ -1,15 +1,9 @@
-# from msilib.schema import ServiceControl
 import streamlit as st
-# import pandas as pd
 
-from src.story import STORY
-import src.logic as lg
-from src.simulation import Simulation
-# from src.simulation_unknown_best import Simulation_unknown_best
-# from src.tuning import tune_simulation, wrap_my_head_around_it
+from src import STORY
+from src import logic as lg
+from src import Simulation
 
-
-# wrap_my_head_around_it()
 
 st.set_page_config(
     page_title="Guacamole Contest",

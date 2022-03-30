@@ -37,26 +37,18 @@ class Simulation:
             random.seed(seed)
 
 
-        # if TEST_JENNAS_NUMBERS:
-        #     self.num_townspeople = 7
-        #     self.assigned_guacs = 6
-        #     self.guac_df = pd.DataFrame([0,1,2,3,4,5], columns = ['Entrant'])
-        #     self.guac_df['Objective Ratings'] = 0
-
-
     def simulate(self):
         self.create_agents()
         self.taste_and_vote()
         self.tally_votes()
-        self.success = self.winner == self.objective_winner
-
+        self.declare_winner()
+        
 
     def create_agents(self):
         """Create the agents to be used in the simulation
 
         Returns: None
         """
-
         #Pepes tend to score people higher
         if self.perc_pepe > 0:
             num_pepes = self.num_townspeople * self.perc_pepe
@@ -114,6 +106,11 @@ class Simulation:
 
         elif self.method == "condorcet":
             self.winner = self.tally_by_condorcet_method()
+
+
+    def declare_winner(self):
+        """This is here in case we need to expand it"""
+        self.success = self.winner == self.objective_winner
 
         
     def tally_by_summing(self):
