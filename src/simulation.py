@@ -34,6 +34,7 @@ class Simulation:
         self.results_df = None
         self.objective_winner = guac_df[["Objective Ratings"]].idxmax()[0]
         self.success = False
+        self.rankings = None
         # self.sum_winner = None
         # self.sum_winners = []
         # self.condorcet_winners = []
@@ -98,7 +99,7 @@ class Simulation:
 
         for person in self.townspeople:
             ballot = person.taste_and_vote(self.guac_df)
-            df[f"Score Person {person.number}"] = ballot["Subjective Ratings"]
+            df[f"Scores {person.number}"] = ballot["Subjective Ratings"]
 
         self.results_df = df
 
@@ -110,7 +111,7 @@ class Simulation:
         elif self.method == "condorcet":
             self.winner = self.tally_by_condorcet_method()
 
-        elif self.method == "rank":
+        elif self.method == "rcv":
             self.winner = self.tally_by_ranking_top_N()
 
 
@@ -195,9 +196,9 @@ class Simulation:
             ballots_matrix_list.append(condorcet_elements.ballot_matrix)
 
             #add the results to the results dataframe with a new column name
-            # self.results_df[f"Score Person {person.number}"] = self.guac_df["ID"].apply(lambda x: condorcet_elements.ballot_dict.get(x, None))
+            # self.results_df[f"Scores {person.number}"] = self.guac_df["ID"].apply(lambda x: condorcet_elements.ballot_dict.get(x, None))
 
-            if len(self.results_df[self.results_df[f"Score Person {person.number}"].isnull()]) == len(self.results_df):
+            if len(self.results_df[self.results_df[f"Scores {person.number}"].isnull()]) == len(self.results_df):
                 sys.exit(f"No scores recorder from person.number {person.number}. Something is wrong...") 
             
         #returning the last condorcet element calculated. 
@@ -205,6 +206,15 @@ class Simulation:
 
 
     def tally_by_ranking_top_N(self, N=3):
+        """TODO: Incorporate N"""
+
+        # I want to display their names not their IDs
+        self.results_df["Entrant"] = self.guac_df["Entrant"]
+        self.results_df.set_index("Entrant", inplace=True)
+        self.results_df.drop(columns=["ID"], inplace=True)
+
         rcv = RankChoiceVoting()
-        self.results_df.set_index("ID", inplace=True)
         ranks = rcv.convert_score_ballots_to_implicit_ranks(self.results_df)
+        self.rankings = rcv.tally_results(ranks)
+        # print("Our Guacamole Rankings Are: ", self.rankings)
+        return self.rankings[0]

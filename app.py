@@ -175,16 +175,20 @@ num_townspeople_sb = col2.slider(
     step=10,
     key=section_title)
 
+methods = {
+    "Summing the Scores":           "sum", 
+    "Tallying Implicit Rankings":   "condorcet",
+    "Ranked Choice Voting":         "rcv",
+}
 method_chosen = st.selectbox("How should we tally the votes?",
-    options=["Summing the Scores", "Tallying Implicit Rankings"])
-method_sb = "sum" if method_chosen == "Summing the Scores" else "condorcet"
+    options=methods.keys())
 
 sandbox_sim = Simulation(sandbox_df, num_townspeople_sb, st_dev, 
     assigned_guacs=guac_limit_sb,
     perc_fra=fra_sb,
     perc_pepe=pepe_sb,
     perc_carlos=carlos_sb,
-    method=method_sb)
+    method=methods[method_chosen])
 sandbox_sim.simulate()
 lg.animate_results(sandbox_sim, key=section_title)
 lg.success_message(section_title, sandbox_sim.success)
