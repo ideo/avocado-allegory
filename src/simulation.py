@@ -1,15 +1,16 @@
 import sys
 import random
-from unittest import result
-from xml.dom.pulldom import parseString
+# from unittest import result
+# from xml.dom.pulldom import parseString
 
+import numpy as np
 import pandas as pd
 
 from .townspeople import Townsperson
 from .condorcetcounting import Condorcetcounting
+from .rank_choice_voting import RankChoiceVoting
 
 
-# TEST_JENNAS_NUMBERS = False
 class Simulation:
     def __init__(
             self, guac_df, num_townspeople=200, st_dev=1.0, fullness_factor = 0.0,
@@ -25,23 +26,25 @@ class Simulation:
         self.perc_fra = perc_fra
         self.perc_pepe = perc_pepe
         self.perc_carlos = perc_carlos
-        self.results_df = None
-        self.objective_winner = guac_df[["Objective Ratings"]].idxmax()[0]
-        self.sum_winner = None
-        self.sum_winners = []
-        self.success = False
-        # self.condorcet_winners = []
-        # self.condorcet_winner = None
         self.method = method.lower()
         if seed:
             random.seed(seed)
 
+        # Initalizing
+        self.results_df = None
+        self.objective_winner = guac_df[["Objective Ratings"]].idxmax()[0]
+        self.success = False
+        # self.sum_winner = None
+        # self.sum_winners = []
+        # self.condorcet_winners = []
+        # self.condorcet_winner = None
+        
 
     def simulate(self):
         self.create_agents()
         self.taste_and_vote()
         self.tally_votes()
-        self.declare_winner()
+        self.record_outcome()
         
 
     def create_agents(self):
@@ -107,8 +110,11 @@ class Simulation:
         elif self.method == "condorcet":
             self.winner = self.tally_by_condorcet_method()
 
+        elif self.method == "rank":
+            self.winner = self.tally_by_ranking_top_N()
 
-    def declare_winner(self):
+
+    def record_outcome(self):
         """This is here in case we need to expand it"""
         self.success = self.winner == self.objective_winner
 
@@ -121,22 +127,18 @@ class Simulation:
         """
         #putting the results together
         self.results_df.set_index(["ID"], inplace = True)
-        # columns_to_consider = self.results_df.columns
-        # self.results_df["sum"] = self.results_df[columns_to_consider].sum(axis=1)
         self.results_df["sum"] = self.results_df.sum(axis=1)
-        # self.results_df["Mean"] = self.results_df[columns_to_consider].mean(axis=1)
         
         #sort the scores to have the sum at the top
-        this_score = 'sum'
-        sorted_scores = self.results_df.sort_values(by=this_score, ascending=False)
+        sorted_scores = self.results_df.sort_values(by="sum", ascending=False)
         sorted_scores['ID'] = sorted_scores.index
 
         #extract highest sum        
-        winning_sum = sorted_scores.iloc[0][this_score]
+        winning_sum = sorted_scores.iloc[0]["sum"]
 
         #create a dictionary of sums - winners to catch multiple winners
         sum_winners_dict = {}
-        for s, w in zip(sorted_scores[this_score].tolist(), sorted_scores['ID'].tolist()):
+        for s, w in zip(sorted_scores["sum"].tolist(), sorted_scores['ID'].tolist()):
             if s in sum_winners_dict.keys():
                 sum_winners_dict[s].append(w)
             else:
@@ -200,4 +202,9 @@ class Simulation:
             
         #returning the last condorcet element calculated. 
         return condorcet_elements, ballots_matrix_list
-        
+
+
+    def tally_by_ranking_top_N(self, N=3):
+        rcv = RankChoiceVoting()
+        self.results_df.set_index("ID", inplace=True)
+        ranks = rcv.convert_score_ballots_to_implicit_ranks(self.results_df)

@@ -31,6 +31,10 @@ guac_df, scenario = lg.choose_scenario()
 
 lg.write_story("demo_voting")
 lg.demo_contest(scenario, st_dev)
+st.write("""
+    Takeaway: When it's clearly good or bad, there's a lot more agreement. 
+    Agreement is trickier when something is just average, not compelling in 
+    either way""")
 # st.image("img/holy_guacamole.jpeg", width=400, caption="This is you, the Guacamole Goddess.")
 
 

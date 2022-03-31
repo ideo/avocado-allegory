@@ -4,7 +4,6 @@ import pandas as pd
 from .condorcetcounting import Condorcetcounting
 
 
-# Base Class
 class Townsperson:
     def __init__(self, st_dev = 1, assigned_guacs = 20, fullness_factor = 0.0, 
                 person_number = None, 
@@ -21,7 +20,6 @@ class Townsperson:
         self.carlos_index = None
         self.voted_for_our_boy = False
         self.ballot = None
-        # self.test_jennas_numbers=test_jennas_numbers
 
 
     def taste_and_vote(self, guac_df):
@@ -41,7 +39,8 @@ class Townsperson:
 
 
     def taste(self, row_data, df_index):
-        """This function uses the objective rating score to compute the subjective one, based on some assumptions
+        """This function uses the objective rating score to compute the 
+        subjective one, based on some assumptions
 
         Args:
             row_data (list): objective rating

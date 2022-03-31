@@ -80,7 +80,7 @@ def sidebar():
         max_value=500,
         step=10)
     st_dev = st.sidebar.number_input("What is the st. dev. of their randomly generated scores?",
-        value=1.0,
+        value=2.0,
         min_value=0.1,
         max_value=5.0,
         step=0.1
