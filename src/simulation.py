@@ -40,7 +40,7 @@ class Simulation:
         """TODO: For unittests, we can update this to have inputs and outputs"""
         self.create_agents()
         self.results_df = self.taste_and_vote()
-        self.tally_votes(self.results_df)
+        self.winner = self.tally_votes(self.results_df)
         self.record_outcome()      
         
 
@@ -100,20 +100,28 @@ class Simulation:
 
     def tally_votes(self, results_df):
         if self.method == "sum":
-            self.winner = self.tally_by_summing()
+            winner = self.tally_by_summing()
 
         elif self.method == "condorcet":
-            self.winner = self.tally_by_condorcet_method()
+            winner = self.tally_by_condorcet_method()
 
         elif self.method == "rcv":
-            self.winner = self.tally_by_ranked_choice()
+            winner = self.tally_by_ranked_choice()
 
         elif self.method == "fptp":
-            self.winner = self.tally_by_first_past_the_post(results_df)
+            winner = self.tally_by_first_past_the_post(results_df)
+
+        return winner
 
 
     def record_outcome(self):
         """This is here in case we need to expand it"""
+        # TODO: we need consistency in how we save the winner, name or ID
+        if isinstance(self.winner, str):
+            # winner is a name, convert to ID
+            ind = self.guac_df[self.guac_df["Entrant"] == self.winner].index[0]
+            self.winner = ind
+
         self.success = self.winner == self.objective_winner
 
         
@@ -214,7 +222,7 @@ class Simulation:
         ranks = rcv.convert_score_ballots_to_implicit_ranks(self.results_df)
         self.rankings = rcv.tally_results(ranks)
         # print("Our Guacamole Rankings Are: ", self.rankings)
-        return self.rankings[0]
+        return self.rankings[0][0]
 
 
     def tally_by_first_past_the_post(self, results_df):

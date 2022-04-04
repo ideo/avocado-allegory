@@ -128,7 +128,6 @@ def choose_scenario(key="intro"):
             df.sort_index(inplace=True)
             df = format_scenario_colors(df)
             df.index = list(range(df.shape[0]))
-            st.write(df)
 
     winner = df["Objective Ratings"].idxmax()
     #draw the chart
@@ -504,9 +503,6 @@ def increment_entrant_num():
 
 
 def show_rankings(rankings):
-
-    print(rankings)
-
     msg = "Our winner is...  \n"
     msg += f"> 1. **{rankings[0][0]}** with {rankings[0][1]} votes!  \n"
     # st.markdown(msg)
