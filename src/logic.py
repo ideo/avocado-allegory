@@ -175,7 +175,7 @@ def animate_results(sim, key):
     elif sim.method == "condorcet":
         animate_condorcet_simulation(sim, key=key)
     else:
-        show_rankings(sim.rankings)     
+        show_rankings(sim.rankings, sim.num_townspeople)     
 
 
 def animate_summation_results(sim, key):
@@ -502,9 +502,11 @@ def increment_entrant_num():
 
 
 
-def show_rankings(rankings):
+def show_rankings(rankings, num_townspeople):
     msg = "Our winner is...  \n"
-    msg += f"> 1. **{rankings[0][0]}** with {rankings[0][1]} votes!  \n"
+    winning_vote = rankings[0][1]
+    perc = round(winning_vote/num_townspeople*100, 0)
+    msg += f"> 1. **{rankings[0][0]}** with {winning_vote} votes! That's {int(perc)}% of the vote.  \n"
     # st.markdown(msg)
 
     if len(rankings) > 1:
