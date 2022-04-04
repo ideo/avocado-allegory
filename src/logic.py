@@ -115,8 +115,22 @@ def choose_scenario(key="intro"):
         on_change=reset_visuals,
         key=key)
     df = get_scenario_dataframe(scenario)
-    winner = df["Objective Ratings"].idxmax()
 
+    if key == "sandbox":
+        num_guacs = col1.slider("How many contestants?",
+            min_value=5,
+            max_value=20,
+            value=20,
+            key="num_guacs")
+
+        if num_guacs < 20:
+            df = df.sample(n=num_guacs, random_state=42)
+            df.sort_index(inplace=True)
+            df = format_scenario_colors(df)
+            df.index = list(range(df.shape[0]))
+            st.write(df)
+
+    winner = df["Objective Ratings"].idxmax()
     #draw the chart
     spec = {
         "height":   275,
@@ -127,7 +141,7 @@ def choose_scenario(key="intro"):
                 "axis": {"labelAngle": 45}
                 },
             "y":    {"field": "Objective Ratings", "type": "quantitative"},
-            "color":    {"field": "Color", "type": "nomical", "scale": None}
+            "color":    {"field": "Color", "type": "nominal", "scale": None}
         },
         "title":    {
             "text": scenario, 
@@ -141,6 +155,14 @@ def choose_scenario(key="intro"):
 def get_scenario_dataframe(scenario):
     df = pd.DataFrame(data=ENTRANTS)
     df["Objective Ratings"] = df[scenario].copy()
+    # winning_score = df["Objective Ratings"].max()
+    # df["Color"] = df["Objective Ratings"].apply(
+    #     lambda x: COLORS["green"] if x==winning_score else COLORS["blue"])
+    df = format_scenario_colors(df)
+    return df
+
+
+def format_scenario_colors(df):
     winning_score = df["Objective Ratings"].max()
     df["Color"] = df["Objective Ratings"].apply(
         lambda x: COLORS["green"] if x==winning_score else COLORS["blue"])

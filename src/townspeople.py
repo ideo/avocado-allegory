@@ -34,7 +34,8 @@ class Townsperson:
             This agent's ballot of subjective rankings
         """
         self.ballot = guac_df.sample(n=self.assigned_guacs, replace=False)
-        self.ballot['Subjective Ratings'] = self.ballot[["Objective Ratings"]].apply(lambda x: self.taste(x, self.ballot.index), axis=1)
+        self.ballot["Subjective Ratings"] = self.ballot[["Objective Ratings"]].apply(
+            lambda x: self.taste(x, self.ballot.index), axis=1)
         return self.ballot
 
 
@@ -50,7 +51,7 @@ class Townsperson:
             float: subjective rating
         """
         obj_rating = row_data[0]
-        taste_order = df_index.get_loc(row_data.name)
+        taste_order = df_index.get_loc(row_data.name) #row.name is the index
 
         if self.carlos_crony and row_data.name==self.carlos_index:
             # We votin' for our boy!

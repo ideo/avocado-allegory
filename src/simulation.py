@@ -32,20 +32,17 @@ class Simulation:
 
         # Initalizing
         self.results_df = None
-        self.objective_winner = guac_df[["Objective Ratings"]].idxmax()[0]
+        self.objective_winner = self.guac_df["Objective Ratings"].idxmax()
         self.success = False
         self.rankings = None
-        # self.sum_winner = None
-        # self.sum_winners = []
-        # self.condorcet_winners = []
-        # self.condorcet_winner = None
         
 
     def simulate(self):
+        """TODO: For unittests, we can update this to have inputs and outputs"""
         self.create_agents()
         self.taste_and_vote()
         self.tally_votes()
-        self.record_outcome()
+        self.record_outcome()      
         
 
     def create_agents(self):
