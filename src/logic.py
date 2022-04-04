@@ -1,8 +1,8 @@
-from decimal import InvalidContext
-from ssl import CHANNEL_BINDING_TYPES
-from tracemalloc import start
-from turtle import onclick
-from xml.dom.minidom import Entity
+# from decimal import InvalidContext
+# from ssl import CHANNEL_BINDING_TYPES
+# from tracemalloc import start
+# from turtle import onclick
+# from xml.dom.minidom import Entity
 import streamlit as st
 import pandas as pd
 import time
@@ -26,6 +26,7 @@ def initialize_session_state():
         "simulation_2_keep_chart_visible":  False,
         "simulation_3_keep_chart_visible":  False,
         "condorcet_keep_chart_visible":     False,
+        "sandbox_keep_chart_visible":       False,
         "entrant_num":                      0,
     }
 
@@ -79,7 +80,7 @@ def sidebar():
         max_value=500,
         step=10)
     st_dev = st.sidebar.number_input("What is the st. dev. of their randomly generated scores?",
-        value=1.0,
+        value=2.0,
         min_value=0.1,
         max_value=5.0,
         step=0.1
@@ -93,7 +94,7 @@ def sidebar():
     return num_townspeople, st_dev, fullness_factor
 
 
-def choose_scenario():
+def choose_scenario(key="intro"):
     """
     The user selects a scenario, which determines the 'objective ratings' to be
     used in the simulation.
@@ -109,26 +110,27 @@ def choose_scenario():
 
     scenario = col1.radio(
         "Choose a scenario", 
-        # options=OBJECTIVE_RATINGS.keys(),
         options=options,
         index=0,
-        on_change=reset_visuals)
+        on_change=reset_visuals,
+        key=key)
+    df = get_scenario_dataframe(scenario)
 
-    df = pd.DataFrame(data=ENTRANTS)
-    df["Objective Ratings"] = df[scenario].copy()
+    if key == "sandbox":
+        num_guacs = col1.slider("How many contestants?",
+            min_value=5,
+            max_value=20,
+            value=20,
+            key="num_guacs")
 
-    #pull data based on corresponding scenario
-    # df = pd.DataFrame(
-    #     columns=["Objective Ratings"], 
-    #     data=OBJECTIVE_RATINGS[scenario])
-    # df["Entrant"] = df.index
-    # df["Entrant"] = df["Entrant"].apply(lambda x: ENTRANTS[x]["Name"])
+        if num_guacs < 20:
+            df = df.sample(n=num_guacs, random_state=42)
+            df.sort_index(inplace=True)
+            df = format_scenario_colors(df)
+            df.index = list(range(df.shape[0]))
+            st.write(df)
+
     winner = df["Objective Ratings"].idxmax()
-    winning_score = df["Objective Ratings"].max()
-    df["Color"] = df["Objective Ratings"].apply(
-        lambda x: COLORS["green"] if x==winning_score else COLORS["blue"])
-
-    # st.write(df)
     #draw the chart
     spec = {
         "height":   275,
@@ -139,7 +141,7 @@ def choose_scenario():
                 "axis": {"labelAngle": 45}
                 },
             "y":    {"field": "Objective Ratings", "type": "quantitative"},
-            "color":    {"field": "Color", "type": "nomical", "scale": None}
+            "color":    {"field": "Color", "type": "nominal", "scale": None}
         },
         "title":    {
             "text": scenario, 
@@ -150,7 +152,34 @@ def choose_scenario():
     return df, scenario
 
 
+def get_scenario_dataframe(scenario):
+    df = pd.DataFrame(data=ENTRANTS)
+    df["Objective Ratings"] = df[scenario].copy()
+    # winning_score = df["Objective Ratings"].max()
+    # df["Color"] = df["Objective Ratings"].apply(
+    #     lambda x: COLORS["green"] if x==winning_score else COLORS["blue"])
+    df = format_scenario_colors(df)
+    return df
+
+
+def format_scenario_colors(df):
+    winning_score = df["Objective Ratings"].max()
+    df["Color"] = df["Objective Ratings"].apply(
+        lambda x: COLORS["green"] if x==winning_score else COLORS["blue"])
+    return df
+
+
 def animate_results(sim, key):
+    """The one function to be called in app.py"""
+    if sim.method == "sum":
+        animate_summation_results(sim, key=key)
+    elif sim.method == "condorcet":
+        animate_condorcet_simulation(sim, key=key)
+    else:
+        st.write(f"The winner is: {sim.winner}")        
+
+
+def animate_summation_results(sim, key):
     """
     Creates the `Simulate` button, animated chart, and success/fail message
     """
@@ -162,22 +191,25 @@ def animate_results(sim, key):
     subtitle = "And the winner is... "
     y_max = int(sim.results_df["sum"].max())
 
+    animation_duration = 1 #second
+    time_per_frame = animation_duration / results_df.shape[0] / 20
+
     bar_chart = None
     if start_btn:
         st.session_state[f"{key}_keep_chart_visible"] = True
         for NN in range(results_df.shape[1]):
             chart_df, spec = format_spec(sim, subtitle, y_max, col_limit=NN)
-            # overwrite_chart(col2, bar_chart, chart_df, spec)
             if bar_chart is not None:
                 bar_chart.vega_lite_chart(chart_df, spec)
             else:
                 bar_chart = col2.vega_lite_chart(chart_df, spec)
-            time.sleep(0.01/2)
+
+            # time.sleep(.01/2)
+            time.sleep(time_per_frame)
 
     if st.session_state[f"{key}_keep_chart_visible"]:
         # Ensure the final chart stays visible
         chart_df, spec = format_spec(sim, subtitle, y_max)
-        # overwrite_chart(col2, bar_chart, chart_df, spec)
         if bar_chart is not None:
             bar_chart.vega_lite_chart(chart_df, spec)
         else:
@@ -212,7 +244,7 @@ def format_spec(sim, subtitle, y_max, col_limit=None):
     chart_df["Entrant"] = sim.guac_df["Entrant"]
     if col_limit is None:
         subtitle += f"Guacamole No. {sim.sum_winner}!"
-        chart_df = format_bar_colors(sim, chart_df, sim.objective_winner, sim.sum_winner)
+        chart_df = format_bar_colors(chart_df, sim.objective_winner, sim.sum_winner)
         color_spec = {"field": "Color", "type": "nomical", "scale": None}
 
     spec = {
@@ -236,7 +268,7 @@ def format_spec(sim, subtitle, y_max, col_limit=None):
     return chart_df, spec
 
 
-def format_bar_colors(sim, chart_df, should_win, actually_won):
+def format_bar_colors(chart_df, should_win, actually_won):
     chart_df["Color"] = pd.Series([COLORS["blue"]]*chart_df.shape[0], index=chart_df.index)
     chart_df.at[actually_won, "Color"] = COLORS["red"]
     chart_df.at[should_win, "Color"] = COLORS["green"]
@@ -288,7 +320,7 @@ def get_row_and_format_dataframe(sim, scenario):
     chart_df.rename(columns={_index: "No Times Won"}, inplace=True)
     chart_df["No Times Won"] = chart_df["No Times Won"].astype(int)
     chart_df.index = chart_df.index.astype(int)
-    chart_df = format_bar_colors(sim, chart_df, should_win[scenario], chart_df["No Times Won"].idxmax())
+    chart_df = format_bar_colors(chart_df, should_win[scenario], chart_df["No Times Won"].idxmax())
     chart_df.index.name = "ID"
     chart_df.reset_index(inplace=True)
     chart_df.sort_values(by="ID", inplace=True)
@@ -322,7 +354,7 @@ def format_N_times_chart_spec(chart_df):
 
 
 def list_who_else_won(df, sim):
-    df = df[df["No Times Won"] > 0]
+    df = df[df["No Times Won"] > 0].copy()
     df.sort_values(by="No Times Won", ascending=False, inplace=True)
     
     name = df.iloc[0]["Entrant"]
@@ -342,31 +374,6 @@ def list_who_else_won(df, sim):
         msg += f"\n- {entrant}, with an objective guac score of {obj_score}, won **{wins}** {p.plural('time', wins)}"
 
     st.markdown(msg)
-
-
-
-# def tally_votes(sim, key):
-#     col1, col2 = st.columns([2,5])
-
-#     col1.button("Simulate!")
-#     y_field = "sum"
-#     chart_df = sim.results_df[[y_field]].copy()
-
-#     #this is to accomodate mine and joe's simulations
-#     winning_guac = chart_df.idxmax()[0]
-#     chart_df["Entrant"] = sim.guac_df["Entrant"]
-
-#     spec = {
-#         "mark": {"type": "bar"},
-#         "encoding": {
-#             "x":    {"field": "Entrant", "tupe": "nominal"},
-#             "y":    {"field": y_field, "type": "quantitative"},
-#         },
-#         "title":    f"Our Winner is Guacamole No. {winning_guac}!",   
-#     }
-#     col2.vega_lite_chart(chart_df, spec)
-#     # st.write(sim.results_df)
-#     return y_field
 
 
 def types_of_voters(key, pepe=None, fra=None, carlos=None):

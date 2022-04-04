@@ -138,7 +138,7 @@ class Condorcetcounting():
         return smith_schwartz_set_df
         
 
-    def declare_winner(self,results_df, ballots_matrix_list):
+    def declare_winner(self, results_df, ballots_matrix_list):
         """This function computes the condorcet winner by ranking the guacs
         belonging to the smith set and ranking them by their average score
 
@@ -214,7 +214,7 @@ class Condorcetcounting():
     def break_tie(self, ballots_matrix_list, results_df):
 
         #select columns with a score
-        scores_cols = [i for i in results_df.columns if 'Score Person' in i]
+        scores_cols = [i for i in results_df.columns if "Scores" in i]
 
         #slice the results to only concentrate on the winners
         results_df_slice = results_df[results_df.index.isin(self.winners)].copy()

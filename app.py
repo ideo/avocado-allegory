@@ -1,15 +1,9 @@
-# from msilib.schema import ServiceControl
 import streamlit as st
-# import pandas as pd
 
-from src.story import STORY
-import src.logic as lg
-from src.simulation import Simulation
-# from src.simulation_unknown_best import Simulation_unknown_best
-# from src.tuning import tune_simulation, wrap_my_head_around_it
+from src import STORY
+from src import logic as lg
+from src import Simulation
 
-
-# wrap_my_head_around_it()
 
 st.set_page_config(
     page_title="Guacamole Contest",
@@ -37,6 +31,10 @@ guac_df, scenario = lg.choose_scenario()
 
 lg.write_story("demo_voting")
 lg.demo_contest(scenario, st_dev)
+st.write("""
+    Takeaway: When it's clearly good or bad, there's a lot more agreement. 
+    Agreement is trickier when something is just average, not compelling in 
+    either way""")
 # st.image("img/holy_guacamole.jpeg", width=400, caption="This is you, the Guacamole Goddess.")
 
 
@@ -49,7 +47,7 @@ sim1 = Simulation(guac_df, num_townspeople, st_dev, fullness_factor=fullness_fac
 sim1.simulate()
 lg.animate_results(sim1, key=section_title)
 if st.session_state[f"{section_title}_keep_chart_visible"]:
-    lg.success_message(section_title, sim1.sum_success)
+    lg.success_message(section_title, sim1.success)
 
 
 st.markdown("---")
@@ -71,7 +69,7 @@ sim2.simulate()
 
 lg.animate_results(sim2, key=section_title)
 if st.session_state[f"{section_title}_keep_chart_visible"]:
-    lg.success_message(section_title, sim2.sum_success, guac_limit2)
+    lg.success_message(section_title, sim2.success, guac_limit2)
 
 st.write("")
 st.write("")
@@ -103,7 +101,7 @@ sim3 = Simulation(guac_df, num_townspeople, st_dev,
     perc_carlos=carlos)
 sim3.simulate()
 lg.animate_results(sim3, key=section_title)
-lg.success_message(section_title, sim3.sum_success)
+lg.success_message(section_title, sim3.success)
 
 num_cronies = sum(townie.carlos_crony for townie in sim3.townspeople)
 num_effective_cronies = sum(townie.voted_for_our_boy for townie in sim3.townspeople)
@@ -133,17 +131,18 @@ num_townspeople4 = col2.slider(
     value=num_townspeople,
     min_value=10,
     max_value=500,
-    step=10
-)
+    step=10,
+    key=section_title)
 
 sim4 = Simulation(guac_df, num_townspeople4, st_dev, 
     assigned_guacs=guac_limit4,
     perc_fra=fra,
     perc_pepe=pepe,
-    perc_carlos=carlos)
+    perc_carlos=carlos,
+    method="condorcet")
 sim4.simulate()
-lg.animate_condorcet_simulation(sim4, key=section_title)
-lg.success_message(section_title, sim4.condo_success)
+lg.animate_results(sim4, key=section_title)
+lg.success_message(section_title, sim4.success)
 
 num_cronies = sum(townie.carlos_crony for townie in sim4.townspeople)
 num_effective_cronies = sum(townie.voted_for_our_boy for townie in sim4.townspeople)
@@ -157,6 +156,39 @@ lg.write_story("conclusion")
 
 st.markdown("---")
 st.subheader("Sandbox")
-st.write(
-    "If there's not yet a `sim` incorporating everything, we'll put it here!"
-    )
+section_title = "sandbox"
+lg.write_story(section_title)
+sandbox_df, sandbox_scenario = lg.choose_scenario(key=section_title)
+pepe_sb, fra_sb, carlos_sb = lg.types_of_voters(section_title, pepe, fra, carlos)
+col1, col2 = st.columns(2)
+guac_limit_sb = col1.slider(
+    "How many guacamoles does each voter get to try?",
+    value=guac_limit3, 
+    min_value=1, 
+    max_value=20,
+    key=section_title)
+num_townspeople_sb = col2.slider(
+    "How many townspeople vote in the contest?",
+    value=num_townspeople,
+    min_value=10,
+    max_value=500,
+    step=10,
+    key=section_title)
+
+methods = {
+    "Summing the Scores":           "sum", 
+    "Tallying Implicit Rankings":   "condorcet",
+    "Ranked Choice Voting":         "rcv",
+}
+method_chosen = st.selectbox("How should we tally the votes?",
+    options=methods.keys())
+
+sandbox_sim = Simulation(sandbox_df, num_townspeople_sb, st_dev, 
+    assigned_guacs=guac_limit_sb,
+    perc_fra=fra_sb,
+    perc_pepe=pepe_sb,
+    perc_carlos=carlos_sb,
+    method=methods[method_chosen])
+sandbox_sim.simulate()
+lg.animate_results(sandbox_sim, key=section_title)
+lg.success_message(section_title, sandbox_sim.success)
