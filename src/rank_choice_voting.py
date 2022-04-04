@@ -64,7 +64,9 @@ class RankChoiceVoting:
             # print("\nWin by majority")
             winner_id = counts[1].argmax()
             winner_name = counts.index[winner_id]
-            self.rankings.insert(0, winner_name)
+            winning_votes = counts.iloc[winner_id, 1]
+            
+            self.rankings.insert(0, (winner_name, int(winning_votes)))
             return self.rankings
 
         # Only two contestants left
@@ -72,11 +74,13 @@ class RankChoiceVoting:
             # print("\nWin by whittling down")
             second_place_ind = counts[1].argmin()
             second_place_name = counts.index[second_place_ind]
-            self.rankings.insert(0, second_place_name)
+            second_place_votes = counts.iloc[second_place_ind, 1]
+            self.rankings.insert(0, (second_place_name, int(second_place_votes)))
 
             first_place_ind = counts[1].argmax()
             first_place_name = counts.index[first_place_ind]
-            self.rankings.insert(0, first_place_name)
+            first_place_votes = counts.iloc[first_place_ind, 1]
+            self.rankings.insert(0, (first_place_name, int(first_place_votes)))
             return self.rankings
 
         # No majority win. Remove the person with the least 1st place ranks
@@ -85,7 +89,15 @@ class RankChoiceVoting:
         else:
             loser_indices = np.where(counts[1] == counts[1].min())[0]
             loser_names = counts.index[loser_indices]
-            self.rankings.insert(0, loser_names.values[0])
+
+            for ind in loser_indices:
+                name = counts.index[ind]
+                vote_count = counts.iloc[ind, 1]
+                try:
+                    vote_count = int(vote_count)
+                except ValueError:
+                    vote_count = 0
+                self.rankings.insert(0, (name, int(vote_count)))
 
             # Find ballots that had this guac as their #1
             ballot_mask = (ranks.loc[loser_names] == 1).any(axis=0)

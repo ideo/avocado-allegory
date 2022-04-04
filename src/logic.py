@@ -176,7 +176,7 @@ def animate_results(sim, key):
     elif sim.method == "condorcet":
         animate_condorcet_simulation(sim, key=key)
     else:
-        st.write(f"The winner is: {sim.winner}")        
+        show_rankings(sim.rankings)     
 
 
 def animate_summation_results(sim, key):
@@ -416,54 +416,6 @@ def types_of_voters(key, pepe=None, fra=None, carlos=None):
     carlos /= 100
     return pepe, fra, carlos
 
-
-# def num_people_and_guac_per_person_slider():
-#     col1, _, col2 = st.columns([4, 1, 4])
-#     num_townspeople = col1.slider("How many townspeople showed up?", 
-#         value=250, 
-#         min_value=10, 
-#         max_value=500)
-#     num_guac_per_person = col2.slider("How many guacs can everyone try?",
-#         value=10,
-#         min_value=1,
-#         max_value=20,
-#         )
-#     return num_townspeople, num_guac_per_person
-
-
-# def num_people_slider(key):
-#     num_townspeople = st.slider(key, 
-#         value=250, 
-#         min_value=10, 
-#         max_value=500)
-#     return num_townspeople
-
-
-# def num_guac_per_person_slider(key):
-#     num_guac_per_person = st.slider(key, 
-#         value=10, 
-#         min_value=1, 
-#         max_value=20)
-#     return num_guac_per_person
-
-
-# def plot_votes(sim, day_title = 1):
-#     y_field = 'Avg'
-#     chart_df = sim.results_df[[y_field]].copy()
-#     chart_df["Entrant"] = chart_df.index
-
-#     winning_guac = sim.sum_winner
-        
-#     spec = {
-#         "mark": {"type": "bar"},
-#         "encoding": {
-#             "x":    {"field": "Entrant", "tupe": "nominal"},
-#             "y":    {"field": y_field, "type": "quantitative"},
-#         },
-#         "title":    f"Day {day_title}: Our Winner is Guacamole No. {winning_guac}!",   
-#     }
-#     st.vega_lite_chart(chart_df, spec)
-
     
 def animate_condorcet_simulation(sim, key=None):
     col1, col2 = st.columns([2,5])
@@ -548,3 +500,19 @@ def increment_entrant_num():
         st.session_state["entrant_num"] += 1
     else:
         st.session_state["entrant_num"] = 0
+
+
+
+def show_rankings(rankings):
+
+    print(rankings)
+
+    msg = "Our winner is...  \n"
+    msg += f"> 1. **{rankings[0][0]}** with {rankings[0][1]} votes!  \n"
+    # st.markdown(msg)
+
+    if len(rankings) > 1:
+        msg += f"And our runners up are...  \n"
+        for prsn in range(1, min(6, len(rankings))):
+            msg += f"> {prsn+1}. {rankings[prsn][0]} with {rankings[prsn][1]} votes.  \n"
+        st.markdown(msg)
