@@ -1,7 +1,6 @@
 import sys
 import random
-# from unittest import result
-# from xml.dom.pulldom import parseString
+from collections import Counter
 
 import numpy as np
 import pandas as pd
@@ -40,8 +39,8 @@ class Simulation:
     def simulate(self):
         """TODO: For unittests, we can update this to have inputs and outputs"""
         self.create_agents()
-        self.taste_and_vote()
-        self.tally_votes()
+        self.results_df = self.taste_and_vote()
+        self.tally_votes(self.results_df)
         self.record_outcome()      
         
 
@@ -91,17 +90,15 @@ class Simulation:
 
 
     def taste_and_vote(self):
-        #Creating the DF that will store the ballots
+        """Tabulate each voter's ballot into one dataframe"""
         df = pd.DataFrame(list(self.guac_df.index), columns = ["ID"])
-
         for person in self.townspeople:
             ballot = person.taste_and_vote(self.guac_df)
             df[f"Scores {person.number}"] = ballot["Subjective Ratings"]
+        return df
 
-        self.results_df = df
 
-
-    def tally_votes(self):
+    def tally_votes(self, results_df):
         if self.method == "sum":
             self.winner = self.tally_by_summing()
 
@@ -109,7 +106,10 @@ class Simulation:
             self.winner = self.tally_by_condorcet_method()
 
         elif self.method == "rcv":
-            self.winner = self.tally_by_ranking_top_N()
+            self.winner = self.tally_by_ranked_choice()
+
+        elif self.method == "fptp":
+            self.winner = self.tally_by_first_past_the_post(results_df)
 
 
     def record_outcome(self):
@@ -202,7 +202,7 @@ class Simulation:
         return condorcet_elements, ballots_matrix_list
 
 
-    def tally_by_ranking_top_N(self, N=3):
+    def tally_by_ranked_choice(self, N=3):
         """TODO: Incorporate N"""
 
         # I want to display their names not their IDs
@@ -215,3 +215,22 @@ class Simulation:
         self.rankings = rcv.tally_results(ranks)
         # print("Our Guacamole Rankings Are: ", self.rankings)
         return self.rankings[0]
+
+
+    def tally_by_first_past_the_post(self, results_df):
+        """
+        Interpret each voter's top score as their one favorite choice. Tally
+        all these single choices with first-past-the-post.
+
+        If there is a tie, it is broken randomly simply by calling .idxmax()
+        """
+        results_df.drop(columns=["ID"], inplace=True)
+        names = self.guac_df["Entrant"]
+        votes = []
+
+        choose_fav = lambda ballot: votes.append(names.iloc[ballot.idxmax()])
+        results_df.apply(choose_fav, axis=0)
+
+        tallies = [(name, count) for name, count in Counter(votes).items()]
+        self.rankings = sorted(tallies, key=lambda x: x[1], reverse=True)
+        return self.rankings[0][0]

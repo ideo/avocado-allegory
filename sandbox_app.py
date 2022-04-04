@@ -45,11 +45,11 @@ methods = {
     "Summing the Scores":           "sum", 
     "Tallying Implicit Rankings":   "condorcet",
     "Ranked Choice Voting":         "rcv",
+    "Pick Your One Favorite":       "fptp",
 }
 method_chosen = st.selectbox("How should we tally the votes?",
     options=methods.keys())
 
-st.write(sandbox_df)
 sandbox_sim = Simulation(sandbox_df, num_townspeople_sb, st_dev, 
     assigned_guacs=guac_limit_sb,
     fullness_factor=fullness_factor,
