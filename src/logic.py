@@ -1,8 +1,3 @@
-# from decimal import InvalidContext
-# from ssl import CHANNEL_BINDING_TYPES
-# from tracemalloc import start
-# from turtle import onclick
-# from xml.dom.minidom import Entity
 import streamlit as st
 import pandas as pd
 import time
@@ -174,8 +169,10 @@ def animate_results(sim, key):
         animate_summation_results(sim, key=key)
     elif sim.method == "condorcet":
         animate_condorcet_simulation(sim, key=key)
-    else:
-        show_rankings(sim.rankings, sim.num_townspeople)     
+    elif sim.method == "rcv":
+        show_rcv_rankings(sim)
+    elif sim.method == "fptp":
+        show_fptp_rankings(sim.rankings, sim.num_townspeople)     
 
 
 def animate_summation_results(sim, key):
@@ -501,16 +498,39 @@ def increment_entrant_num():
         st.session_state["entrant_num"] = 0
 
 
+def show_rcv_rankings(sim):
+    rankings = sim.rankings
+    print(sim.rcv.original_vote_counts)
+    winner = sim.rankings[0][0]
 
-def show_rankings(rankings, num_townspeople):
+    msg = "Our winner is...  \n"
+    winning_vote = rankings[0][1]
+    perc = lambda vc: f"{int(round(vc/sim.num_townspeople*100, 0))}%"
+    msg += f"> 1. **{winner}** with {winning_vote} votes! That's {perc(winning_vote)} of the vote.  \n"
+
+    if sim.rcv.eliminations == 0:
+        msg += f"""{winner} won an outright majority, with no need for 
+            elimination rounds!  \n"""
+    else:
+        original_tally = int(sim.rcv.original_vote_counts.loc[winner, 1])
+        msg += f"""{winner} had an original first-place-vote count of 
+            {original_tally} votes (only {perc(original_tally)} of the vote), 
+            but won a majority after {sim.rcv.eliminations} rounds of 
+            elimination.  \n"""
+
+    if len(rankings) > 1:
+        msg += f"\nAnd our runners up are...  \n"
+        for prsn in range(1, min(6, len(rankings))):
+            msg += f"> {prsn+1}. {rankings[prsn][0]} with {rankings[prsn][1]} votes. That's {perc(rankings[prsn][1])} of the vote.  \n"
+        st.markdown(msg)
+
+
+def show_fptp_rankings(rankings, num_townspeople):
     msg = "Our winner is...  \n"
     winning_vote = rankings[0][1]
     perc = lambda vc: int(round(vc/num_townspeople*100, 0))
 
-    # perc = round(winning_vote/num_townspeople*100, 0)
     msg += f"> 1. **{rankings[0][0]}** with {winning_vote} votes! That's {perc(winning_vote)}% of the vote.  \n"
-    # st.markdown(msg)
-
     if len(rankings) > 1:
         msg += f"And our runners up are...  \n"
         for prsn in range(1, min(6, len(rankings))):

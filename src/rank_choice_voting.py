@@ -5,6 +5,11 @@ import pandas as pd
 class RankChoiceVoting:
     def __init__(self):
         self.rankings = []
+        self.dropped_candidates = []
+        self.win_type = None
+        self.eliminations = 0
+        self.original_vote_counts = None
+        self.num_voters = None
 
 
     def convert_score_ballots_to_implicit_ranks(self, ballot_df, max_score=10):
@@ -53,51 +58,35 @@ class RankChoiceVoting:
             - docstring
         """
         counts = ranks.apply(lambda s: s.value_counts(), axis=1)
-        num_voters = ranks.shape[1]
-        num_first_place_votes = counts[1].max()
+        if self.original_vote_counts is None:
+            self.original_vote_counts = counts
+            self.num_voters = ranks.shape[1]
 
-        # if counts.shape[0] == 20:
-        #     print(counts)
+        num_first_place_votes = counts[1].max()
  
         # Majority Win
-        if num_first_place_votes > num_voters/2:
-            # print("\nWin by majority")
-            winner_id = counts[1].argmax()
-            winner_name = counts.index[winner_id]
-            winning_votes = counts.iloc[winner_id, 1]
-            
-            self.rankings.insert(0, (winner_name, int(winning_votes)))
+        if num_first_place_votes > self.num_voters/2:
+            print("Majority Win")
+            self.win_type = "majority"
+            vote_counts = counts[1].copy().dropna()
+            self.rankings = self.counts_series_into_rankings(vote_counts)
             return self.rankings
 
         # Only two contestants left
         elif counts.shape[0] == 2:
-            # print("\nWin by whittling down")
-            second_place_ind = counts[1].argmin()
-            second_place_name = counts.index[second_place_ind]
-            second_place_votes = counts.iloc[second_place_ind, 1]
-            self.rankings.insert(0, (second_place_name, int(second_place_votes)))
-
-            first_place_ind = counts[1].argmax()
-            first_place_name = counts.index[first_place_ind]
-            first_place_votes = counts.iloc[first_place_ind, 1]
-            self.rankings.insert(0, (first_place_name, int(first_place_votes)))
+            self.win_type = "plurality"
+            vote_counts = counts[1].copy().dropna()
+            self.rankings = self.counts_series_into_rankings(vote_counts)
             return self.rankings
 
         # No majority win. Remove the person with the least 1st place ranks
-        # TODO: This ignores people with no first place votes. They should be 
-        # dropped first.
         else:
+            self.eliminations += 1
+            # TODO: This ignores people with no (NaN) first place votes. 
+            # They should be dropped first.
             loser_indices = np.where(counts[1] == counts[1].min())[0]
             loser_names = counts.index[loser_indices]
-
-            for ind in loser_indices:
-                name = counts.index[ind]
-                vote_count = counts.iloc[ind, 1]
-                try:
-                    vote_count = int(vote_count)
-                except ValueError:
-                    vote_count = 0
-                self.rankings.insert(0, (name, int(vote_count)))
+            self.dropped_candidates.append(loser_names)
 
             # Find ballots that had this guac as their #1
             ballot_mask = (ranks.loc[loser_names] == 1).any(axis=0)
@@ -108,6 +97,12 @@ class RankChoiceVoting:
                 new_ranks[col] = new_ranks[col].apply(lambda r: r-1)
 
             return self.tally_results(new_ranks)
+
+
+    def counts_series_into_rankings(self, vote_counts):
+        tallies = [(name, int(count)) for name, count in vote_counts.items()]
+        rankings = sorted(tallies, key=lambda x: x[1], reverse=True)
+        return rankings
 
 
 

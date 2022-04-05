@@ -237,7 +237,7 @@ class Simulation:
         rcv = RankChoiceVoting()
         ranks = rcv.convert_score_ballots_to_implicit_ranks(self.results_df)
         self.rankings = rcv.tally_results(ranks)
-        # print("Our Guacamole Rankings Are: ", self.rankings)
+        self.rcv = rcv
         return self.rankings[0][0]
 
 

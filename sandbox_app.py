@@ -61,5 +61,4 @@ sandbox_sim.simulate()
 
 lg.animate_results(sandbox_sim, key=section_title)
 lg.success_message(section_title, sandbox_sim.success)
-
 lg.print_params(sandbox_sim)
