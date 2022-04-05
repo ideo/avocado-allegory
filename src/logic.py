@@ -505,12 +505,26 @@ def increment_entrant_num():
 def show_rankings(rankings, num_townspeople):
     msg = "Our winner is...  \n"
     winning_vote = rankings[0][1]
-    perc = round(winning_vote/num_townspeople*100, 0)
-    msg += f"> 1. **{rankings[0][0]}** with {winning_vote} votes! That's {int(perc)}% of the vote.  \n"
+    perc = lambda vc: int(round(vc/num_townspeople*100, 0))
+
+    # perc = round(winning_vote/num_townspeople*100, 0)
+    msg += f"> 1. **{rankings[0][0]}** with {winning_vote} votes! That's {perc(winning_vote)}% of the vote.  \n"
     # st.markdown(msg)
 
     if len(rankings) > 1:
         msg += f"And our runners up are...  \n"
         for prsn in range(1, min(6, len(rankings))):
-            msg += f"> {prsn+1}. {rankings[prsn][0]} with {rankings[prsn][1]} votes.  \n"
+            msg += f"> {prsn+1}. {rankings[prsn][0]} with {rankings[prsn][1]} votes. That's {perc(rankings[prsn][1])}% of the vote.  \n"
         st.markdown(msg)
+
+
+def print_params(sim):
+    tab_width = 6
+    msg = "{\n"
+    for k, v in sim.params.items():
+        v = f"'{v}'" if isinstance(v, str) else v
+        num_tabs = 3 - len(k)//tab_width
+        tabs = "\t"*num_tabs
+        msg += f"\t'{k}':{tabs}{v},\n"
+    msg += "}"
+    st.code(msg)

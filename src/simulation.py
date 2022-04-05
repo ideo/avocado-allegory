@@ -34,7 +34,23 @@ class Simulation:
         self.objective_winner = self.guac_df["Objective Ratings"].idxmax()
         self.success = False
         self.rankings = None
-        
+
+
+    @property
+    def params(self):
+        param_dict = {
+            # "num_entrants":     self.guac_df.shape[0],
+            "num_townspeople":  self.num_townspeople,
+            "assigned_guacs":   self.assigned_guacs,
+            "st_dev":           self.st_dev,
+            "fullness_factor":  self.fullness_factor,
+            "perc_fra":         self.perc_fra,
+            "perc_pepe":        self.perc_pepe,
+            "perc_carlos":      self.perc_carlos,
+            "method":           self.method,
+        }
+        return param_dict
+
 
     def simulate(self):
         """TODO: For unittests, we can update this to have inputs and outputs"""
