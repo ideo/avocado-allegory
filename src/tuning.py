@@ -3,7 +3,7 @@ import pandas as pd
 import numpy as np
 
 from .simulation import Simulation
-import matplotlib.pyplot as plt
+# import matplotlib.pyplot as plt
 from .config import COLORS, ENTRANTS
 
 

@@ -1,7 +1,8 @@
 COLORS = {
-    "blue":     "#4c78a8",
-    "green":    "#9EA856",
-    "red":      "#E0665C",
+    "blue":             "#4c78a8",
+    "green":            "#9EA856",
+    "red":              "#E0665C",
+    "avocado-green":    "#B1C086"
 }
 
 

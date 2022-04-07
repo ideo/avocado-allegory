@@ -1,8 +1,3 @@
-# from decimal import InvalidContext
-# from ssl import CHANNEL_BINDING_TYPES
-# from tracemalloc import start
-# from turtle import onclick
-# from xml.dom.minidom import Entity
 import streamlit as st
 import pandas as pd
 import time
@@ -28,6 +23,7 @@ def initialize_session_state():
         "condorcet_keep_chart_visible":     False,
         "sandbox_keep_chart_visible":       False,
         "entrant_num":                      0,
+        "N":                                5,
     }
 
     for key, value in initial_values.items():
@@ -128,7 +124,6 @@ def choose_scenario(key="intro"):
             df.sort_index(inplace=True)
             df = format_scenario_colors(df)
             df.index = list(range(df.shape[0]))
-            st.write(df)
 
     winner = df["Objective Ratings"].idxmax()
     #draw the chart
@@ -175,8 +170,10 @@ def animate_results(sim, key):
         animate_summation_results(sim, key=key)
     elif sim.method == "condorcet":
         animate_condorcet_simulation(sim, key=key)
-    else:
-        st.write(f"The winner is: {sim.winner}")        
+    elif sim.method == "rcv":
+        show_rcv_rankings(sim)
+    elif sim.method == "fptp":
+        show_fptp_rankings(sim.rankings, sim.num_townspeople)     
 
 
 def animate_summation_results(sim, key):
@@ -416,54 +413,6 @@ def types_of_voters(key, pepe=None, fra=None, carlos=None):
     carlos /= 100
     return pepe, fra, carlos
 
-
-# def num_people_and_guac_per_person_slider():
-#     col1, _, col2 = st.columns([4, 1, 4])
-#     num_townspeople = col1.slider("How many townspeople showed up?", 
-#         value=250, 
-#         min_value=10, 
-#         max_value=500)
-#     num_guac_per_person = col2.slider("How many guacs can everyone try?",
-#         value=10,
-#         min_value=1,
-#         max_value=20,
-#         )
-#     return num_townspeople, num_guac_per_person
-
-
-# def num_people_slider(key):
-#     num_townspeople = st.slider(key, 
-#         value=250, 
-#         min_value=10, 
-#         max_value=500)
-#     return num_townspeople
-
-
-# def num_guac_per_person_slider(key):
-#     num_guac_per_person = st.slider(key, 
-#         value=10, 
-#         min_value=1, 
-#         max_value=20)
-#     return num_guac_per_person
-
-
-# def plot_votes(sim, day_title = 1):
-#     y_field = 'Avg'
-#     chart_df = sim.results_df[[y_field]].copy()
-#     chart_df["Entrant"] = chart_df.index
-
-#     winning_guac = sim.sum_winner
-        
-#     spec = {
-#         "mark": {"type": "bar"},
-#         "encoding": {
-#             "x":    {"field": "Entrant", "tupe": "nominal"},
-#             "y":    {"field": y_field, "type": "quantitative"},
-#         },
-#         "title":    f"Day {day_title}: Our Winner is Guacamole No. {winning_guac}!",   
-#     }
-#     st.vega_lite_chart(chart_df, spec)
-
     
 def animate_condorcet_simulation(sim, key=None):
     col1, col2 = st.columns([2,5])
@@ -548,3 +497,54 @@ def increment_entrant_num():
         st.session_state["entrant_num"] += 1
     else:
         st.session_state["entrant_num"] = 0
+
+
+def show_rcv_rankings(sim):
+    rankings = sim.rankings
+    winner = sim.rankings[0][0]
+
+    msg = "Our winner is...  \n"
+    winning_vote = rankings[0][1]
+    perc = lambda vc: f"{int(round(vc/sim.num_townspeople*100, 0))}%"
+    msg += f"> 1. **{winner}** with {winning_vote} votes! That's {perc(winning_vote)} of the vote.  \n"
+
+    if sim.rcv.eliminations == 0:
+        msg += f"""{winner} won an outright majority, with no need for 
+            elimination rounds!  \n"""
+    else:
+        original_tally = int(sim.rcv.original_vote_counts.loc[winner, 1])
+        msg += f"""{winner} had an original first-place-vote count of 
+            {original_tally} votes (only {perc(original_tally)} of the vote), 
+            but won a {sim.rcv.win_type} after {sim.rcv.eliminations} rounds of 
+            elimination.  \n"""
+
+    if len(rankings) > 1:
+        msg += f"\nAnd our runners up are...  \n"
+        for prsn in range(1, min(6, len(rankings))):
+            msg += f"> {prsn+1}. {rankings[prsn][0]} with {rankings[prsn][1]} votes. That's {perc(rankings[prsn][1])} of the vote.  \n"
+        st.markdown(msg)
+
+
+def show_fptp_rankings(rankings, num_townspeople):
+    msg = "Our winner is...  \n"
+    winning_vote = rankings[0][1]
+    perc = lambda vc: int(round(vc/num_townspeople*100, 0))
+
+    msg += f"> 1. **{rankings[0][0]}** with {winning_vote} votes! That's {perc(winning_vote)}% of the vote.  \n"
+    if len(rankings) > 1:
+        msg += f"And our runners up are...  \n"
+        for prsn in range(1, min(6, len(rankings))):
+            msg += f"> {prsn+1}. {rankings[prsn][0]} with {rankings[prsn][1]} votes. That's {perc(rankings[prsn][1])}% of the vote.  \n"
+        st.markdown(msg)
+
+
+def print_params(sim):
+    tab_width = 6
+    msg = "{\n"
+    for k, v in sim.params.items():
+        v = f"'{v}'" if isinstance(v, str) else v
+        num_tabs = 3 - len(k)//tab_width
+        tabs = "\t"*num_tabs
+        msg += f"\t'{k}':{tabs}{v},\n"
+    msg += "}"
+    st.code(msg)

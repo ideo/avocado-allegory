@@ -1,13 +1,12 @@
 import sys
 import random
-# from unittest import result
-# from xml.dom.pulldom import parseString
+from collections import Counter
 
 import numpy as np
 import pandas as pd
 
 from .townspeople import Townsperson
-from .condorcetcounting import Condorcetcounting
+from .condorcet_counting import CondorcetCounting
 from .rank_choice_voting import RankChoiceVoting
 
 
@@ -15,7 +14,7 @@ class Simulation:
     def __init__(
             self, guac_df, num_townspeople=200, st_dev=1.0, fullness_factor = 0.0,
             assigned_guacs=20, perc_fra=0.0, perc_pepe=0.0, perc_carlos=0.0,
-            method="sum", seed=None
+            method="sum", rank_limit=None, seed=None
         ):
         self.guac_df = guac_df
         self.num_townspeople = num_townspeople
@@ -27,6 +26,7 @@ class Simulation:
         self.perc_pepe = perc_pepe
         self.perc_carlos = perc_carlos
         self.method = method.lower()
+        self.rank_limit=rank_limit
         if seed:
             random.seed(seed)
 
@@ -35,13 +35,29 @@ class Simulation:
         self.objective_winner = self.guac_df["Objective Ratings"].idxmax()
         self.success = False
         self.rankings = None
-        
+
+
+    @property
+    def params(self):
+        param_dict = {
+            # "num_entrants":     self.guac_df.shape[0],
+            "num_townspeople":  self.num_townspeople,
+            "assigned_guacs":   self.assigned_guacs,
+            "st_dev":           self.st_dev,
+            "fullness_factor":  self.fullness_factor,
+            "perc_fra":         self.perc_fra,
+            "perc_pepe":        self.perc_pepe,
+            "perc_carlos":      self.perc_carlos,
+            "method":           self.method,
+        }
+        return param_dict
+
 
     def simulate(self):
         """TODO: For unittests, we can update this to have inputs and outputs"""
         self.create_agents()
-        self.taste_and_vote()
-        self.tally_votes()
+        self.results_df = self.taste_and_vote()
+        self.winner = self.tally_votes(self.results_df)
         self.record_outcome()      
         
 
@@ -91,29 +107,38 @@ class Simulation:
 
 
     def taste_and_vote(self):
-        #Creating the DF that will store the ballots
+        """Tabulate each voter's ballot into one dataframe"""
         df = pd.DataFrame(list(self.guac_df.index), columns = ["ID"])
-
         for person in self.townspeople:
             ballot = person.taste_and_vote(self.guac_df)
             df[f"Scores {person.number}"] = ballot["Subjective Ratings"]
+        return df
 
-        self.results_df = df
 
-
-    def tally_votes(self):
+    def tally_votes(self, results_df):
         if self.method == "sum":
-            self.winner = self.tally_by_summing()
+            winner = self.tally_by_summing()
 
         elif self.method == "condorcet":
-            self.winner = self.tally_by_condorcet_method()
+            winner = self.tally_by_condorcet_method()
 
         elif self.method == "rcv":
-            self.winner = self.tally_by_ranking_top_N()
+            winner = self.tally_by_ranked_choice(N=self.rank_limit)
+
+        elif self.method == "fptp":
+            winner = self.tally_by_first_past_the_post(results_df)
+
+        return winner
 
 
     def record_outcome(self):
         """This is here in case we need to expand it"""
+        # TODO: we need consistency in how we save the winner, name or ID
+        if isinstance(self.winner, str):
+            # winner is a name, convert to ID
+            ind = self.guac_df[self.guac_df["Entrant"] == self.winner].index[0]
+            self.winner = ind
+
         self.success = self.winner == self.objective_winner
 
         
@@ -202,7 +227,7 @@ class Simulation:
         return condorcet_elements, ballots_matrix_list
 
 
-    def tally_by_ranking_top_N(self, N=3):
+    def tally_by_ranked_choice(self, N=None):
         """TODO: Incorporate N"""
 
         # I want to display their names not their IDs
@@ -210,8 +235,27 @@ class Simulation:
         self.results_df.set_index("Entrant", inplace=True)
         self.results_df.drop(columns=["ID"], inplace=True)
 
-        rcv = RankChoiceVoting()
+        rcv = RankChoiceVoting(N)
         ranks = rcv.convert_score_ballots_to_implicit_ranks(self.results_df)
         self.rankings = rcv.tally_results(ranks)
-        # print("Our Guacamole Rankings Are: ", self.rankings)
-        return self.rankings[0]
+        self.rcv = rcv
+        return self.rankings[0][0]
+
+
+    def tally_by_first_past_the_post(self, results_df):
+        """
+        Interpret each voter's top score as their one favorite choice. Tally
+        all these single choices with first-past-the-post.
+
+        If there is a tie, it is broken randomly simply by calling .idxmax()
+        """
+        results_df.drop(columns=["ID"], inplace=True)
+        names = self.guac_df["Entrant"]
+        votes = []
+
+        choose_fav = lambda ballot: votes.append(names.iloc[ballot.idxmax()])
+        results_df.apply(choose_fav, axis=0)
+
+        tallies = [(name, count) for name, count in Counter(votes).items()]
+        self.rankings = sorted(tallies, key=lambda x: x[1], reverse=True)
+        return self.rankings[0][0]

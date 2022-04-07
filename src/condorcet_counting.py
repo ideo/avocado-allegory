@@ -7,7 +7,7 @@ from unittest import runner
 import numpy as np
 import pandas as pd
 import sys
-class Condorcetcounting():
+class CondorcetCounting():
     def __init__(
             self, 
             guac_df, 
