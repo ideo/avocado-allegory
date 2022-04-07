@@ -211,7 +211,7 @@ class Simulation:
         for person in self.townspeople:
 
             #creating the elements to compute the condorcet winner
-            condorcet_elements = Condorcetcounting(self.guac_df, person.ballot)
+            condorcet_elements = CondorcetCounting(self.guac_df, person.ballot)
             # condorcet_elements = person.taste_and_vote(self.guac_df)
 
             #collect ballox matrices
