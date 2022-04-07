@@ -6,7 +6,7 @@ import numpy as np
 import pandas as pd
 
 from .townspeople import Townsperson
-from .condorcetcounting import Condorcetcounting
+from .condorcet_counting import CondorcetCounting
 from .rank_choice_voting import RankChoiceVoting
 
 
@@ -14,7 +14,7 @@ class Simulation:
     def __init__(
             self, guac_df, num_townspeople=200, st_dev=1.0, fullness_factor = 0.0,
             assigned_guacs=20, perc_fra=0.0, perc_pepe=0.0, perc_carlos=0.0,
-            method="sum", seed=None
+            method="sum", rank_limit=None, seed=None
         ):
         self.guac_df = guac_df
         self.num_townspeople = num_townspeople
@@ -26,6 +26,7 @@ class Simulation:
         self.perc_pepe = perc_pepe
         self.perc_carlos = perc_carlos
         self.method = method.lower()
+        self.rank_limit=rank_limit
         if seed:
             random.seed(seed)
 
@@ -122,7 +123,7 @@ class Simulation:
             winner = self.tally_by_condorcet_method()
 
         elif self.method == "rcv":
-            winner = self.tally_by_ranked_choice()
+            winner = self.tally_by_ranked_choice(N=self.rank_limit)
 
         elif self.method == "fptp":
             winner = self.tally_by_first_past_the_post(results_df)
@@ -226,7 +227,7 @@ class Simulation:
         return condorcet_elements, ballots_matrix_list
 
 
-    def tally_by_ranked_choice(self, N=3):
+    def tally_by_ranked_choice(self, N=None):
         """TODO: Incorporate N"""
 
         # I want to display their names not their IDs
@@ -234,7 +235,7 @@ class Simulation:
         self.results_df.set_index("Entrant", inplace=True)
         self.results_df.drop(columns=["ID"], inplace=True)
 
-        rcv = RankChoiceVoting()
+        rcv = RankChoiceVoting(N)
         ranks = rcv.convert_score_ballots_to_implicit_ranks(self.results_df)
         self.rankings = rcv.tally_results(ranks)
         self.rcv = rcv

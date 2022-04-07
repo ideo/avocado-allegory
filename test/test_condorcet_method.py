@@ -2,7 +2,7 @@ import unittest
 
 import pandas as pd
 
-from src import Condorcetcounting
+from src import CondorcetCounting
 
 
 def construct_jenna_example_df():

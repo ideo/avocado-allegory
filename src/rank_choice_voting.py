@@ -3,13 +3,17 @@ import pandas as pd
 
 
 class RankChoiceVoting:
-    def __init__(self):
+    def __init__(self, N=None):
+        self.N = N
+
+        # Initialize
         self.rankings = []
         self.dropped_candidates = []
         self.win_type = None
         self.eliminations = 0
         self.original_vote_counts = None
         self.num_voters = None
+        
 
 
     def convert_score_ballots_to_implicit_ranks(self, ballot_df, max_score=10):
@@ -58,15 +62,20 @@ class RankChoiceVoting:
             - docstring
         """
         counts = ranks.apply(lambda s: s.value_counts(), axis=1)
+        
         if self.original_vote_counts is None:
+            # This will only run the first time
             self.original_vote_counts = counts
             self.num_voters = ranks.shape[1]
+
+            if self.N is not None:
+                # Limit ranks to just top N ranks
+                counts = counts[list(range(1,self.N+1))].copy()
 
         num_first_place_votes = counts[1].max()
  
         # Majority Win
         if num_first_place_votes > self.num_voters/2:
-            print("Majority Win")
             self.win_type = "majority"
             vote_counts = counts[1].copy().dropna()
             self.rankings = self.counts_series_into_rankings(vote_counts)

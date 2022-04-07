@@ -23,6 +23,7 @@ def initialize_session_state():
         "condorcet_keep_chart_visible":     False,
         "sandbox_keep_chart_visible":       False,
         "entrant_num":                      0,
+        "N":                                5,
     }
 
     for key, value in initial_values.items():
@@ -500,7 +501,6 @@ def increment_entrant_num():
 
 def show_rcv_rankings(sim):
     rankings = sim.rankings
-    print(sim.rcv.original_vote_counts)
     winner = sim.rankings[0][0]
 
     msg = "Our winner is...  \n"
@@ -515,7 +515,7 @@ def show_rcv_rankings(sim):
         original_tally = int(sim.rcv.original_vote_counts.loc[winner, 1])
         msg += f"""{winner} had an original first-place-vote count of 
             {original_tally} votes (only {perc(original_tally)} of the vote), 
-            but won a majority after {sim.rcv.eliminations} rounds of 
+            but won a {sim.rcv.win_type} after {sim.rcv.eliminations} rounds of 
             elimination.  \n"""
 
     if len(rankings) > 1:

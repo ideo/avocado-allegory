@@ -1,7 +1,5 @@
-from re import sub
+# from re import sub
 import numpy as np
-# import pandas as pd
-# from .condorcetcounting import Condorcetcounting
 
 
 class Townsperson:
