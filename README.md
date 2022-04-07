@@ -20,7 +20,7 @@ More useful at this stage will be:
 poetry run streamlit run sandbox_app.py
 ```
 
-The `sandbox_app.py` has been set up to explore different voting methods, consistency of outcomes, and help craft the specifc simulation set ups we'll want to inculde in the story. This is where we are currenlty spending our time.
+The `sandbox_app.py` has been set up to explore different voting methods, consistency of outcomes, and help craft the specifc simulation set ups we'll want to inculde in the story. This is where we are currenlty spending our time. If you have a voting method you want to try out, this can be a good place to start. Alternatively, feel free to take a look at our [big ole list of issues](https://github.com/ideo/avocado-allegory/projects/1).
 
 
 ### The Code
