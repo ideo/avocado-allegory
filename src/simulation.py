@@ -7,7 +7,7 @@ import pandas as pd
 
 from .townspeople import Townsperson
 from .condorcet_counting import CondorcetCounting
-from .rank_choice_voting import RankChoiceVoting
+from .ranked_choice_voting import RankChoiceVoting
 
 
 class Simulation:
