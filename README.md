@@ -28,6 +28,8 @@ The code written in `src/simulation.py` has been written to be highly modular wi
 
 Voting methods are handled by separate classes. The idea is to write them so they could one day be used independently of this simulation. The only two have so far are `src/condorecet_counting.py` and `src/ranked_choice_voting.py`. Please contribute by by adding new ones or stress testing the existing ones!
 
+The high level structre of the streamlit app is defined in `app.py`, the heavy lifting is contained in `src/logic.py`, and then the story is copied and pasted from [Google Docs](https://docs.google.com/document/d/1CA9NXp8I9b6ds16khcJLrY1ZL7ZBABK6KRu9SvBL5JI/edit?usp=sharing) into `src/story.py`.
+
 
 ### Version Control
 Streamlit will let you develop locally with the latest python (3.9.x) but can only host up to python 3.7.12. Please don't change the python or any package versions specified in `pyproject.toml`. Poetry generally handles version properly when attempting to add a package, but sometimes you need to google around a bit to find the right package version to specify.
