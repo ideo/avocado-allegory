@@ -26,7 +26,7 @@ class Simulation:
         self.perc_pepe = perc_pepe
         self.perc_carlos = perc_carlos
         self.method = method.lower()
-        self.rank_limit=rank_limit
+        self.rank_limit=rank_limit if self.method == "rcv" else None
         if seed:
             random.seed(seed)
 
@@ -40,7 +40,6 @@ class Simulation:
     @property
     def params(self):
         param_dict = {
-            # "num_entrants":     self.guac_df.shape[0],
             "num_townspeople":  self.num_townspeople,
             "assigned_guacs":   self.assigned_guacs,
             "st_dev":           self.st_dev,
@@ -49,6 +48,9 @@ class Simulation:
             "perc_pepe":        self.perc_pepe,
             "perc_carlos":      self.perc_carlos,
             "method":           self.method,
+            "rank_limit":       self.rank_limit,
+            # "num_entrants":     self.guac_df.shape[0],
+            # "scenario":       scenario,
         }
         return param_dict
 

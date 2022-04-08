@@ -320,3 +320,18 @@ def plot_results(df):
     invalid_results["Ratio"] = \
         invalid_results["Townspeople"] / invalid_results["Sampling Limit"]
     # st.write(invalid_results)
+
+
+
+############################ Simulating 100 Times ############################
+
+
+def load_dataframe(sim_params, filename):
+    try:
+        df = pd.read_csv(filename)
+        df.drop(columns=["Unnamed: 0"], inplace=True)
+    except FileNotFoundError:
+        # Create Dataframe
+        columns = list(sim_params.keys()) + ["scenario"]
+        df = pd.DataFrame(columns=columns)
+    return df

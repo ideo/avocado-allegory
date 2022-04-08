@@ -539,6 +539,7 @@ def show_fptp_rankings(rankings, num_townspeople):
 
 
 def print_params(sim):
+    st.text("Parameter Summary:")
     tab_width = 6
     msg = "{\n"
     for k, v in sim.params.items():

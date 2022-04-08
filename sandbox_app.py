@@ -4,6 +4,12 @@ from src import logic as lg
 from src import Simulation
 
 
+st.set_page_config(
+    page_title="Development Sandbox",
+    page_icon="img/avocado-emoji.png",
+    initial_sidebar_state="collapsed")
+
+
 lg.initialize_session_state()
 
 st.subheader("Sandbox")
