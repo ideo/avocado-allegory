@@ -26,7 +26,7 @@ The `sandbox_app.py` has been set up to explore different voting methods, consis
 ### The Code
 The code written in `src/simulation.py` has been written to be highly modular with ths intent of making it easy to drop in new voting methods over time. The simulated agents definied in `src/townspeople.py` vote by sampling from a normal distribution with the mean set to (or offset from) the "objective score" set by the reader. The agents return a score ballot. Those score ballots are then converted into relevant and necessary ballots by the voting methods classes. For example, in our implementation of Ranked Choice Voting, agents still submit score ballots, but the `RankChoiceVoting` class coverts them into rankings before tallying.
 
-Voting methods are handled by separate classes. The idea is to write them so they could one day be used independently of this simulation. The only two have so far are `src/condorecet_counting.py` and `src/ranked_choice_voting.py`. Please contribute by by adding new ones or stress testing the existing ones!
+Voting methods are handled by separate classes. The idea is to write them so they could one day be used independently of this simulation. The only two have so far are `src/condorecet_counting.py` and `src/ranked_choice_voting.py`. Please contribute by by adding new ones or stress testing the existing ones! If you do, please also add tests that verify it to `tests/`.
 
 The high level structre of the streamlit app is defined in `app.py`, the heavy lifting is contained in `src/logic.py`, and then the story is copied and pasted from [Google Docs](https://docs.google.com/document/d/1CA9NXp8I9b6ds16khcJLrY1ZL7ZBABK6KRu9SvBL5JI/edit?usp=sharing) into `src/story.py`.
 
